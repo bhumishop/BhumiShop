@@ -7,6 +7,7 @@ import AboutView from '../views/AboutView.vue'
 import VideosView from '../views/VideosView.vue'
 import AuthView from '../views/AuthView.vue'
 import MyOrdersView from '../views/MyOrdersView.vue'
+import ProfileView from '../views/ProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/minhas-compras',
       name: 'my-orders',
       component: MyOrdersView
+    },
+    {
+      path: '/perfil',
+      name: 'profile',
+      component: ProfileView
     },
     {
       path: '/:pathMatch(.*)*',

@@ -13,15 +13,12 @@
         <router-link to="/sobre">Sobre</router-link>
       </nav>
       <div class="header-actions">
-        <router-link v-if="authStore.isLoggedIn" to="/minhas-compras" class="user-link" title="Minhas Compras">
-          📦
-        </router-link>
-        <router-link v-if="!authStore.isLoggedIn" to="/login" class="user-link" title="Login">
+        <router-link v-if="authStore.isLoggedIn" to="/perfil" class="user-link" title="Minha Conta">
           👤
         </router-link>
-        <button v-else @click="handleLogout" class="logout-btn" title="Sair">
-          🚪
-        </button>
+        <router-link v-else to="/login" class="user-link" title="Login">
+          👤
+        </router-link>
         <router-link to="/carrinho" class="cart-icon">
           <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
           🛒

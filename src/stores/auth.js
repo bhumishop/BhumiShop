@@ -24,7 +24,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function signUp(email, password) {
     const { data, error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`
+      }
     })
     if (error) throw error
     return data
@@ -37,6 +40,28 @@ export const useAuthStore = defineStore('auth', () => {
     })
     if (error) throw error
     user.value = data.user
+    return data
+  }
+
+  async function signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
+    })
+    if (error) throw error
+    return data
+  }
+
+  async function signInWithGithub() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
+    })
+    if (error) throw error
     return data
   }
 
@@ -59,6 +84,8 @@ export const useAuthStore = defineStore('auth', () => {
     initialize,
     signUp,
     signIn,
+    signInWithGoogle,
+    signInWithGithub,
     signOut,
     resetPassword
   }

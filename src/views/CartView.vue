@@ -173,7 +173,7 @@
             <p><strong>Total:</strong> R$ {{ cartStore.totalPrice.toFixed(2) }}</p>
             <p><strong>Pagamento:</strong> {{ getPaymentMethodName(cartStore.paymentMethod) }}</p>
           </div>
-          <router-link to="/produtos" class="btn-secondary">
+          <router-link to="/" class="btn-secondary">
             Continuar Comprando
           </router-link>
         </div>
