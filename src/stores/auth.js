@@ -2,11 +2,17 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase'
 
+const PRODUCTION_URL = 'https://shop.bhumisparshaschool.org'
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(true)
 
   const isLoggedIn = computed(() => !!user.value)
+
+  function getRedirectUrl() {
+    return PRODUCTION_URL
+  }
 
   async function initialize() {
     loading.value = true
@@ -26,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`
+        emailRedirectTo: PRODUCTION_URL
       }
     })
     if (error) throw error
@@ -47,7 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`
+        redirectTo: PRODUCTION_URL
       }
     })
     if (error) throw error
@@ -58,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${window.location.origin}/`
+        redirectTo: PRODUCTION_URL
       }
     })
     if (error) throw error
@@ -72,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function resetPassword(email) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: `${PRODUCTION_URL}/reset-password`
     })
     if (error) throw error
   }
