@@ -5,8 +5,6 @@ import ProductDetailView from '../views/ProductDetailView.vue'
 import CartView from '../views/CartView.vue'
 import AboutView from '../views/AboutView.vue'
 import VideosView from '../views/VideosView.vue'
-import ConfigView from '../views/ConfigView.vue'
-import AdminView from '../views/AdminView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,16 +38,6 @@ const router = createRouter({
       path: '/videos',
       name: 'videos',
       component: VideosView
-    },
-    {
-      path: '/config',
-      name: 'config',
-      component: ConfigView
-    },
-    {
-      path: '/admin',
-      name: 'admin',
-      component: AdminView
     },
     {
       path: '/:pathMatch(.*)*',

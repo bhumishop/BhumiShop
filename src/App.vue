@@ -17,9 +17,6 @@
           <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
           🛒
         </router-link>
-        <router-link to="/config" class="config-icon" title="Configurações">
-          ⚙️
-        </router-link>
       </div>
     </header>
     
