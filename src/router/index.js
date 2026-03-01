@@ -5,6 +5,8 @@ import ProductDetailView from '../views/ProductDetailView.vue'
 import CartView from '../views/CartView.vue'
 import AboutView from '../views/AboutView.vue'
 import VideosView from '../views/VideosView.vue'
+import AuthView from '../views/AuthView.vue'
+import MyOrdersView from '../views/MyOrdersView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +40,16 @@ const router = createRouter({
       path: '/videos',
       name: 'videos',
       component: VideosView
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: AuthView
+    },
+    {
+      path: '/minhas-compras',
+      name: 'my-orders',
+      component: MyOrdersView
     },
     {
       path: '/:pathMatch(.*)*',

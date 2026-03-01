@@ -13,6 +13,15 @@
         <router-link to="/sobre">Sobre</router-link>
       </nav>
       <div class="header-actions">
+        <router-link v-if="authStore.isLoggedIn" to="/minhas-compras" class="user-link" title="Minhas Compras">
+          📦
+        </router-link>
+        <router-link v-if="!authStore.isLoggedIn" to="/login" class="user-link" title="Login">
+          👤
+        </router-link>
+        <button v-else @click="handleLogout" class="logout-btn" title="Sair">
+          🚪
+        </button>
         <router-link to="/carrinho" class="cart-icon">
           <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
           🛒
@@ -31,11 +40,25 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCartStore } from './stores/cart'
+import { useAuthStore } from './stores/auth'
 
+const router = useRouter()
 const cartStore = useCartStore()
+const authStore = useAuthStore()
+
 const cartCount = computed(() => cartStore.items.length)
+
+onMounted(() => {
+  authStore.initialize()
+})
+
+async function handleLogout() {
+  await authStore.signOut()
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -117,6 +140,20 @@ const cartCount = computed(() => cartStore.items.length)
   cursor: pointer;
   position: relative;
   text-decoration: none;
+}
+
+.user-link, .logout-btn {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.user-link:hover, .logout-btn:hover {
+  color: var(--accent-purple);
 }
 
 .header-actions {

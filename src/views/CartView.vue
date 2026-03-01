@@ -184,14 +184,21 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
+import { useAuthStore } from '../stores/auth'
+import { useOrderStore } from '../stores/orders'
 
+const router = useRouter()
 const cartStore = useCartStore()
+const authStore = useAuthStore()
+const orderStore = useOrderStore()
 
 const showCheckoutModal = ref(false)
 const checkoutStep = ref('form')
 const orderNumber = ref('')
 const pixQRCode = ref('')
+const savingOrder = ref(false)
 
 const CONFIG_KEY = 'bhumi-shop-config'
 const defaultConfig = {
@@ -261,15 +268,45 @@ function checkout() {
     alert('Por favor, preencha nome e WhatsApp.')
     return
   }
+  
+  if (!authStore.isLoggedIn) {
+    alert('Faça login ou cadastre-se para finalizar a compra.')
+    router.push('/login')
+    return
+  }
+  
   showCheckoutModal.value = true
   checkoutStep.value = 'form'
 }
 
-function processPayment() {
-  if (cartStore.paymentMethod === 'pix') {
-    generatePixQRCode()
+async function processPayment() {
+  savingOrder.value = true
+  
+  try {
+    const orderData = {
+      userId: authStore.user.id,
+      total: cartStore.totalPrice,
+      paymentMethod: cartStore.paymentMethod,
+      items: cartStore.items,
+      customerName: clientData.value.name,
+      customerEmail: clientData.value.email,
+      customerPhone: clientData.value.phone,
+      shippingAddress: clientData.value.address
+    }
+    
+    const order = await orderStore.createOrder(orderData)
+    orderNumber.value = order.order_number
+    
+    if (cartStore.paymentMethod === 'pix') {
+      generatePixQRCode()
+    }
+    checkoutStep.value = cartStore.paymentMethod
+  } catch (error) {
+    console.error('Erro ao criar pedido:', error)
+    alert('Erro ao processar pedido. Tente novamente.')
+  } finally {
+    savingOrder.value = false
   }
-  checkoutStep.value = cartStore.paymentMethod
 }
 
 function generatePixQRCode() {
@@ -318,7 +355,6 @@ function copyPixKey() {
 }
 
 function confirmPixPayment() {
-  generateOrderNumber()
   checkoutStep.value = 'success'
   cartStore.clearCart()
 }
