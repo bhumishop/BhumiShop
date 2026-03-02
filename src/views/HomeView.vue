@@ -377,7 +377,7 @@ const featuredProducts = computed(() => productStore.products.slice(0, 4))
       rgba(26, 26, 46, 0.7) 50%, 
       rgba(10, 10, 10, 0.9) 100%
     ),
-    url('/images/backgrounds/budha clean.png') no-repeat center center;
+    url('/images/backgrounds/bhui.png') no-repeat center center;
   background-size: contain, 40% auto;
   background-position: center;
 }
