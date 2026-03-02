@@ -220,14 +220,7 @@ const featuredProducts = computed(() => productStore.products.slice(0, 4))
 .categories-preview {
   padding: 4rem 1rem;
   position: relative;
-  background: 
-    linear-gradient(180deg, 
-      rgba(10, 10, 10, 0.9) 0%, 
-      rgba(26, 26, 46, 0.8) 50%, 
-      rgba(10, 10, 10, 0.95) 100%
-    ),
-    url('/images/backgrounds/budha-bubble.png') no-repeat center center;
-  background-size: cover;
+  background: var(--bg-secondary);
 }
 
 .categories-preview::before {
@@ -302,14 +295,7 @@ const featuredProducts = computed(() => productStore.products.slice(0, 4))
 
 .featured-products {
   padding: 4rem 1rem;
-  background: 
-    linear-gradient(180deg, 
-      rgba(26, 26, 46, 0.92) 0%, 
-      rgba(18, 18, 31, 0.95) 100%
-    ),
-    url('/images/backgrounds/buddha-punk.jpg') no-repeat;
-  background-size: cover;
-  background-position: center;
+  background: var(--bg-secondary);
   position: relative;
 }
 
@@ -371,15 +357,7 @@ const featuredProducts = computed(() => productStore.products.slice(0, 4))
   padding: 4rem 1rem;
   text-align: center;
   position: relative;
-  background: 
-    linear-gradient(180deg, 
-      rgba(10, 10, 10, 0.85) 0%, 
-      rgba(26, 26, 46, 0.7) 50%, 
-      rgba(10, 10, 10, 0.9) 100%
-    ),
-    url('/images/backgrounds/bhui.png') no-repeat center center;
-  background-size: contain, 40% auto;
-  background-position: center;
+  background: var(--bg-secondary);
 }
 
 .about-preview::before {
@@ -410,15 +388,7 @@ const featuredProducts = computed(() => productStore.products.slice(0, 4))
 
 .projects-banner {
   padding: 4rem 1rem;
-  background: 
-    linear-gradient(180deg, 
-      rgba(10, 10, 10, 0.8) 0%, 
-      rgba(26, 26, 46, 0.6) 50%, 
-      rgba(10, 10, 10, 0.9) 100%
-    ),
-    url('/images/backgrounds/prata-ativa-poster.png') no-repeat center center;
-  background-size: cover;
-  background-position: center;
+  background: var(--bg-secondary);
   position: relative;
 }
 
