@@ -96,7 +96,7 @@ button {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-dark) 100%);
-  color: white;
+  color: #00FF41;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;

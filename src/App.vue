@@ -108,7 +108,7 @@ async function handleLogout() {
 }
 
 .logo .accent {
-  color: var(--accent-green);
+  color: #00FF41;
   text-shadow: 
     0 0 10px var(--accent-green),
     0 0 20px var(--accent-green),
@@ -129,7 +129,7 @@ async function handleLogout() {
 
 .main-nav a:hover,
 .main-nav a.router-link-active {
-  color: var(--accent-green);
+  color: #00FF41;
 }
 
 .cart-icon {
@@ -141,7 +141,7 @@ async function handleLogout() {
 
 .user-link, .logout-btn {
   font-size: 1.3rem;
-  color: var(--text-secondary);
+  color: #9D4EDD;
   text-decoration: none;
   transition: color 0.3s ease;
   background: none;
@@ -150,7 +150,7 @@ async function handleLogout() {
 }
 
 .user-link:hover, .logout-btn:hover {
-  color: var(--accent-purple);
+  color: #7B2CBF;
 }
 
 .header-actions {
@@ -175,7 +175,7 @@ async function handleLogout() {
   top: -8px;
   right: -8px;
   background: var(--accent-purple);
-  color: white;
+  color: #00FF41;
   font-size: 0.75rem;
   padding: 2px 6px;
   border-radius: 50%;
