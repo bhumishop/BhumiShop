@@ -14,10 +14,10 @@
       </nav>
       <div class="header-actions">
         <router-link v-if="authStore.isLoggedIn" to="/perfil" class="user-link" title="Minha Conta">
-          👤
+          👥
         </router-link>
         <router-link v-else to="/login" class="user-link" title="Login">
-          👤
+          👥
         </router-link>
         <router-link to="/carrinho" class="cart-icon">
           <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
@@ -140,8 +140,8 @@ async function handleLogout() {
 }
 
 .user-link, .logout-btn {
-  font-size: 1.3rem;
-  color: #9D4EDD;
+  font-size: 1.5rem;
+  color: #9D4EDD !important;
   text-decoration: none;
   transition: color 0.3s ease;
   background: none;
@@ -150,7 +150,7 @@ async function handleLogout() {
 }
 
 .user-link:hover, .logout-btn:hover {
-  color: #7B2CBF;
+  color: #7B2CBF !important;
 }
 
 .header-actions {
