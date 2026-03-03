@@ -14,10 +14,10 @@
       </nav>
       <div class="header-actions">
         <router-link v-if="authStore.isLoggedIn" to="/perfil" class="user-link" title="Minha Conta">
-          👥
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#9D4EDD"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </router-link>
         <router-link v-else to="/login" class="user-link" title="Login">
-          👥
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#9D4EDD"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </router-link>
         <router-link to="/carrinho" class="cart-icon">
           <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
@@ -140,17 +140,18 @@ async function handleLogout() {
 }
 
 .user-link, .logout-btn {
-  font-size: 1.5rem;
-  color: #9D4EDD !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
   background: none;
   border: none;
   cursor: pointer;
 }
 
 .user-link:hover, .logout-btn:hover {
-  color: #7B2CBF !important;
+  opacity: 0.8;
 }
 
 .header-actions {
