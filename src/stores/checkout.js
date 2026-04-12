@@ -167,7 +167,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       if (paymentMethod.value === 'pix') {
         const pix = await abacatePay.createPixPayment({
           amount: Math.round(totalWithShipping.value * 100),
-          description: `Pedido ${order.order_number}`,
+          description: `${t('stores.checkout.orderPrefix')} ${order.order_number}`,
           customer: customer
         })
 
@@ -179,7 +179,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
             name: item.name,
             price: Math.round(item.price * 100),
             quantity: item.quantity,
-            description: item.size ? `Tamanho: ${item.size}` : undefined
+            description: item.size ? `${t('stores.checkout.sizePrefix')}: ${item.size}` : undefined
           })),
           customer: customer,
           returnUrl: `${window.location.origin}/minhas-compras`,

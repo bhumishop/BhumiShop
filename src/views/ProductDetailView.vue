@@ -16,7 +16,7 @@
       <div class="product-detail__info">
         <BaseBadge :variant="'accent'" size="sm">{{ categoryName }}</BaseBadge>
         <h1 class="product-detail__name">{{ product.name }}</h1>
-        <p v-if="product.artist" class="product-detail__artist">por {{ product.artist }}</p>
+        <p v-if="product.artist" class="product-detail__artist">{{ $t('productDetail.by') }} {{ product.artist }}</p>
         <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
 
         <p v-if="product.description" class="product-detail__desc">{{ product.description }}</p>

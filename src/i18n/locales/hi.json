@@ -210,7 +210,8 @@
     "confirmed": "भुगतान की पुष्टि हो गई!",
     "waiting": "भुगतान की प्रतीक्षा...",
     "paid": "मैंने भुगतान कर दिया",
-    "tryAgain": "पुनः प्रयास करें"
+    "tryAgain": "पुनः प्रयास करें",
+    "qrCodeAlt": "PIX QR Code"
   },
   "orderConfirmation": {
     "title": "ऑर्डर पूरा हुआ!",
@@ -258,7 +259,8 @@
     "toast": {
       "loginSuccess": "सफलतापूर्वक लॉगिन हुआ!",
       "registerSuccess": "खाता सफलतापूर्वक बनाया गया!"
-    }
+    },
+    "google": "Continue with Google"
   },
   "profile": {
     "title": "मेरी प्रोफ़ाइल",
@@ -380,7 +382,9 @@
       "createOrderError": "ऑर्डर बनाने में विफल",
       "paymentError": "भुगतान प्रसंस्करण में त्रुटि",
       "orderSuccess": "ऑर्डर सफलतापूर्वक बनाया गया!",
-      "pixConfirmed": "PIX भुगतान की पुष्टि हो गई!"
+      "pixConfirmed": "PIX भुगतान की पुष्टि हो गई!",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
