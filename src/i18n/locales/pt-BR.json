@@ -199,6 +199,7 @@
     "title": "Pagamento PIX",
     "generating": "Gerando QR Code...",
     "instructions": "Escaneie o QR Code ou copie o codigo PIX:",
+    "qrCodeAlt": "QR Code PIX",
     "copied": "Copiado!",
     "copy": "Copiar",
     "verifying": "Verificando pagamento...",
@@ -236,6 +237,7 @@
     },
     "divider": "ou",
     "wechat": "Continuar com WeChat",
+    "google": "Continuar com Google",
     "sms": "Entrar com SMS",
     "phone": "Telefone",
     "phonePlaceholder": "+55 11 99999-9999",
@@ -406,7 +408,9 @@
       "createOrderError": "Falha ao criar pedido",
       "paymentError": "Erro ao processar pagamento",
       "orderSuccess": "Pedido criado com sucesso!",
-      "pixConfirmed": "Pagamento PIX confirmado!"
+      "pixConfirmed": "Pagamento PIX confirmado!",
+      "orderPrefix": "Pedido",
+      "sizePrefix": "Tamanho"
     },
     "shipping": {
       "invalidCEP": "CEP invalido ou regiao nao atendida",

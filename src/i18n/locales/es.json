@@ -210,7 +210,8 @@
     "confirmed": "¡Pago confirmado!",
     "waiting": "Esperando pago...",
     "paid": "Ya Pague",
-    "tryAgain": "Intentar de Nuevo"
+    "tryAgain": "Intentar de Nuevo",
+    "qrCodeAlt": "PIX QR Code"
   },
   "orderConfirmation": {
     "title": "¡Pedido Realizado!",
@@ -258,7 +259,8 @@
     "toast": {
       "loginSuccess": "¡Inicio de sesion exitoso!",
       "registerSuccess": "¡Cuenta creada con exito!"
-    }
+    },
+    "google": "Continue with Google"
   },
   "profile": {
     "title": "Mi Perfil",
@@ -380,7 +382,9 @@
       "createOrderError": "Error al crear pedido",
       "paymentError": "Error al procesar pago",
       "orderSuccess": "¡Pedido creado con exito!",
-      "pixConfirmed": "¡Pago PIX confirmado!"
+      "pixConfirmed": "¡Pago PIX confirmado!",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",

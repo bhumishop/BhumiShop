@@ -13,7 +13,7 @@
           <img
             v-if="pixData.qrCode"
             :src="pixData.qrCode"
-            alt="QR Code PIX"
+            :alt="$t('pixPayment.qrCodeAlt')"
             class="pix-payment__qr-img"
           />
           <div v-else class="pix-payment__qr-fallback">

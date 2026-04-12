@@ -210,7 +210,8 @@
     "confirmed": "ยืนยันการชำระเงินแล้ว!",
     "waiting": "รอการชำระเงิน...",
     "paid": "ฉันชำระเงินแล้ว",
-    "tryAgain": "ลองอีกครั้ง"
+    "tryAgain": "ลองอีกครั้ง",
+    "qrCodeAlt": "PIX QR Code"
   },
   "orderConfirmation": {
     "title": "สั่งซื้อสำเร็จ!",
@@ -258,7 +259,8 @@
     "toast": {
       "loginSuccess": "เข้าสู่ระบบสำเร็จ!",
       "registerSuccess": "สร้างบัญชีสำเร็จ!"
-    }
+    },
+    "google": "Continue with Google"
   },
   "profile": {
     "title": "โปรไฟล์ของฉัน",
@@ -380,7 +382,9 @@
       "createOrderError": "สร้างคำสั่งซื้อไม่สำเร็จ",
       "paymentError": "ข้อผิดพลาดในการประมวลผลการชำระเงิน",
       "orderSuccess": "สร้างคำสั่งซื้อเรียบร้อยแล้ว!",
-      "pixConfirmed": "ยืนยันการชำระเงิน PIX แล้ว!"
+      "pixConfirmed": "ยืนยันการชำระเงิน PIX แล้ว!",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",

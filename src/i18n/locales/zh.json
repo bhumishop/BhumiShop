@@ -210,7 +210,8 @@
     "confirmed": "支付已确认！",
     "waiting": "等待支付...",
     "paid": "我已支付",
-    "tryAgain": "重试"
+    "tryAgain": "重试",
+    "qrCodeAlt": "PIX QR Code"
   },
   "orderConfirmation": {
     "title": "订单已提交！",
@@ -258,7 +259,8 @@
     "toast": {
       "loginSuccess": "登录成功！",
       "registerSuccess": "账户创建成功！"
-    }
+    },
+    "google": "Continue with Google"
   },
   "profile": {
     "title": "我的资料",
@@ -380,7 +382,9 @@
       "createOrderError": "创建订单失败",
       "paymentError": "处理支付出错",
       "orderSuccess": "订单创建成功！",
-      "pixConfirmed": "PIX支付已确认！"
+      "pixConfirmed": "PIX支付已确认！",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",

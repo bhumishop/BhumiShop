@@ -210,7 +210,8 @@
     "confirmed": "支払いが確認されました！",
     "waiting": "支払い待ち...",
     "paid": "支払い済み",
-    "tryAgain": "再試行"
+    "tryAgain": "再試行",
+    "qrCodeAlt": "PIX QR Code"
   },
   "orderConfirmation": {
     "title": "注文が確定しました！",
@@ -258,7 +259,8 @@
     "toast": {
       "loginSuccess": "ログインしました！",
       "registerSuccess": "アカウントが作成されました！"
-    }
+    },
+    "google": "Continue with Google"
   },
   "profile": {
     "title": "マイプロフィール",
@@ -380,7 +382,9 @@
       "createOrderError": "注文作成に失敗しました",
       "paymentError": "支払い処理エラー",
       "orderSuccess": "注文が作成されました！",
-      "pixConfirmed": "PIX支払いが確認されました！"
+      "pixConfirmed": "PIX支払いが確認されました！",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",

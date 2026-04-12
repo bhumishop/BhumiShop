@@ -199,6 +199,7 @@
     "title": "PIX Payment",
     "generating": "Generating QR Code...",
     "instructions": "Scan the QR Code or copy the PIX code:",
+    "qrCodeAlt": "PIX QR Code",
     "copied": "Copied!",
     "copy": "Copy",
     "verifying": "Verifying payment...",
@@ -236,6 +237,7 @@
     },
     "divider": "or",
     "wechat": "Continue with WeChat",
+    "google": "Continue with Google",
     "sms": "Login with SMS",
     "phone": "Phone",
     "phonePlaceholder": "+55 11 99999-9999",
@@ -406,7 +408,9 @@
       "createOrderError": "Failed to create order",
       "paymentError": "Error processing payment",
       "orderSuccess": "Order created successfully!",
-      "pixConfirmed": "PIX payment confirmed!"
+      "pixConfirmed": "PIX payment confirmed!",
+      "orderPrefix": "Order",
+      "sizePrefix": "Size"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
