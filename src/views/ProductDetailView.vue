@@ -1,331 +1,372 @@
 <template>
   <div class="product-detail container" v-if="product">
-    <div class="product-layout">
-      <div class="product-gallery">
-        <div class="main-image">
-          <img 
-            v-if="product.image && product.image.startsWith('data:')" 
-            :src="product.image" 
-            :alt="product.name"
-            class="product-img"
-          >
-          <div v-else class="placeholder-image">{{ product.category }}</div>
-        </div>
+    <nav class="product-detail__breadcrumb">
+      <router-link to="/">{{ $t('productDetail.breadcrumbHome') }}</router-link>
+      <span class="product-detail__sep">/</span>
+      <router-link to="/produtos">{{ $t('productDetail.breadcrumbProducts') }}</router-link>
+      <span class="product-detail__sep">/</span>
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail__layout">
+      <div class="product-detail__gallery">
+        <ProductGallery :images="productImages" :product-name="product.name" />
       </div>
 
-      <div class="product-info">
-        <span class="product-category">{{ getCategoryName(product.category) }}</span>
-        <h1 class="product-title">{{ product.name }}</h1>
-        <p v-if="product.artist" class="product-artist">Artista: {{ product.artist }}</p>
-        <p class="product-price">R$ {{ product.price.toFixed(2) }}</p>
-        
-        <p class="product-description">{{ product.description }}</p>
-        
-        <p v-if="product.info" class="product-info-text">ℹ️ {{ product.info }}</p>
+      <div class="product-detail__info">
+        <BaseBadge :variant="'accent'" size="sm">{{ categoryName }}</BaseBadge>
+        <h1 class="product-detail__name">{{ product.name }}</h1>
+        <p v-if="product.artist" class="product-detail__artist">por {{ product.artist }}</p>
+        <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
 
-        <div class="product-options">
-          <div v-if="product.sizes" class="size-selector">
-            <label>Tamanho:</label>
-            <div class="sizes">
-              <button 
-                v-for="size in product.sizes" 
-                :key="size"
-                :class="['size-btn', { active: selectedSize === size }]"
-                @click="selectedSize = size"
-              >
-                {{ size }}
-              </button>
-            </div>
-          </div>
+        <p v-if="product.description" class="product-detail__desc">{{ product.description }}</p>
 
-          <div class="quantity-selector">
-            <label>Quantidade:</label>
-            <div class="quantity-controls">
-              <button @click="quantity > 1 && quantity--">-</button>
-              <span>{{ quantity }}</span>
-              <button @click="quantity++">+</button>
-            </div>
+        <p v-if="product.info" class="product-detail__extra">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          {{ product.info }}
+        </p>
+
+        <div v-if="product.sizes && product.sizes.length" class="product-detail__variants">
+          <ProductVariants v-model="selectedSize" :sizes="product.sizes" />
+        </div>
+
+        <div class="product-detail__qty">
+          <span class="product-detail__qty-label">{{ $t('productDetail.quantity') }}</span>
+          <div class="product-detail__qty-controls">
+            <button @click="decrementQty" :disabled="quantity <= 1" :aria-label="$t('productDetail.decrease')">−</button>
+            <span class="product-detail__qty-value">{{ quantity }}</span>
+            <button @click="incrementQty" :disabled="quantity >= 99" :aria-label="$t('productDetail.increase')">+</button>
           </div>
         </div>
 
-        <div class="product-stock-info">
-          <span :class="['stock-badge', product.stock]">
-            {{ product.stock === 'print-on-demand' ? 'Impressão sob demanda' : 'Em estoque' }}
-          </span>
+        <div class="product-detail__stock">
+          <BaseBadge :variant="product.stock === 'print-on-demand' ? 'default' : 'success'" size="xs">
+            {{ product.stock === 'print-on-demand' ? $t('productDetail.onDemand') : $t('productDetail.inStock') }}
+          </BaseBadge>
         </div>
 
-        <div class="product-actions">
-          <button class="btn-primary" @click="addToCart">
-            Adicionar ao Carrinho
-          </button>
+        <div class="product-detail__actions">
+          <BaseButton variant="primary" size="lg" full :loading="addingToCart" @click="addToCart">
+            {{ $t('productDetail.addToCart') }}
+          </BaseButton>
         </div>
       </div>
     </div>
   </div>
 
-  <div v-else class="not-found container">
-    <h2>Produto não encontrado</h2>
-    <router-link to="/produtos" class="btn-secondary">
-      Voltar aos Produtos
-    </router-link>
+  <div v-else-if="productStore.loading" class="product-detail container">
+    <div class="product-detail__layout">
+      <BaseSkeleton variant="image" class="product-detail__skeleton-gallery" />
+      <div class="product-detail__skeleton-info">
+        <BaseSkeleton variant="title" />
+        <BaseSkeleton variant="text" width="50%" />
+        <BaseSkeleton variant="text" width="30%" />
+        <BaseSkeleton variant="button" />
+      </div>
+    </div>
+  </div>
+
+  <div v-else class="product-detail container">
+    <div class="product-detail__notfound">
+      <h2>{{ $t('productDetail.notFound') }}</h2>
+      <BaseButton variant="secondary" @click="$router.push('/produtos')">{{ $t('productDetail.viewProducts') }}</BaseButton>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useProductStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
+import { useToastStore } from '../stores/toast'
+import ProductGallery from '../components/product/ProductGallery.vue'
+import ProductVariants from '../components/product/ProductVariants.vue'
+import BaseBadge from '../components/common/BaseBadge.vue'
+import BaseButton from '../components/common/BaseButton.vue'
+import BaseSkeleton from '../components/common/BaseSkeleton.vue'
 
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
 const cartStore = useCartStore()
+const toast = useToastStore()
+const { t } = useI18n()
+
+const selectedSize = ref(null)
+const quantity = ref(1)
+const addingToCart = ref(false)
+
+const product = computed(() => productStore.getProductById(route.params.id))
+
+const productImages = computed(() => {
+  if (!product.value) return []
+  const img = product.value.image
+  if (img && (img.startsWith('data:') || img.startsWith('http'))) {
+    return [img]
+  }
+  return []
+})
+
+const categoryName = computed(() => {
+  if (!product.value) return ''
+  const cat = productStore.categories.find(c => c.id === product.value.category)
+  return cat?.name || product.value.category || ''
+})
 
 onMounted(async () => {
   if (productStore.products.length === 0) {
     await productStore.fetchProducts()
   }
+  if (productStore.categories.length === 0) {
+    await productStore.fetchCategories()
+  }
 })
 
-const product = computed(() => productStore.getProductById(route.params.id))
-const selectedSize = ref(null)
-const quantity = ref(1)
+watch(() => route.params.id, () => {
+  selectedSize.value = null
+  quantity.value = 1
+})
 
-function getCategoryName(categoryId) {
-  const categories = productStore.categories
-  const cat = categories.find(c => c.id === categoryId)
-  return cat ? cat.name : categoryId
+function formatPrice(value) {
+  return Number(value).toFixed(2).replace('.', ',')
 }
 
-function addToCart() {
-  if (product.value.sizes && !selectedSize.value) {
-    alert('Por favor, selecione um tamanho.')
+function incrementQty() {
+  if (quantity.value < 99) quantity.value++
+}
+
+function decrementQty() {
+  if (quantity.value > 1) quantity.value--
+}
+
+async function addToCart() {
+  if (product.value?.sizes?.length && !selectedSize.value) {
+    toast.warning(t('productDetail.selectSize'))
     return
   }
 
-  cartStore.addItem({
-    id: product.value.id,
-    name: product.value.name,
-    price: product.value.price,
-    image: product.value.image,
-    size: selectedSize.value,
-    quantity: quantity.value
-  })
-
-  alert('Produto adicionado ao carrinho!')
-  router.push('/carrinho')
+  addingToCart.value = true
+  try {
+    cartStore.addItem({
+      id: product.value.id,
+      name: product.value.name,
+      price: product.value.price,
+      image: product.value.image,
+      category: product.value.category,
+      size: selectedSize.value,
+      quantity: quantity.value,
+      fulfillment_type: product.value.fulfillment_type || 'own',
+      weight: product.value.weight || 0.3,
+      dimensions: product.value.dimensions,
+      shipping_zones: product.value.shipping_zones
+    })
+    toast.success(t('productDetail.addedToCart', { name: product.value.name }))
+    cartStore.openDrawer()
+  } finally {
+    addingToCart.value = false
+  }
 }
 </script>
 
 <style scoped>
 .product-detail {
-  padding: 3rem 1rem;
-  min-height: 60vh;
+  padding: clamp(1rem, 2.5vh, 1.5rem) clamp(1rem, 3vw, 1.5rem) clamp(2.5rem, 6vh, 4rem);
 }
 
-.product-layout {
+.product-detail__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
+  font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  color: var(--text-muted);
+  margin-bottom: clamp(1.25rem, 3vh, 2rem);
+}
+
+.product-detail__breadcrumb a {
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.product-detail__breadcrumb a:hover {
+  color: var(--accent);
+}
+
+.product-detail__sep {
+  color: var(--text-muted);
+}
+
+.product-detail__layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
   align-items: start;
 }
 
-.product-gallery {
+.product-detail__gallery {
   position: sticky;
-  top: 100px;
+  top: calc(var(--header-height) + clamp(1rem, 2.5vh, 2rem));
 }
 
-.main-image {
-  aspect-ratio: 1;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.placeholder-image {
-  font-size: 4rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.product-category {
-  color: var(--accent-purple-light);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.product-title {
-  font-size: 2rem;
-  margin: 0.5rem 0 1rem;
-}
-
-.product-price {
-  font-size: 2.5rem;
-  color: var(--accent-green);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.product-artist {
-  font-size: 1rem;
-  color: var(--accent-purple-light);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.product-info-text {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-  padding: 0.75rem;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  border-left: 3px solid var(--accent-purple);
-}
-
-.product-description {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  line-height: 1.8;
-  margin-bottom: 2rem;
-}
-
-.product-options {
-  margin-bottom: 2rem;
-}
-
-.size-selector,
-.quantity-selector {
-  margin-bottom: 1.5rem;
-}
-
-.size-selector label,
-.quantity-selector label {
-  display: block;
-  color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-}
-
-.sizes {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.size-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 0.75rem 1.25rem;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.size-btn:hover {
-  border-color: var(--accent-green);
-}
-
-.size-btn.active {
-  background: var(--accent-green);
-  border-color: var(--accent-green);
-  color: var(--bg-primary);
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.quantity-controls button {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  width: 40px;
-  height: 40px;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.quantity-controls button:hover {
-  border-color: var(--accent-green);
-}
-
-.quantity-controls span {
-  font-size: 1.25rem;
-  font-weight: 600;
-  min-width: 40px;
-  text-align: center;
-}
-
-.stock-badge {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  border-radius: 4px;
-  margin-bottom: 2rem;
-}
-
-.stock-badge.print-on-demand {
-  background: rgba(157, 78, 221, 0.2);
-  color: var(--accent-purple-light);
-  border: 1px solid var(--accent-purple);
-}
-
-.stock-badge.estoque {
-  background: rgba(0, 255, 65, 0.2);
-  color: var(--accent-green);
-  border: 1px solid var(--accent-green);
-}
-
-.product-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.product-actions .btn-primary {
+.product-detail__skeleton-gallery {
   flex: 1;
 }
 
-.not-found {
-  text-align: center;
-  padding: 4rem 1rem;
+.product-detail__skeleton-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.625rem, 1.5vh, 1rem);
 }
 
-.not-found h2 {
-  margin-bottom: 2rem;
+.product-detail__name {
+  font-size: clamp(1.375rem, 3.5vw, 1.75rem);
+  font-weight: 700;
+  margin: clamp(0.5rem, 1.2vh, 0.75rem) 0 clamp(0.125rem, 0.3vh, 0.25rem);
+  letter-spacing: -0.02em;
+}
+
+.product-detail__artist {
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  color: var(--text-secondary);
+  margin-bottom: clamp(0.625rem, 1.5vh, 1rem);
+}
+
+.product-detail__price {
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+}
+
+.product-detail__price::after {
+  content: '';
+  display: inline-block;
+  width: clamp(0.375rem, 0.75vw, 0.5rem);
+  height: clamp(0.375rem, 0.75vw, 0.5rem);
+  background: var(--green-adorn);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 clamp(0.375rem, 1vw, 0.625rem) var(--green-adorn-glow);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.product-detail__desc {
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: clamp(0.625rem, 1.5vh, 1rem);
+}
+
+.product-detail__extra {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
+  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
+  color: var(--text-secondary);
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(0.75rem, 1.5vw, 1rem);
+  background: var(--surface-1);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent);
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+  line-height: 1.5;
+}
+
+.product-detail__extra svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.product-detail__variants {
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+}
+
+.product-detail__qty {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+}
+
+.product-detail__qty-label {
+  font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.product-detail__qty-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.product-detail__qty-controls button {
+  width: clamp(2rem, 4vw, 2.25rem);
+  height: clamp(2rem, 4vw, 2.25rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.product-detail__qty-controls button:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.product-detail__qty-controls button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.product-detail__qty-value {
+  width: clamp(2.25rem, 4vw, 2.5rem);
+  text-align: center;
+  font-size: clamp(0.8rem, 1.4vw, 0.9rem);
+  font-weight: 600;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  line-height: clamp(2rem, 4vw, 2.25rem);
+}
+
+.product-detail__stock {
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+}
+
+.product-detail__actions {
+  margin-top: clamp(0.375rem, 1vh, 0.5rem);
+}
+
+.product-detail__notfound {
+  text-align: center;
+  padding: clamp(2.5rem, 8vh, 4rem) 0;
+}
+
+.product-detail__notfound h2 {
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
-  .product-layout {
+  .product-detail__layout {
     grid-template-columns: 1fr;
   }
-  
-  .product-gallery {
+
+  .product-detail__gallery {
     position: static;
+  }
+
+  .product-detail__price {
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
   }
 }
 </style>

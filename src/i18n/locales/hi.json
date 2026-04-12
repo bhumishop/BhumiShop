@@ -1,0 +1,422 @@
+{
+  "common": {
+    "appName": "BhumiShop",
+    "appDescription": "Bhumisparsha School की वर्चुअल दुकान। अर्थ, कला और उद्देश्य के साथ उत्पाद।",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "save": "सहेजें",
+    "add": "जोड़ें",
+    "remove": "हटाएं",
+    "search": "खोजें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "continue": "जारी रखें",
+    "or": "या",
+    "all": "सभी",
+    "actions": "कार्रवाई",
+    "image": "छवि",
+    "description": "विवरण",
+    "notes": "नोट्स",
+    "additionalInfo": "अतिरिक्त जानकारी",
+    "copyright": "© {year} Bhumisparsha School. सर्वाधिकार सुरक्षित।",
+    "securePayment": "AbacatePay के माध्यम से सुरक्षित भुगतान",
+    "contactEmail": "contact@bhumisparshaschool.org"
+  },
+  "nav": {
+    "home": "होम",
+    "products": "उत्पाद",
+    "admin": "व्यवस्थापक",
+    "myOrders": "मेरे ऑर्डर",
+    "profile": "मेरी प्रोफ़ाइल",
+    "login": "लॉगिन",
+    "cart": "कार्ट",
+    "account": "मेरा खाता",
+    "contact": "संपर्क",
+    "menu": "मेनू"
+  },
+  "home": {
+    "heroTitle1": "उद्देश्य के साथ",
+    "heroTitle2": "कला",
+    "heroSubtitle": "Bhumisparsha School के अद्वितीय उत्पाद खोजें -- किताबें, कला और बहुत कुछ।",
+    "viewProducts": "उत्पाद देखें",
+    "categories": "श्रेणियाँ",
+    "highlights": "विशेष"
+  },
+  "products": {
+    "title": "उत्पाद",
+    "categories": "श्रेणियाँ",
+    "allCategories": "सभी श्रेणियाँ",
+    "all": "सभी",
+    "productCount": "{count} उत्पाद",
+    "searchPlaceholder": "उत्पाद खोजें...",
+    "clearSearch": "खोज मिटाएं",
+    "notFound": "कोई उत्पाद नहीं मिला।",
+    "previous": "पिछला",
+    "next": "अगला"
+  },
+  "productDetail": {
+    "breadcrumbHome": "होम",
+    "breadcrumbProducts": "उत्पाद",
+    "by": "द्वारा",
+    "quantity": "मात्रा",
+    "decrease": "कम करें",
+    "increase": "बढ़ाएं",
+    "onDemand": "मांग पर मुद्रण",
+    "inStock": "स्टॉक में उपलब्ध",
+    "addToCart": "कार्ट में जोड़ें",
+    "viewProducts": "उत्पाद देखें",
+    "notFound": "उत्पाद नहीं मिला",
+    "selectSize": "कृपया एक आकार चुनें।",
+    "addedToCart": "{name} कार्ट में जोड़ा गया!"
+  },
+  "productCard": {
+    "add": "जोड़ें",
+    "addedToCart": "{name} कार्ट में जोड़ा गया"
+  },
+  "productVariants": {
+    "size": "आकार",
+    "sizePlaceholder": "S, M, L, XL"
+  },
+  "cart": {
+    "title": "कार्ट",
+    "subtitle": "आपके आइटम साइड पैनल में दिखाई देते हैं। देखने के लिए शीर्ष पर कार्ट आइकन पर क्लिक करें।",
+    "openCart": "कार्ट खोलें",
+    "checkout": "खरीदें",
+    "viewProducts": "उत्पाद देखें",
+    "empty": "आपका कार्ट खाली है",
+    "size": "आकार:",
+    "remove": "हटाएं",
+    "total": "कुल",
+    "clearCart": "कार्ट खाली करें",
+    "cartCount": "कार्ट ({count})"
+  },
+  "checkout": {
+    "title": "चेकआउट",
+    "steps": {
+      "cart": "Cart",
+      "info": "Information",
+      "payment": "Payment",
+      "confirmation": "Confirmation"
+    },
+    "step1": {
+      "title": "Order Summary",
+      "emptyCart": "Your cart is empty",
+      "viewProducts": "View Products",
+      "continue": "Continue",
+      "bhumiShopItems": "Bhumi Shop Items",
+      "umaPencaItems": "Uma Penca Items",
+      "digitalItems": "Digital Items",
+      "sentByUmaPenca": "Sent by Uma Penca",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi)",
+      "free": "Free",
+      "total": "Total"
+    },
+    "step2": {
+      "title": "Contact Information",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "cpf": "CPF (optional)",
+      "addressSection": "Shipping Address",
+      "cep": "CEP",
+      "street": "Street / Avenue",
+      "number": "Number",
+      "complement": "Complement (optional)",
+      "neighborhood": "Neighborhood",
+      "city": "City",
+      "notes": "Notes (optional)",
+      "back": "Back",
+      "continue": "Continue",
+      "placeholders": {
+        "name": "Your name",
+        "email": "your@email.com",
+        "phone": "(11) 99999-9999",
+        "cpf": "000.000.000-00",
+        "cep": "00000-000",
+        "street": "Delivery address",
+        "number": "No.",
+        "complement": "Apt, block, etc.",
+        "neighborhood": "Neighborhood",
+        "city": "City",
+        "notes": "Additional delivery information"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailInvalid": "Invalid email",
+        "phoneInvalid": "Invalid phone",
+        "cepInvalid": "Invalid CEP"
+      }
+    },
+    "step3": {
+      "title": "Shipping & Payment",
+      "shipping": "Shipping",
+      "selectProvider": "Select Payment Provider",
+      "providerPrompt": "Your cart has items from Uma Penca. Choose how you want to pay:",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi Shop)",
+      "shippingUmaPenca": "Shipping (Uma Penca)",
+      "free": "Free",
+      "total": "Total",
+      "back": "Back",
+      "generatePix": "Generate PIX",
+      "goToPayment": "Go to Payment",
+      "payWithMercadoPago": "Pay with Mercado Pago",
+      "goToUmaPenca": "Go to Uma Penca",
+      "confirmPayment": "Confirm Payment"
+    },
+    "stepperSteps": [
+      "Cart",
+      "Info",
+      "Shipping & Payment",
+      "Confirmation"
+    ],
+    "step4": {
+      "title": "Processing Payment",
+      "finalizePayment": "Finalize Payment",
+      "redirectDesc": "You will be redirected to the secure AbacatePay checkout.",
+      "loadingMercadoPago": "Loading Mercado Pago...",
+      "redirectingUmaPenca": "Redirecting to Uma Penca",
+      "umaPencaDesc": "Your items will be processed in the Uma Penca checkout.",
+      "goToUmaPenca": "Go to Uma Penca",
+      "continueShopping": "Continue Shopping",
+      "viewOrders": "View My Orders",
+      "pixConfirmed": "PIX payment confirmed!"
+    }
+  },
+  "payment": {
+    "title": "भुगतान विधि",
+    "pix": "PIX",
+    "pixDescription": "तत्काल भुगतान",
+    "creditCard": "क्रेडिट कार्ड",
+    "creditCardDescription": "AbacatePay के माध्यम से",
+    "pixBricks": "PIX (Mercado Pago)",
+    "pixBricksDescription": "Instant payment via Mercado Pago",
+    "umaPenca": "Uma Penca",
+    "umaPencaDescription": "T-shirts, mugs and more"
+  },
+  "pixPayment": {
+    "title": "PIX भुगतान",
+    "generating": "QR कोड जनरेट हो रहा है...",
+    "instructions": "QR कोड स्कैन करें या PIX कोड कॉपी करें:",
+    "copied": "कॉपी हो गया!",
+    "copy": "कॉपी",
+    "verifying": "भुगतान सत्यापित हो रहा है...",
+    "confirmed": "भुगतान की पुष्टि हो गई!",
+    "waiting": "भुगतान की प्रतीक्षा...",
+    "paid": "मैंने भुगतान कर दिया",
+    "tryAgain": "पुनः प्रयास करें"
+  },
+  "orderConfirmation": {
+    "title": "ऑर्डर पूरा हुआ!",
+    "message": "आपका ऑर्डर {orderNumber} सफलतापूर्वक बनाया गया।",
+    "instructions": "भुगतान पूरा करने के लिए नीचे दिए गए बटन पर क्लिक करें:",
+    "pixInstruction": "ऊपर PIX भुगतान पूरा करें और पुष्टि करने के लिए 'मैंने भुगतान कर दिया' पर क्लिक करें।",
+    "viewOrders": "मेरे ऑर्डर देखें",
+    "continueShopping": "खरीदारी जारी रखें",
+    "goToPayment": "भुगतान पर जाएं"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "register": "खाता बनाएं",
+    "fullName": "पूरा नाम",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "placeholders": {
+      "name": "आपका नाम",
+      "email": "your@email.com",
+      "password": "न्यूनतम 6 अक्षर"
+    },
+    "validation": {
+      "nameRequired": "नाम आवश्यक है",
+      "emailRequired": "ईमेल आवश्यक है",
+      "emailInvalid": "अमान्य ईमेल",
+      "passwordRequired": "पासवर्ड आवश्यक है",
+      "passwordMinLength": "न्यूनतम 6 अक्षर"
+    },
+    "divider": "या",
+    "wechat": "WeChat से जारी रखें",
+    "sms": "SMS से लॉगिन",
+    "phone": "फ़ोन",
+    "phonePlaceholder": "+55 11 99999-9999",
+    "sendSmsCode": "SMS कोड भेजें",
+    "codeSent": "कोड भेजा गया! अपना फ़ोन जांचें।",
+    "smsCodeSent": "SMS कोड भेजा गया!",
+    "switchToRegister": "खाता नहीं है? खाता बनाएं",
+    "switchToLogin": "पहले से खाता है? लॉगिन",
+    "errors": {
+      "wechatLogin": "WeChat लॉगिन में त्रुटि",
+      "phoneRequired": "फ़ोन नंबर आवश्यक है",
+      "smsCode": "SMS कोड भेजने में त्रुटि",
+      "processRequest": "अनुरोध प्रसंस्करण में त्रुटि"
+    },
+    "toast": {
+      "loginSuccess": "सफलतापूर्वक लॉगिन हुआ!",
+      "registerSuccess": "खाता सफलतापूर्वक बनाया गया!"
+    }
+  },
+  "profile": {
+    "title": "मेरी प्रोफ़ाइल",
+    "admin": "व्यवस्थापक",
+    "myOrders": "मेरे ऑर्डर",
+    "logout": "लॉगआउट",
+    "empty": "अपनी प्रोफ़ाइल देखने के लिए आपको लॉगिन करना होगा।",
+    "login": "लॉगिन",
+    "toast": {
+      "logoutSuccess": "आप लॉगआउट हो गए",
+      "logoutError": "लॉगआउट में त्रुटि"
+    }
+  },
+  "myOrders": {
+    "title": "मेरे ऑर्डर",
+    "empty": "कोई ऑर्डर नहीं मिला",
+    "viewProducts": "उत्पाद देखें",
+    "status": {
+      "pending": "लंबित",
+      "processing": "प्रसंस्करण",
+      "shipped": "भेजा गया",
+      "delivered": "वितरित",
+      "cancelled": "रद्द"
+    },
+    "payment": {
+      "pending": "भुगतान लंबित",
+      "paid": "भुगतान हुआ",
+      "failed": "विफल",
+      "refunded": "धनवापसी"
+    },
+    "labels": {
+      "pixPayment": "भुगतान: PIX",
+      "cardPayment": "भुगतान: कार्ड",
+      "total": "कुल:"
+    }
+  },
+  "admin": {
+    "title": "व्यवस्थापक पैनल",
+    "addProduct": "+ उत्पाद जोड़ें",
+    "tabs": {
+      "products": "उत्पाद",
+      "categories": "श्रेणियाँ"
+    },
+    "filters": {
+      "allCategories": "सभी श्रेणियाँ",
+      "searchProduct": "उत्पाद खोजें..."
+    },
+    "table": {
+      "name": "नाम",
+      "category": "श्रेणी",
+      "price": "मूल्य",
+      "stock": "स्टॉक",
+      "actions": "कार्रवाई"
+    },
+    "stock": {
+      "onDemand": "मांग पर",
+      "inStock": "स्टॉक में"
+    },
+    "empty": "कोई उत्पाद नहीं मिला।",
+    "modal": {
+      "editProduct": "उत्पाद संपादित करें",
+      "newProduct": "नया उत्पाद",
+      "productName": "उत्पाद का नाम",
+      "category": "श्रेणी",
+      "price": "मूल्य (R$)",
+      "stockType": "स्टॉक प्रकार",
+      "sizes": "आकार (अल्पविराम से अलग)",
+      "description": "विवरण",
+      "image": "छवि",
+      "artist": "कलाकार",
+      "additionalInfo": "अतिरिक्त जानकारी",
+      "sizePlaceholder": "S, M, L, XL",
+      "imagePlaceholder": "या छवि URL पेस्ट करें",
+      "artistPlaceholder": "कलाकार/लेखक का नाम",
+      "newCategory": "नई श्रेणी..."
+    },
+    "confirmations": {
+      "deleteProduct": "क्या आप वाकई इस उत्पाद को हटाना चाहते हैं?",
+      "deleteCategory": "इस श्रेणी को हटाएं?"
+    },
+    "toast": {
+      "imageTooLarge": "छवि बहुत बड़ी है। अधिकतम 5MB।",
+      "nameRequired": "उत्पाद का नाम आवश्यक है",
+      "productUpdated": "उत्पाद सफलतापूर्वक अपडेट किया गया",
+      "productAdded": "उत्पाद सफलतापूर्वक जोड़ा गया",
+      "productDeleted": "उत्पाद हटा दिया गया",
+      "categoryAdded": "श्रेणी जोड़ी गई",
+      "categoryDeleted": "श्रेणी हटा दी गई",
+      "saveError": "उत्पाद सहेजने में त्रुटि",
+      "deleteError": "उत्पाद हटाने में त्रुटि",
+      "addCategoryError": "श्रेणी जोड़ने में त्रुटि",
+      "deleteCategoryError": "श्रेणी हटाने में त्रुटि"
+    }
+  },
+  "toast": {
+    "pixConfirmed": "PIX भुगतान की पुष्टि हो गई!",
+    "paymentError": "भुगतान प्रसंस्करण में त्रुटि"
+  },
+  "theme": {
+    "lightMode": "लाइट मोड में स्विच करें",
+    "darkMode": "डार्क मोड में स्विच करें"
+  },
+  "stores": {
+    "products": {
+      "loadError": "उत्पाद लोड करने में त्रुटि",
+      "loadCategoriesError": "श्रेणियाँ लोड करने में त्रुटि",
+      "addError": "उत्पाद जोड़ने में त्रुटि",
+      "updateError": "उत्पाद अपडेट करने में त्रुटि",
+      "deleteError": "उत्पाद हटाने में त्रुटि",
+      "addCategoryError": "श्रेणी जोड़ने में त्रुटि",
+      "deleteCategoryError": "श्रेणी हटाने में त्रुटि"
+    },
+    "orders": {
+      "loadError": "ऑर्डर लोड करने में त्रुटि",
+      "loadOrderError": "ऑर्डर लोड करने में त्रुटि",
+      "createError": "ऑर्डर बनाने में त्रुटि"
+    },
+    "checkout": {
+      "createOrderError": "ऑर्डर बनाने में विफल",
+      "paymentError": "भुगतान प्रसंस्करण में त्रुटि",
+      "orderSuccess": "ऑर्डर सफलतापूर्वक बनाया गया!",
+      "pixConfirmed": "PIX भुगतान की पुष्टि हो गई!"
+    },
+    "shipping": {
+      "invalidCEP": "Invalid CEP or region not served",
+      "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+      "immediateDigitalDelivery": "Immediate digital delivery"
+    }
+  },
+  "shipping": {
+    "calculateShipping": "Calculate Shipping",
+    "freeShippingProgress": "Free shipping on own items!",
+    "freeShippingRemaining": "Only R$ {amount} left for free shipping",
+    "bhumiShopItems": "Bhumi Shop Items",
+    "umaPencaItems": "Uma Penca Items",
+    "digitalItems": "Digital Items",
+    "immediateDelivery": "Immediate Delivery",
+    "businessDays": "{days} business days",
+    "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+    "immediateDigitalDelivery": "Immediate digital delivery",
+    "invalidCEP": "Invalid CEP or region not served"
+  },
+  "paymentProvider": {
+    "title": "How do you want to pay?",
+    "subtitle": "Select payment provider",
+    "close": "Close",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "umaPencaDirect": "Uma Penca Direct",
+    "umaPencaDesc": "T-shirts, mugs and more - sent by Uma Penca",
+    "abacatepay": "AbacatePay",
+    "abacatepayDesc": "PIX and Card - national processing",
+    "pixBricksIntl": "PIX Bricks International",
+    "pixBricksDesc": "International PIX - pay from anywhere",
+    "externalCheckout": "External Checkout",
+    "pix": "PIX",
+    "card": "Card",
+    "upi": "UPI",
+    "alipay": "Alipay"
+  }
+}

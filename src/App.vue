@@ -1,197 +1,71 @@
 <template>
-  <div class="app-container">
-    <header class="app-header">
-      <div class="logo">
-        <router-link to="/">
-          <h1>BHUMI<span class="accent">SHOP</span></h1>
-        </router-link>
-      </div>
-      <nav class="main-nav">
-        <router-link to="/">Início</router-link>
-        <router-link to="/produtos">Produtos</router-link>
-        <router-link to="/videos">Vídeos</router-link>
-        <router-link to="/sobre">Sobre</router-link>
-      </nav>
-      <div class="header-actions">
-        <router-link v-if="authStore.isLoggedIn" to="/perfil" class="user-link" title="Minha Conta">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#9D4EDD"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </router-link>
-        <router-link v-else to="/login" class="user-link" title="Login">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#9D4EDD"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </router-link>
-        <router-link to="/carrinho" class="cart-icon">
-          <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
-          🛒
-        </router-link>
-      </div>
-    </header>
-    
+  <div class="app-root">
+    <AppHeader />
     <main class="app-main">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
-    
-    <footer class="app-footer">
-      <p>&copy; 2026 Bhumisparsha School. Todos os direitos reservados.</p>
-    </footer>
+    <AppFooter />
+    <CartDrawer />
+    <ToastContainer />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCartStore } from './stores/cart'
+import { onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
+import { useThemeStore } from './stores/theme'
+import AppHeader from './components/layout/AppHeader.vue'
+import AppFooter from './components/layout/AppFooter.vue'
+import CartDrawer from './components/layout/CartDrawer.vue'
+import ToastContainer from './components/common/BaseToast.vue'
 
-const router = useRouter()
-const cartStore = useCartStore()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
+const route = useRoute()
 
-const cartCount = computed(() => cartStore.items.length)
+function onPageEnter(el, done) {
+  pageEnter(el, done)
+}
+
+function onPageLeave(el, done) {
+  pageLeave(el, done)
+}
+
+// Refresh ScrollTrigger on every route change
+// This is critical: scroll positions change when navigating between pages
+watch(() => route.path, () => {
+  // Wait for DOM to update, then refresh
+  requestAnimationFrame(() => {
+    refreshScrollTriggers()
+  })
+})
 
 onMounted(() => {
   authStore.initialize()
+  themeStore.init()
+  initGlobalAnimations()
 })
 
-async function handleLogout() {
-  await authStore.signOut()
-  router.push('/')
-}
+onUnmounted(() => {
+  revertGlobalAnimations()
+})
 </script>
 
 <style scoped>
-.app-container {
+.app-root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: 
-    linear-gradient(180deg, 
-      rgba(26, 26, 46, 0.98) 0%, 
-      rgba(18, 18, 31, 0.95) 100%
-    );
-  border-bottom: 2px solid var(--accent-purple);
-  position: relative;
-  z-index: 100;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-}
-
-.app-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--accent-purple) 20%, 
-    var(--accent-green) 50%, 
-    var(--accent-purple) 80%, 
-    transparent 100%
-  );
-  box-shadow: 0 0 10px var(--accent-purple), 0 0 20px var(--accent-green-glow);
-}
-
-.logo h1 {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  margin: 0;
-  color: var(--text-primary);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.1em;
-}
-
-.logo .accent {
-  color: #00FF41;
-  text-shadow: 
-    0 0 10px var(--accent-green),
-    0 0 20px var(--accent-green),
-    0 0 40px var(--accent-green-glow);
-}
-
-.main-nav {
-  display: flex;
-  gap: 2rem;
-}
-
-.main-nav a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-family: var(--font-body);
-  transition: color 0.3s ease;
-}
-
-.main-nav a:hover,
-.main-nav a.router-link-active {
-  color: #00FF41;
-}
-
-.cart-icon {
-  font-size: 1.5rem;
-  cursor: pointer;
-  position: relative;
-  text-decoration: none;
-}
-
-.user-link, .logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.user-link:hover, .logout-btn:hover {
-  opacity: 0.8;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.config-icon {
-  font-size: 1.3rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.config-icon:hover {
-  color: var(--accent-purple);
-}
-
-.cart-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: var(--accent-purple);
-  color: #00FF41;
-  font-size: 0.75rem;
-  padding: 2px 6px;
-  border-radius: 50%;
-}
-
 .app-main {
   flex: 1;
-}
-
-.app-footer {
-  padding: 1rem 2rem;
-  text-align: center;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--accent-purple-dark);
-  color: var(--text-secondary);
-  font-family: var(--font-body);
+  padding-top: var(--header-height);
 }
 </style>

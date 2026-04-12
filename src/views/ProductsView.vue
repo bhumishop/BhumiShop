@@ -1,247 +1,171 @@
 <template>
   <div class="products-page container">
-    <h1 class="page-title">Nossos Produtos</h1>
-    
-    <div class="filters">
-      <button 
-        v-for="cat in categories" 
-        :key="cat.id"
-        :class="['filter-btn', { active: activeCategory === cat.id }]"
-        @click="activeCategory = cat.id"
-      >
-        <span>{{ cat.icon }}</span>
-        {{ cat.name }}
-      </button>
+    <div class="products-page__header">
+      <h1 class="products-page__title">{{ $t('products.title') }}</h1>
     </div>
 
-    <div class="products-grid">
-      <router-link 
-        v-for="product in filteredProducts" 
-        :key="product.id"
-        :to="`/produtos/${product.id}`"
-        class="product-card card"
-      >
-        <div class="product-image">
-          <img 
-            v-if="hasValidImage(product.image)" 
-            :src="product.image" 
-            :alt="product.name"
-            class="product-img"
-            @error="handleImageError"
+    <div class="products-page__layout">
+      <aside class="products-page__sidebar">
+        <div class="filter-group">
+          <h3 class="filter-group__title">{{ $t('products.categories') }}</h3>
+          <button
+            :class="['filter-group__item', { 'filter-group__item--active': activeCategory === '' }]"
+            @click="setCategory('')"
           >
-          <div v-else class="placeholder-image">{{ getCategoryInitial(product.category) }}</div>
-          <span class="product-badge">{{ getCategoryName(product.category) }}</span>
+            {{ $t('products.all') }}
+          </button>
+          <button
+            v-for="cat in productStore.categories"
+            :key="cat.id"
+            :class="['filter-group__item', { 'filter-group__item--active': activeCategory === cat.id }]"
+            @click="setCategory(cat.id)"
+          >
+            {{ cat.icon }} {{ cat.name }}
+          </button>
         </div>
-        <div class="product-info">
-          <h3 class="product-name">{{ product.name }}</h3>
-          <p class="product-description">{{ product.description }}</p>
-          <div class="product-footer">
-            <span class="product-price">R$ {{ product.price.toFixed(2) }}</span>
-            <span class="product-stock" :class="product.stock">
-              {{ product.stock === 'print-on-demand' ? 'Sob demanda' : 'Em estoque' }}
-            </span>
-          </div>
-        </div>
-      </router-link>
-    </div>
+      </aside>
 
-    <div v-if="filteredProducts.length === 0" class="no-products">
-      <p>Nenhum produto encontrado nesta categoria.</p>
+      <div class="products-page__main">
+        <div class="products-page__toolbar">
+          <p class="products-page__count">
+            {{ $t('products.productCount', { count: productStore.filteredProducts.length }) }}
+          </p>
+        </div>
+
+        <ProductGrid
+          :products="productStore.paginatedProducts"
+          :loading="productStore.loading"
+          :current-page="productStore.currentPage"
+          :total-pages="productStore.totalPages"
+          @update:current-page="productStore.setPage"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProductStore } from '../stores/products'
+import ProductGrid from '../components/product/ProductGrid.vue'
 
 const route = useRoute()
 const productStore = useProductStore()
+const activeCategory = ref('')
 
 onMounted(async () => {
-  if (productStore.products.length === 0) {
-    await productStore.fetchProducts()
-    await productStore.fetchCategories()
+  await Promise.all([
+    productStore.fetchProducts(),
+    productStore.fetchCategories()
+  ])
+  if (route.query.category) {
+    activeCategory.value = route.query.category
+    productStore.setActiveCategory(route.query.category)
   }
 })
 
-const activeCategory = ref('todos')
-const categories = computed(() => productStore.categories)
-
-const filteredProducts = computed(() => {
-  return productStore.getProductsByCategory(activeCategory.value)
+watch(() => route.query.category, (val) => {
+  if (val) {
+    activeCategory.value = val
+    productStore.setActiveCategory(val)
+  }
 })
 
-function hasValidImage(image) {
-  return image && (image.startsWith('data:') || image.startsWith('http'))
+function setCategory(catId) {
+  activeCategory.value = catId
+  productStore.setActiveCategory(catId)
 }
-
-function getCategoryInitial(categoryId) {
-  if (!categoryId) return 'P'
-  const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.name.charAt(0).toUpperCase() : categoryId.toString().charAt(0).toUpperCase()
-}
-
-function getCategoryName(categoryId) {
-  const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.name : categoryId
-}
-
-function handleImageError(event) {
-  event.target.style.display = 'none'
-  event.target.nextElementSibling.style.display = 'flex'
-}
-
-watch(() => route.query.categoria, (newCategory) => {
-  if (newCategory) {
-    activeCategory.value = newCategory
-  }
-}, { immediate: true })
 </script>
 
 <style scoped>
 .products-page {
-  padding: 2rem 1rem;
-  min-height: 60vh;
+  padding: clamp(1.5rem, 4vh, 2rem) clamp(1rem, 3vw, 1.5rem) clamp(2.5rem, 6vh, 4rem);
 }
 
-.page-title {
-  font-size: 2.5rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  color: var(--text-primary);
+.products-page__title {
+  font-size: clamp(1.375rem, 3.5vw, 1.75rem);
+  font-weight: 700;
+  margin-bottom: clamp(1.25rem, 3vh, 2rem);
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 3rem;
-}
-
-.filter-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.filter-btn:hover {
-  border-color: var(--accent-purple);
-  color: var(--text-primary);
-}
-
-.filter-btn.active {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
-  color: white;
-}
-
-.products-grid {
+.products-page__layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: clamp(10rem, 20vw, 12.5rem) 1fr;
+  gap: var(--gap-lg);
 }
 
-.product-card {
-  text-decoration: none;
-  color: inherit;
-}
-
-.product-image {
-  height: 220px;
-  background: var(--bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.placeholder-image {
-  font-size: 3rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.product-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--accent-purple);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
+.filter-group__title {
+  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
   font-weight: 600;
   text-transform: uppercase;
-  border-radius: 4px;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: clamp(0.5rem, 1.2vh, 0.75rem);
 }
 
-.product-info {
-  padding: 1.5rem;
+.filter-group__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  margin-bottom: clamp(0.0625rem, 0.2vh, 0.125rem);
 }
 
-.product-name {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+.filter-group__item:hover {
+  background: var(--surface-2);
   color: var(--text-primary);
 }
 
-.product-description {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.filter-group__item--active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 500;
 }
 
-.product-footer {
+.products-page__toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
 }
 
-.product-price {
-  color: var(--accent-green);
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.product-stock {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-
-.product-stock.print-on-demand {
-  color: var(--accent-purple-light);
-}
-
-.product-stock.estoque {
-  color: var(--accent-green);
-}
-
-.no-products {
-  text-align: center;
-  padding: 4rem;
+.products-page__count {
+  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
   color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .products-page__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .products-page__sidebar {
+    display: flex;
+    overflow-x: auto;
+    gap: clamp(0.375rem, 0.75vw, 0.5rem);
+    padding-bottom: clamp(0.375rem, 0.75vh, 0.5rem);
+  }
+
+  .filter-group {
+    display: flex;
+    gap: clamp(0.375rem, 0.75vw, 0.5rem);
+  }
+
+  .filter-group__title {
+    display: none;
+  }
+
+  .filter-group__item {
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: clamp(0.3rem, 0.6vw, 0.4rem) clamp(0.75rem, 1.5vw, 1rem);
+    font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  }
 }
 </style>
