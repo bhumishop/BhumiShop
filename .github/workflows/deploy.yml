@@ -40,9 +40,15 @@ jobs:
 
       - name: Build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-          VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY || 'placeholder-key' }}
-        run: pnpm build
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || '' }}
+          VITE_SUPABASE_KEY: ${{ vars.VITE_SUPABASE_KEY || '' }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_KEY" ]; then
+            echo "⚠️ Supabase not configured - running in demo mode"
+            echo "VITE_SUPABASE_URL=https://placeholder.supabase.co" >> $GITHUB_ENV
+            echo "VITE_SUPABASE_KEY=placeholder-key" >> $GITHUB_ENV
+          fi
+          pnpm build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
