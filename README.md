@@ -4,7 +4,6 @@
 
 ![Vue.js](https://img.shields.io/badge/Vue.js-3-green)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-yellow)
-![Vercel](https://img.shields.io/badge/Vercel-Deploy-black)
 
 ---
 
@@ -39,7 +38,8 @@ Loja virtual completa para comercialização de produtos da comunidade Bhumi. De
 
 ### 👤 Conta do Cliente
 - Cadastro email/senha
-- Login Google OAuth
+- Login WeChat (微信登录)
+- Login por SMS
 - Meus pedidos
 - Acompanhamento de status
 
@@ -53,7 +53,6 @@ Loja virtual completa para comercialização de produtos da comunidade Bhumi. De
 | Vite | Build tool |
 | Pinia | Gerenciamento de estado |
 | Supabase | Backend (Auth, Database) |
-| Vercel | Deploy |
 
 ---
 
@@ -90,6 +89,7 @@ Crie um arquivo `.env`:
 ```env
 VITE_SUPABASE_URL=https://nuypyyxnacvglpqwqihx.supabase.co
 VITE_SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_WECHAT_APP_ID=your-wechat-app-id
 ```
 
 ---
@@ -172,22 +172,30 @@ src/
 ## 🔐 Autenticação
 
 - **Email/Senha:** Cadastro tradicional
-- **Google OAuth:** Login rápido com conta Google
+- **WeChat (微信登录):** Login rápido com conta WeChat
+- **SMS:** Login por código SMS no telefone
 
 ---
 
 ## 🚢 Deploy
 
-### Vercel
+### 阿里云 (Alibaba Cloud) / 腾讯云 (Tencent Cloud)
 
-1. Conecte o repositório ao [Vercel](https://vercel.com)
-2. Adicione as variáveis de ambiente
-3. Deploy automático
+1. Faça o build de produção com `npm run build`
+2. Faça upload do diretório `dist/` para o serviço de hospedagem estática
+3. Configure as variáveis de ambiente no painel do provedor
+4. Configure o domínio e certificado SSL
+
+#### Opções de deploy:
+- **阿里云 OSS** + CDN: Hospedagem estática com Object Storage Service
+- **腾讯云 COS** + CDN: Cloud Object Storage para arquivos estáticos
+- **Docker**: Containerize com Nginx para deploy em qualquer cloud
 
 ```bash
-git add .
-git commit -m "Update"
-git push origin master
+# Build para produção
+npm run build
+
+# O diretório dist/ estará pronto para deploy
 ```
 
 ---

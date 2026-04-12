@@ -4,7 +4,25 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BhumiShop - Loja Virtual</title>
+    <meta name="description" content="BhumiShop - Bhumisparsha School Virtual Store">
+    <title>BhumiShop - Bhumisparsha School</title>
+    <script>
+      // Set initial lang attribute based on stored locale or browser preference
+      (function() {
+        var locale = localStorage.getItem('locale');
+        if (!locale) {
+          var lang = navigator.language || navigator.userLanguage;
+          var supported = ['en', 'pt-BR', 'zh', 'ja', 'es', 'th', 'ne', 'hi'];
+          if (supported.indexOf(lang) !== -1) {
+            locale = lang;
+          } else {
+            locale = lang.split('-')[0];
+            if (supported.indexOf(locale) === -1) locale = 'pt-BR';
+          }
+        }
+        document.documentElement.lang = locale;
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

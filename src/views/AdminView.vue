@@ -1,672 +1,604 @@
 <template>
   <div class="admin-page container">
-    <div class="admin-header">
-      <h1 class="page-title">Painel Admin</h1>
-      <button @click="showAddModal = true" class="btn-primary">
-        + Adicionar Produto
+    <div class="admin-page__header">
+      <h1 class="admin-page__title">{{ $t('admin.title') }}</h1>
+      <BaseButton variant="primary" @click="openAddModal">{{ $t('admin.addProduct') }}</BaseButton>
+    </div>
+
+    <div class="admin-page__tabs">
+      <button
+        v-for="tab in tabs"
+        :key="tab.key"
+        :class="['admin-page__tab', { 'admin-page__tab--active': activeTab === tab.key }]"
+        @click="activeTab = tab.key"
+      >
+        {{ tab.label }}
       </button>
     </div>
 
-    <div class="admin-tabs">
-      <button 
-        :class="['tab-btn', { active: activeTab === 'products' }]"
-        @click="activeTab = 'products'"
-      >
-        Produtos ({{ products.length }})
-      </button>
-      <button 
-        :class="['tab-btn', { active: activeTab === 'categories' }]"
-        @click="activeTab = 'categories'"
-      >
-        Categorias
-      </button>
-    </div>
-
-    <div v-if="activeTab === 'products'" class="products-management">
-      <div class="filters">
-        <select v-model="filterCategory" class="filter-select">
-          <option value="">Todas as categorias</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-            {{ cat.name }}
-          </option>
+    <!-- Products Tab -->
+    <div v-if="activeTab === 'products'" class="admin-section">
+      <div class="admin-section__filters">
+        <select v-model="filterCategory" class="admin-select">
+          <option value="">{{ $t('admin.filters.allCategories') }}</option>
+          <option v-for="cat in productStore.categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
         </select>
-        <input 
-          v-model="searchQuery" 
-          type="text" 
-          placeholder="Buscar produto..."
-          class="search-input"
-        >
+        <input v-model="searchQuery" type="text" :placeholder="$t('admin.filters.searchProduct')" class="admin-input" />
       </div>
 
-      <div class="products-table">
-        <table>
+      <div v-if="productStore.loading" class="admin-section__loading">
+        <BaseSkeleton variant="text" />
+        <BaseSkeleton variant="text" />
+        <BaseSkeleton variant="text" />
+      </div>
+
+      <div v-else-if="filteredProducts.length === 0" class="admin-section__empty">
+        <p>{{ $t('admin.empty') }}</p>
+      </div>
+
+      <div v-else class="admin-table-wrap">
+        <table class="admin-table">
           <thead>
             <tr>
-              <th>Imagem</th>
-              <th>Nome</th>
-              <th>Artista</th>
-              <th>Categoria</th>
-              <th>Preço</th>
-              <th>Estoque</th>
-              <th>Ações</th>
+              <th>{{ $t('admin.table.name') }}</th>
+              <th>{{ $t('admin.table.category') }}</th>
+              <th>{{ $t('admin.table.price') }}</th>
+              <th>{{ $t('admin.table.stock') }}</th>
+              <th>{{ $t('admin.table.actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="product in filteredProducts" :key="product.id">
               <td>
-                <div class="product-thumb">
-                  {{ product.category?.charAt(0) || 'P' }}
+                <div class="admin-product-cell">
+                  <div class="admin-product-cell__img">
+                    <img v-if="product.image && (product.image.startsWith('data:') || product.image.startsWith('http'))" :src="product.image" :alt="product.name" />
+                    <span v-else>{{ product.name?.charAt(0) || '?' }}</span>
+                  </div>
+                  <span class="admin-product-cell__name">{{ product.name }}</span>
                 </div>
               </td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.artist || '-' }}</td>
+              <td><BaseBadge variant="accent" size="xs">{{ getCategoryName(product.category) }}</BaseBadge></td>
+              <td class="admin-mono">R$ {{ formatPrice(product.price) }}</td>
               <td>
-                <span class="category-badge">{{ getCategoryName(product.category) }}</span>
-              </td>
-              <td>R$ {{ product.price.toFixed(2) }}</td>
-              <td>
-                <span :class="['stock-badge', product.stock]">
-                  {{ product.stock === 'print-on-demand' ? 'Sob demanda' : 'Estoque' }}
-                </span>
+                <BaseBadge :variant="product.stock === 'print-on-demand' ? 'default' : 'success'" size="xs">
+                  {{ product.stock === 'print-on-demand' ? $t('admin.stock.onDemand') : $t('admin.stock.inStock') }}
+                </BaseBadge>
               </td>
               <td>
-                <div class="action-buttons">
-                  <button @click="editProduct(product)" class="edit-btn">✏️</button>
-                  <button @click="deleteProduct(product.id)" class="delete-btn">🗑️</button>
+                <div class="admin-actions">
+                  <button class="admin-actions__btn admin-actions__btn--edit" @click="editProduct(product)" :title="$t('common.edit')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="admin-actions__btn admin-actions__btn--delete" @click="deleteProduct(product.id)" :title="$t('common.delete')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <div v-if="filteredProducts.length === 0" class="no-products">
-        <p>Nenhum produto encontrado.</p>
-      </div>
     </div>
 
-    <div v-if="activeTab === 'categories'" class="categories-management">
-      <div class="category-cards">
-        <div v-for="cat in categories" :key="cat.id" class="category-edit-card">
-          <div class="cat-info">
-            <span class="cat-icon">{{ cat.icon }}</span>
-            <input v-model="cat.name" @blur="saveCategories" class="cat-name-input">
-          </div>
-          <button @click="deleteCategory(cat.id)" class="delete-btn">🗑️</button>
+    <!-- Categories Tab -->
+    <div v-if="activeTab === 'categories'" class="admin-section">
+      <div class="admin-categories">
+        <div v-for="cat in productStore.categories" :key="cat.id" class="admin-category-card">
+          <span>{{ cat.icon }} {{ cat.name }}</span>
+          <button class="admin-actions__btn admin-actions__btn--delete" @click="handleDeleteCategory(cat.id)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
-        
-        <div class="add-category-card">
-          <input 
-            v-model="newCategory" 
-            placeholder="Nova categoria..."
-            @keyup.enter="addCategory"
-          >
-          <button @click="addCategory" class="btn-secondary">+</button>
+        <div class="admin-category-card admin-category-card--add">
+          <input v-model="newCategoryName" :placeholder="$t('admin.modal.newCategory')" @keyup.enter="handleAddCategory" />
+          <BaseButton variant="secondary" size="sm" @click="handleAddCategory">{{ $t('common.add') }}</BaseButton>
         </div>
       </div>
     </div>
 
-    <div v-if="showAddModal || editingProduct" class="modal-overlay" @click.self="closeModal">
-      <div class="modal">
-        <h2>{{ editingProduct ? 'Editar Produto' : 'Novo Produto' }}</h2>
-        
-        <form @submit.prevent="saveProduct">
-          <div class="form-group">
-            <label>Nome do produto</label>
-            <input v-model="productForm.name" required>
-          </div>
-
-          <div class="form-group">
-            <label>Categoria</label>
-            <select v-model="productForm.category" required>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                {{ cat.name }}
-              </option>
+    <!-- Product Modal -->
+    <BaseModal v-model="showModal" :title="editingProduct ? $t('admin.modal.editProduct') : $t('admin.modal.newProduct')" size="lg">
+      <form class="admin-form" @submit.prevent="handleSaveProduct">
+        <BaseInput v-model="productForm.name" :label="$t('admin.modal.productName')" required />
+        <div class="admin-form__row">
+          <div class="admin-form__field">
+            <label class="admin-form__label">{{ $t('admin.modal.category') }}</label>
+            <select v-model="productForm.category" required class="admin-select">
+              <option v-for="cat in productStore.categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Preço (R$)</label>
-              <input v-model.number="productForm.price" type="number" step="0.01" required>
-            </div>
-            <div class="form-group">
-              <label>Tipo de estoque</label>
-              <select v-model="productForm.stock">
-                <option value="print-on-demand">Sob demanda</option>
-                <option value="estoque">Estoque</option>
-              </select>
-            </div>
+          <BaseInput v-model.number="productForm.price" :label="$t('admin.modal.price')" type="number" step="0.01" required />
+        </div>
+        <div class="admin-form__row">
+          <div class="admin-form__field">
+            <label class="admin-form__label">{{ $t('admin.modal.stockType') }}</label>
+            <select v-model="productForm.stock" class="admin-select">
+              <option value="print-on-demand">{{ $t('admin.stock.onDemand') }}</option>
+              <option value="estoque">{{ $t('admin.stock.inStock') }}</option>
+            </select>
           </div>
-
-          <div class="form-group">
-            <label>Descrição</label>
-            <textarea v-model="productForm.description" rows="3"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Imagem do produto</label>
-            <div class="image-upload">
-              <input 
-                type="file" 
-                accept="image/*" 
-                @change="handleImageUpload"
-                id="image-upload"
-              >
-              <label for="image-upload" class="upload-btn">
-                📁 Escolher imagem
-              </label>
-              <span v-if="productForm.imagePreview" class="preview-text">
-                ✅ Imagem carregada
-              </span>
-            </div>
-            <input 
-              v-model="productForm.image" 
-              placeholder="Ou cole URL da imagem"
-              class="url-input"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Artista</label>
-            <input v-model="productForm.artist" placeholder="Nome do artista/autor">
-          </div>
-
-          <div class="form-group">
-            <label>Info</label>
-            <input v-model="productForm.info" placeholder="Informações adicionais">
-          </div>
-
-          <div v-if="productForm.category === 'camisetas'" class="form-group">
-            <label>Tamanhos (separados por vírgula)</label>
-            <input v-model="sizesInput" placeholder="P, M, G, GG">
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary">
-              {{ editingProduct ? 'Salvar' : 'Adicionar' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <BaseInput v-model="productForm.sizes" :label="$t('admin.modal.sizes')" :placeholder="$t('admin.modal.sizePlaceholder')" />
+        </div>
+        <div class="admin-form__field">
+          <label class="admin-form__label">{{ $t('admin.modal.description') }}</label>
+          <textarea v-model="productForm.description" rows="3" class="admin-textarea"></textarea>
+        </div>
+        <div class="admin-form__field">
+          <label class="admin-form__label">{{ $t('admin.modal.image') }}</label>
+          <input type="file" accept="image/*" @change="handleImageUpload" class="admin-file" />
+          <input v-model="productForm.image" :placeholder="$t('admin.modal.imagePlaceholder')" class="admin-input" />
+        </div>
+        <BaseInput v-model="productForm.artist" :label="$t('admin.modal.artist')" :placeholder="$t('admin.modal.artistPlaceholder')" />
+        <BaseInput v-model="productForm.info" :label="$t('admin.modal.additionalInfo')" />
+      </form>
+      <template #footer>
+        <BaseButton variant="secondary" @click="closeModal">{{ $t('common.cancel') }}</BaseButton>
+        <BaseButton variant="primary" :loading="saving" @click="handleSaveProduct">
+          {{ editingProduct ? $t('common.save') : $t('common.add') }}
+        </BaseButton>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useProductStore } from '../stores/products'
+import { useToastStore } from '../stores/toast'
+import BaseButton from '../components/common/BaseButton.vue'
+import BaseBadge from '../components/common/BaseBadge.vue'
+import BaseModal from '../components/common/BaseModal.vue'
+import BaseInput from '../components/common/BaseInput.vue'
+import BaseSkeleton from '../components/common/BaseSkeleton.vue'
 
 const productStore = useProductStore()
-
-const products = computed(() => productStore.products)
-const categories = computed(() => productStore.categories)
+const toast = useToastStore()
+const { t } = useI18n()
 
 const activeTab = ref('products')
 const searchQuery = ref('')
 const filterCategory = ref('')
-const showAddModal = ref(false)
+const showModal = ref(false)
 const editingProduct = ref(null)
-const newCategory = ref('')
-const sizesInput = ref('')
+const saving = ref(false)
+const newCategoryName = ref('')
+
+const tabs = computed(() => [
+  { key: 'products', label: t('admin.tabs.products') },
+  { key: 'categories', label: t('admin.tabs.categories') }
+])
 
 const defaultForm = {
   name: '',
-  category: 'livros',
-  price: 0,
+  category: '',
+  price: '',
   description: '',
   stock: 'print-on-demand',
   image: '',
-  imagePreview: false,
   artist: '',
-  info: ''
+  info: '',
+  sizes: ''
 }
 
-const productForm = ref({ ...defaultForm })
+const productForm = reactive({ ...defaultForm })
 
 const filteredProducts = computed(() => {
-  let result = products.value
-  
+  let result = productStore.products
   if (filterCategory.value) {
     result = result.filter(p => p.category === filterCategory.value)
   }
-  
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(p => 
-      p.name.toLowerCase().includes(query) ||
-      p.description?.toLowerCase().includes(query)
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(p =>
+      p.name?.toLowerCase().includes(q) ||
+      p.artist?.toLowerCase().includes(q)
     )
   }
-  
   return result
 })
 
-function getCategoryName(categoryId) {
-  const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.name : categoryId
+onMounted(async () => {
+  await Promise.all([
+    productStore.fetchProducts(),
+    productStore.fetchCategories()
+  ])
+})
+
+function getCategoryName(catId) {
+  const cat = productStore.categories.find(c => c.id === catId)
+  return cat?.name || catId || ''
+}
+
+function formatPrice(val) {
+  return Number(val).toFixed(2).replace('.', ',')
+}
+
+function openAddModal() {
+  editingProduct.value = null
+  Object.assign(productForm, defaultForm)
+  showModal.value = true
+}
+
+function editProduct(product) {
+  editingProduct.value = product
+  Object.assign(productForm, {
+    name: product.name || '',
+    category: product.category || '',
+    price: product.price || '',
+    description: product.description || '',
+    stock: product.stock || 'print-on-demand',
+    image: product.image || '',
+    artist: product.artist || '',
+    info: product.info || '',
+    sizes: product.sizes ? product.sizes.join(', ') : ''
+  })
+  showModal.value = true
+}
+
+function closeModal() {
+  if (editingProduct.value || showModal.value) {
+    showModal.value = false
+    editingProduct.value = null
+    Object.assign(productForm, defaultForm)
+  }
 }
 
 function handleImageUpload(event) {
   const file = event.target.files[0]
   if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('admin.toast.imageTooLarge'))
+      return
+    }
     const reader = new FileReader()
     reader.onload = (e) => {
-      productForm.value.image = e.target.result
-      productForm.value.imagePreview = true
+      productForm.image = e.target.result
     }
     reader.readAsDataURL(file)
   }
 }
 
-function editProduct(product) {
-  editingProduct.value = product
-  productForm.value = { ...product }
-  sizesInput.value = product.sizes ? product.sizes.join(', ') : ''
-}
-
-function deleteProduct(id) {
-  if (confirm('Tem certeza que deseja excluir este produto?')) {
-    productStore.products = productStore.products.filter(p => p.id !== id)
-    saveToStorage()
+async function handleSaveProduct() {
+  if (!productForm.name.trim()) {
+    toast.error(t('admin.toast.nameRequired'))
+    return
   }
-}
 
-function closeModal() {
-  showAddModal.value = false
-  editingProduct.value = null
-  productForm.value = { ...defaultForm }
-  sizesInput.value = ''
-}
-
-function saveProduct() {
-  const sizes = sizesInput.value ? sizesInput.value.split(',').map(s => s.trim()) : null
-  
-  const productData = {
-    ...productForm.value,
-    sizes,
-    image: productForm.value.image || '/images/placeholder.png'
-  }
-  
-  if (editingProduct.value) {
-    const index = productStore.products.findIndex(p => p.id === editingProduct.value.id)
-    if (index !== -1) {
-      productStore.products[index] = { ...editingProduct.value, ...productData }
+  saving.value = true
+  try {
+    const data = {
+      name: productForm.name.trim(),
+      category: productForm.category,
+      price: parseFloat(productForm.price) || 0,
+      description: productForm.description.trim(),
+      stock: productForm.stock,
+      image: productForm.image.trim(),
+      artist: productForm.artist.trim(),
+      info: productForm.info.trim(),
+      sizes: productForm.sizes
+        ? productForm.sizes.split(',').map(s => s.trim()).filter(Boolean)
+        : null
     }
-  } else {
-    const newId = Math.max(...productStore.products.map(p => p.id), 0) + 1
-    productStore.products.push({ ...productData, id: newId })
-  }
-  
-  saveToStorage()
-  closeModal()
-}
 
-function addCategory() {
-  if (!newCategory.value.trim()) return
-  
-  const id = newCategory.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  const icon = '📦'
-  
-  if (!categories.value.find(c => c.id === id)) {
-    productStore.categories.push({ id, name: newCategory.value, icon })
-    saveToStorage()
-  }
-  
-  newCategory.value = ''
-}
+    if (editingProduct.value) {
+      await productStore.updateProduct(editingProduct.value.id, data)
+      toast.success(t('admin.toast.productUpdated'))
+    } else {
+      await productStore.addProduct(data)
+      toast.success(t('admin.toast.productAdded'))
+    }
 
-function deleteCategory(id) {
-  if (confirm('Excluir esta categoria? Os produtos não serão excluídos.')) {
-    productStore.categories = productStore.categories.filter(c => c.id !== id)
-    saveToStorage()
+    closeModal()
+  } catch (err) {
+    toast.error(err.message || t('admin.toast.saveError'))
+  } finally {
+    saving.value = false
   }
 }
 
-function saveCategories() {
-  saveToStorage()
+async function deleteProduct(id) {
+  if (!confirm(t('admin.confirmations.deleteProduct'))) return
+  try {
+    await productStore.deleteProduct(id)
+    toast.success(t('admin.toast.productDeleted'))
+  } catch (err) {
+    toast.error(err.message || t('admin.toast.deleteError'))
+  }
 }
 
-function saveToStorage() {
-  localStorage.setItem('bhumi-products', JSON.stringify(productStore.products))
-  localStorage.setItem('bhumi-categories', JSON.stringify(productStore.categories))
+async function handleAddCategory() {
+  const name = newCategoryName.value.trim()
+  if (!name) return
+
+  try {
+    const id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]/g, '-')
+    await productStore.addCategory({ id, name, icon: '📦' })
+    newCategoryName.value = ''
+    toast.success(t('admin.toast.categoryAdded'))
+  } catch (err) {
+    toast.error(err.message || t('admin.toast.addCategoryError'))
+  }
 }
 
-onMounted(() => {
-  const savedProducts = localStorage.getItem('bhumi-products')
-  const savedCategories = localStorage.getItem('bhumi-categories')
-  
-  if (savedProducts) {
-    productStore.products = JSON.parse(savedProducts)
+async function handleDeleteCategory(id) {
+  if (!confirm(t('admin.confirmations.deleteCategory'))) return
+  try {
+    await productStore.deleteCategory(id)
+    toast.success(t('admin.toast.categoryDeleted'))
+  } catch (err) {
+    toast.error(err.message || t('admin.toast.deleteCategoryError'))
   }
-  if (savedCategories) {
-    productStore.categories = JSON.parse(savedCategories)
-  }
-})
+}
 </script>
 
 <style scoped>
 .admin-page {
-  padding: 2rem 1rem;
-  min-height: 80vh;
+  padding: clamp(1.5rem, 4vh, 2rem) clamp(1rem, 3vw, 1.5rem) clamp(2.5rem, 6vh, 4rem);
 }
 
-.admin-header {
+.admin-page__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.25rem, 3vh, 2rem);
 }
 
-.page-title {
-  font-size: 2rem;
+.admin-page__title {
+  font-size: clamp(1.375rem, 3.5vw, 1.75rem);
+  font-weight: 700;
 }
 
-.admin-tabs {
+.admin-page__tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: clamp(1.25rem, 3vh, 2rem);
 }
 
-.tab-btn {
-  background: transparent;
+.admin-page__tab {
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.8rem, 1.4vw, 0.9rem);
+  font-weight: 500;
   color: var(--text-secondary);
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+}
+
+.admin-page__tab:hover {
+  color: var(--text-primary);
+}
+
+.admin-page__tab--active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
   font-weight: 600;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  transition: all 0.3s ease;
 }
 
-.tab-btn.active {
-  background: var(--accent-purple);
-  color: white;
-}
-
-.tab-btn:hover:not(.active) {
-  border-color: var(--accent-purple);
-  color: var(--text-primary);
-}
-
-.filters {
+.admin-section__filters {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: clamp(0.625rem, 1.5vw, 1rem);
+  margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
 }
 
-.filter-select,
-.search-input {
-  padding: 0.75rem 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+.admin-select,
+.admin-input {
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
+  background: var(--surface-0);
   color: var(--text-primary);
-  border-radius: 4px;
+  outline: none;
+  transition: all var(--transition-fast);
 }
 
-.filter-select {
-  min-width: 200px;
+.admin-select:focus,
+.admin-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 clamp(0.125rem, 0.3vw, 0.1875rem) var(--accent-light);
 }
 
-.search-input {
+.admin-input {
   flex: 1;
-  max-width: 400px;
+  max-width: min(18.75rem, 90%);
 }
 
-.products-table {
+.admin-section__loading,
+.admin-section__empty {
+  padding: clamp(1.25rem, 4vh, 2rem) 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.admin-table-wrap {
   overflow-x: auto;
 }
 
-table {
+.admin-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th, td {
-  padding: 1rem;
+.admin-table th {
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
-}
-
-th {
-  background: var(--bg-secondary);
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(0.625rem, 1.2vw, 1rem);
+  font-size: clamp(0.65rem, 1.1vw, 0.75rem);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border);
 }
 
-.product-thumb {
-  width: 40px;
-  height: 40px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
+.admin-table td {
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(0.625rem, 1.2vw, 1rem);
+  border-bottom: 1px solid var(--surface-2);
+  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
+}
+
+.admin-product-cell {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.2vw, 0.75rem);
+}
+
+.admin-product-cell__img {
+  width: clamp(2.25rem, 4.5vw, 2.5rem);
+  height: clamp(2.25rem, 4.5vw, 2.5rem);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  color: var(--accent-purple);
+  font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  color: var(--text-muted);
 }
 
-.category-badge {
-  background: var(--bg-secondary);
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-}
-
-.stock-badge {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-
-.stock-badge.print-on-demand {
-  background: rgba(157, 78, 221, 0.2);
-  color: var(--accent-purple-light);
-}
-
-.stock-badge.estoque {
-  background: rgba(0, 255, 65, 0.2);
-  color: var(--accent-green);
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.edit-btn, .delete-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.edit-btn:hover {
-  border-color: var(--accent-green);
-}
-
-.delete-btn:hover {
-  border-color: #ff4444;
-}
-
-.no-products {
-  text-align: center;
-  padding: 3rem;
-  color: var(--text-secondary);
-}
-
-.category-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.category-edit-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.cat-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.cat-icon {
-  font-size: 1.5rem;
-}
-
-.cat-name-input {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.add-category-card {
-  background: var(--bg-card);
-  border: 1px dashed var(--border-color);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.add-category-card input {
-  flex: 1;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+.admin-product-cell__img img {
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  object-fit: cover;
+}
+
+.admin-product-cell__name {
+  font-weight: 500;
+}
+
+.admin-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.admin-actions {
+  display: flex;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
+}
+
+.admin-actions__btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  width: clamp(2rem, 4vw, 2.25rem);
+  height: clamp(2rem, 4vw, 2.25rem);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal h2 {
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.admin-actions__btn--edit {
   color: var(--text-secondary);
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 0.75rem;
-  border-radius: 4px;
+.admin-actions__btn--edit:hover {
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
-.image-upload {
+.admin-actions__btn--delete {
+  color: var(--text-muted);
+}
+
+.admin-actions__btn--delete:hover {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.admin-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(clamp(12rem, 25vw, 14rem), 100%), 1fr));
+  gap: clamp(0.625rem, 1.5vw, 1rem);
+}
+
+.admin-category-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
+  justify-content: space-between;
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(0.625rem, 1.2vw, 1rem);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: clamp(0.8rem, 1.4vw, 0.9rem);
+  transition: all var(--transition-fast);
 }
 
-.image-upload input[type="file"] {
-  display: none;
+.admin-category-card:hover {
+  border-color: var(--accent-subtle);
+  box-shadow: var(--shadow-sm);
 }
 
-.upload-btn {
-  background: var(--bg-secondary);
-  border: 1px dashed var(--accent-purple);
-  color: var(--text-primary);
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.upload-btn:hover {
-  border-color: var(--accent-green);
-  background: rgba(0, 255, 65, 0.1);
-}
-
-.preview-text {
-  color: var(--accent-green);
-  font-size: 0.85rem;
-}
-
-.url-input {
-  margin-top: 0.5rem;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-actions {
+.admin-category-card--add {
   display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
+}
+
+.admin-category-card--add input {
+  flex: 1;
+  padding: clamp(0.25rem, 0.6vw, 0.375rem) clamp(0.375rem, 0.75vw, 0.5rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.admin-category-card--add input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 clamp(0.125rem, 0.3vw, 0.1875rem) var(--accent-light);
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vh, 1rem);
+}
+
+.admin-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(0.625rem, 1.5vw, 1rem);
+}
+
+.admin-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.25rem, 0.5vh, 0.375rem);
+}
+
+.admin-form__label {
+  font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.admin-textarea {
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
+  resize: vertical;
+  outline: none;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.admin-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 clamp(0.125rem, 0.3vw, 0.1875rem) var(--accent-light);
+}
+
+.admin-file {
+  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
+  margin-bottom: clamp(0.375rem, 0.75vh, 0.5rem);
 }
 
 @media (max-width: 768px) {
-  .admin-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .filters {
-    flex-direction: column;
-  }
-  
-  .form-row {
+  .admin-form__row {
     grid-template-columns: 1fr;
   }
 }

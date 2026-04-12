@@ -1,0 +1,422 @@
+{
+  "common": {
+    "appName": "BhumiShop",
+    "appDescription": "Bhumisparsha Schoolのオンラインストア。意味、芸術、目的のある製品。",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "delete": "削除",
+    "edit": "編集",
+    "save": "保存",
+    "add": "追加",
+    "remove": "削除",
+    "search": "検索",
+    "close": "閉じる",
+    "back": "戻る",
+    "continue": "続ける",
+    "or": "または",
+    "all": "すべて",
+    "actions": "操作",
+    "image": "画像",
+    "description": "説明",
+    "notes": "メモ",
+    "additionalInfo": "追加情報",
+    "copyright": "© {year} Bhumisparsha School. All rights reserved.",
+    "securePayment": "AbacatePay経由の安全な支払い",
+    "contactEmail": "contact@bhumisparshaschool.org"
+  },
+  "nav": {
+    "home": "ホーム",
+    "products": "製品",
+    "admin": "管理",
+    "myOrders": "注文履歴",
+    "profile": "マイプロフィール",
+    "login": "ログイン",
+    "cart": "カート",
+    "account": "マイアカウント",
+    "contact": "お問い合わせ",
+    "menu": "メニュー"
+  },
+  "home": {
+    "heroTitle1": "目的を持った",
+    "heroTitle2": "アート",
+    "heroSubtitle": "Bhumisparsha Schoolのユニークな製品を見つけましょう -- 本、アートなど。",
+    "viewProducts": "製品を見る",
+    "categories": "カテゴリー",
+    "highlights": "おすすめ"
+  },
+  "products": {
+    "title": "製品",
+    "categories": "カテゴリー",
+    "allCategories": "すべてのカテゴリー",
+    "all": "すべて",
+    "productCount": "{count} 件の製品",
+    "searchPlaceholder": "製品を検索...",
+    "clearSearch": "検索をクリア",
+    "notFound": "製品が見つかりません。",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "productDetail": {
+    "breadcrumbHome": "ホーム",
+    "breadcrumbProducts": "製品",
+    "by": "by",
+    "quantity": "数量",
+    "decrease": "減らす",
+    "increase": "増やす",
+    "onDemand": "オンデマンド印刷",
+    "inStock": "在庫あり",
+    "addToCart": "カートに追加",
+    "viewProducts": "製品を見る",
+    "notFound": "製品が見つかりません",
+    "selectSize": "サイズを選択してください。",
+    "addedToCart": "{name} をカートに追加しました！"
+  },
+  "productCard": {
+    "add": "追加",
+    "addedToCart": "{name} をカートに追加しました"
+  },
+  "productVariants": {
+    "size": "サイズ",
+    "sizePlaceholder": "S, M, L, XL"
+  },
+  "cart": {
+    "title": "カート",
+    "subtitle": "アイテムはサイドパネルに表示されます。上部のカートアイコンをクリックして表示してください。",
+    "openCart": "カートを開く",
+    "checkout": "購入を確定",
+    "viewProducts": "製品を見る",
+    "empty": "カートは空です",
+    "size": "サイズ：",
+    "remove": "削除",
+    "total": "合計",
+    "clearCart": "カートをクリア",
+    "cartCount": "カート ({count})"
+  },
+  "checkout": {
+    "title": "チェックアウト",
+    "steps": {
+      "cart": "Cart",
+      "info": "Information",
+      "payment": "Payment",
+      "confirmation": "Confirmation"
+    },
+    "step1": {
+      "title": "Order Summary",
+      "emptyCart": "Your cart is empty",
+      "viewProducts": "View Products",
+      "continue": "Continue",
+      "bhumiShopItems": "Bhumi Shop Items",
+      "umaPencaItems": "Uma Penca Items",
+      "digitalItems": "Digital Items",
+      "sentByUmaPenca": "Sent by Uma Penca",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi)",
+      "free": "Free",
+      "total": "Total"
+    },
+    "step2": {
+      "title": "Contact Information",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "cpf": "CPF (optional)",
+      "addressSection": "Shipping Address",
+      "cep": "CEP",
+      "street": "Street / Avenue",
+      "number": "Number",
+      "complement": "Complement (optional)",
+      "neighborhood": "Neighborhood",
+      "city": "City",
+      "notes": "Notes (optional)",
+      "back": "Back",
+      "continue": "Continue",
+      "placeholders": {
+        "name": "Your name",
+        "email": "your@email.com",
+        "phone": "(11) 99999-9999",
+        "cpf": "000.000.000-00",
+        "cep": "00000-000",
+        "street": "Delivery address",
+        "number": "No.",
+        "complement": "Apt, block, etc.",
+        "neighborhood": "Neighborhood",
+        "city": "City",
+        "notes": "Additional delivery information"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailInvalid": "Invalid email",
+        "phoneInvalid": "Invalid phone",
+        "cepInvalid": "Invalid CEP"
+      }
+    },
+    "step3": {
+      "title": "Shipping & Payment",
+      "shipping": "Shipping",
+      "selectProvider": "Select Payment Provider",
+      "providerPrompt": "Your cart has items from Uma Penca. Choose how you want to pay:",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi Shop)",
+      "shippingUmaPenca": "Shipping (Uma Penca)",
+      "free": "Free",
+      "total": "Total",
+      "back": "Back",
+      "generatePix": "Generate PIX",
+      "goToPayment": "Go to Payment",
+      "payWithMercadoPago": "Pay with Mercado Pago",
+      "goToUmaPenca": "Go to Uma Penca",
+      "confirmPayment": "Confirm Payment"
+    },
+    "stepperSteps": [
+      "Cart",
+      "Info",
+      "Shipping & Payment",
+      "Confirmation"
+    ],
+    "step4": {
+      "title": "Processing Payment",
+      "finalizePayment": "Finalize Payment",
+      "redirectDesc": "You will be redirected to the secure AbacatePay checkout.",
+      "loadingMercadoPago": "Loading Mercado Pago...",
+      "redirectingUmaPenca": "Redirecting to Uma Penca",
+      "umaPencaDesc": "Your items will be processed in the Uma Penca checkout.",
+      "goToUmaPenca": "Go to Uma Penca",
+      "continueShopping": "Continue Shopping",
+      "viewOrders": "View My Orders",
+      "pixConfirmed": "PIX payment confirmed!"
+    }
+  },
+  "payment": {
+    "title": "支払い方法",
+    "pix": "PIX",
+    "pixDescription": "即時支払い",
+    "creditCard": "クレジットカード",
+    "creditCardDescription": "AbacatePay経由",
+    "pixBricks": "PIX (Mercado Pago)",
+    "pixBricksDescription": "Instant payment via Mercado Pago",
+    "umaPenca": "Uma Penca",
+    "umaPencaDescription": "T-shirts, mugs and more"
+  },
+  "pixPayment": {
+    "title": "PIX支払い",
+    "generating": "QRコードを生成中...",
+    "instructions": "QRコードをスキャンするか、PIXコードをコピーしてください：",
+    "copied": "コピーしました！",
+    "copy": "コピー",
+    "verifying": "支払いを確認中...",
+    "confirmed": "支払いが確認されました！",
+    "waiting": "支払い待ち...",
+    "paid": "支払い済み",
+    "tryAgain": "再試行"
+  },
+  "orderConfirmation": {
+    "title": "注文が確定しました！",
+    "message": "注文 {orderNumber} が正常に作成されました。",
+    "instructions": "下のボタンクリックして支払いを完了してください：",
+    "pixInstruction": "上記のPIX支払いを完了し、「支払い済み」をクリックして確認してください。",
+    "viewOrders": "注文履歴を見る",
+    "continueShopping": "ショッピングを続ける",
+    "goToPayment": "支払いに進む"
+  },
+  "auth": {
+    "login": "ログイン",
+    "register": "アカウント作成",
+    "fullName": "氏名",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "placeholders": {
+      "name": "お名前",
+      "email": "your@email.com",
+      "password": "6文字以上"
+    },
+    "validation": {
+      "nameRequired": "名前は必須です",
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "無効なメールアドレス",
+      "passwordRequired": "パスワードは必須です",
+      "passwordMinLength": "6文字以上"
+    },
+    "divider": "または",
+    "wechat": "WeChatで続ける",
+    "sms": "SMSでログイン",
+    "phone": "電話番号",
+    "phonePlaceholder": "+55 11 99999-9999",
+    "sendSmsCode": "SMSコードを送信",
+    "codeSent": "コードを送信しました！携帯電話を確認してください。",
+    "smsCodeSent": "SMSコードを送信しました！",
+    "switchToRegister": "アカウントをお持ちでないですか？アカウント作成",
+    "switchToLogin": "すでにアカウントをお持ちですか？ログイン",
+    "errors": {
+      "wechatLogin": "WeChatログインエラー",
+      "phoneRequired": "電話番号は必須です",
+      "smsCode": "SMSコード送信エラー",
+      "processRequest": "リクエスト処理エラー"
+    },
+    "toast": {
+      "loginSuccess": "ログインしました！",
+      "registerSuccess": "アカウントが作成されました！"
+    }
+  },
+  "profile": {
+    "title": "マイプロフィール",
+    "admin": "管理者",
+    "myOrders": "注文履歴",
+    "logout": "ログアウト",
+    "empty": "プロフィールを表示するにはログインが必要です。",
+    "login": "ログイン",
+    "toast": {
+      "logoutSuccess": "ログアウトしました",
+      "logoutError": "ログアウトエラー"
+    }
+  },
+  "myOrders": {
+    "title": "注文履歴",
+    "empty": "注文が見つかりません",
+    "viewProducts": "製品を見る",
+    "status": {
+      "pending": "保留中",
+      "processing": "処理中",
+      "shipped": "発送済み",
+      "delivered": "お届け済み",
+      "cancelled": "キャンセル済み"
+    },
+    "payment": {
+      "pending": "支払い保留中",
+      "paid": "支払い済み",
+      "failed": "失敗",
+      "refunded": "返金済み"
+    },
+    "labels": {
+      "pixPayment": "支払い：PIX",
+      "cardPayment": "支払い：カード",
+      "total": "合計："
+    }
+  },
+  "admin": {
+    "title": "管理パネル",
+    "addProduct": "+ 製品を追加",
+    "tabs": {
+      "products": "製品",
+      "categories": "カテゴリー"
+    },
+    "filters": {
+      "allCategories": "すべてのカテゴリー",
+      "searchProduct": "製品を検索..."
+    },
+    "table": {
+      "name": "名前",
+      "category": "カテゴリー",
+      "price": "価格",
+      "stock": "在庫",
+      "actions": "操作"
+    },
+    "stock": {
+      "onDemand": "オンデマンド",
+      "inStock": "在庫あり"
+    },
+    "empty": "製品が見つかりません。",
+    "modal": {
+      "editProduct": "製品を編集",
+      "newProduct": "新しい製品",
+      "productName": "製品名",
+      "category": "カテゴリー",
+      "price": "価格 (R$)",
+      "stockType": "在庫タイプ",
+      "sizes": "サイズ（カンマ区切り）",
+      "description": "説明",
+      "image": "画像",
+      "artist": "アーティスト",
+      "additionalInfo": "追加情報",
+      "sizePlaceholder": "S, M, L, XL",
+      "imagePlaceholder": "または画像URLを貼り付け",
+      "artistPlaceholder": "アーティスト/著者名",
+      "newCategory": "新しいカテゴリー..."
+    },
+    "confirmations": {
+      "deleteProduct": "この製品を削除してもよろしいですか？",
+      "deleteCategory": "このカテゴリーを削除しますか？"
+    },
+    "toast": {
+      "imageTooLarge": "画像が大きすぎます。最大5MB。",
+      "nameRequired": "製品名は必須です",
+      "productUpdated": "製品が更新されました",
+      "productAdded": "製品が追加されました",
+      "productDeleted": "製品が削除されました",
+      "categoryAdded": "カテゴリーが追加されました",
+      "categoryDeleted": "カテゴリーが削除されました",
+      "saveError": "製品保存エラー",
+      "deleteError": "製品削除エラー",
+      "addCategoryError": "カテゴリー追加エラー",
+      "deleteCategoryError": "カテゴリー削除エラー"
+    }
+  },
+  "toast": {
+    "pixConfirmed": "PIX支払いが確認されました！",
+    "paymentError": "支払い処理エラー"
+  },
+  "theme": {
+    "lightMode": "ライトモードに切り替え",
+    "darkMode": "ダークモードに切り替え"
+  },
+  "stores": {
+    "products": {
+      "loadError": "製品読み込みエラー",
+      "loadCategoriesError": "カテゴリー読み込みエラー",
+      "addError": "製品追加エラー",
+      "updateError": "製品更新エラー",
+      "deleteError": "製品削除エラー",
+      "addCategoryError": "カテゴリー追加エラー",
+      "deleteCategoryError": "カテゴリー削除エラー"
+    },
+    "orders": {
+      "loadError": "注文読み込みエラー",
+      "loadOrderError": "注文読み込みエラー",
+      "createError": "注文作成エラー"
+    },
+    "checkout": {
+      "createOrderError": "注文作成に失敗しました",
+      "paymentError": "支払い処理エラー",
+      "orderSuccess": "注文が作成されました！",
+      "pixConfirmed": "PIX支払いが確認されました！"
+    },
+    "shipping": {
+      "invalidCEP": "Invalid CEP or region not served",
+      "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+      "immediateDigitalDelivery": "Immediate digital delivery"
+    }
+  },
+  "shipping": {
+    "calculateShipping": "Calculate Shipping",
+    "freeShippingProgress": "Free shipping on own items!",
+    "freeShippingRemaining": "Only R$ {amount} left for free shipping",
+    "bhumiShopItems": "Bhumi Shop Items",
+    "umaPencaItems": "Uma Penca Items",
+    "digitalItems": "Digital Items",
+    "immediateDelivery": "Immediate Delivery",
+    "businessDays": "{days} business days",
+    "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+    "immediateDigitalDelivery": "Immediate digital delivery",
+    "invalidCEP": "Invalid CEP or region not served"
+  },
+  "paymentProvider": {
+    "title": "How do you want to pay?",
+    "subtitle": "Select payment provider",
+    "close": "Close",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "umaPencaDirect": "Uma Penca Direct",
+    "umaPencaDesc": "T-shirts, mugs and more - sent by Uma Penca",
+    "abacatepay": "AbacatePay",
+    "abacatepayDesc": "PIX and Card - national processing",
+    "pixBricksIntl": "PIX Bricks International",
+    "pixBricksDesc": "International PIX - pay from anywhere",
+    "externalCheckout": "External Checkout",
+    "pix": "PIX",
+    "card": "Card",
+    "upi": "UPI",
+    "alipay": "Alipay"
+  }
+}

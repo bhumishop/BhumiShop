@@ -1,0 +1,422 @@
+{
+  "common": {
+    "appName": "BhumiShop",
+    "appDescription": "ร้านค้าออนไลน์ของ Bhumisparsha School สินค้าที่มีความหมาย ศิลปะ และวัตถุประสงค์",
+    "loading": "กำลังโหลด...",
+    "error": "ข้อผิดพลาด",
+    "success": "สำเร็จ",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "save": "บันทึก",
+    "add": "เพิ่ม",
+    "remove": "ลบออก",
+    "search": "ค้นหา",
+    "close": "ปิด",
+    "back": "ย้อนกลับ",
+    "continue": "ดำเนินการต่อ",
+    "or": "หรือ",
+    "all": "ทั้งหมด",
+    "actions": "การกระทำ",
+    "image": "รูปภาพ",
+    "description": "คำอธิบาย",
+    "notes": "หมายเหตุ",
+    "additionalInfo": "ข้อมูลเพิ่มเติม",
+    "copyright": "© {year} Bhumisparsha School สงวนลิขสิทธิ์",
+    "securePayment": "การชำระเงินที่ปลอดภัยผ่าน AbacatePay",
+    "contactEmail": "contact@bhumisparshaschool.org"
+  },
+  "nav": {
+    "home": "หน้าแรก",
+    "products": "สินค้า",
+    "admin": "ผู้ดูแลระบบ",
+    "myOrders": "คำสั่งซื้อของฉัน",
+    "profile": "โปรไฟล์ของฉัน",
+    "login": "เข้าสู่ระบบ",
+    "cart": "รถเข็น",
+    "account": "บัญชีของฉัน",
+    "contact": "ติดต่อ",
+    "menu": "เมนู"
+  },
+  "home": {
+    "heroTitle1": "ศิลปะที่มี",
+    "heroTitle2": "วัตถุประสงค์",
+    "heroSubtitle": "ค้นพบสินค้าเฉพาะจาก Bhumisparsha School -- หนังสือ ศิลปะ และอีกมากมาย",
+    "viewProducts": "ดูสินค้า",
+    "categories": "หมวดหมู่",
+    "highlights": "สินค้าแนะนำ"
+  },
+  "products": {
+    "title": "สินค้า",
+    "categories": "หมวดหมู่",
+    "allCategories": "หมวดหมู่ทั้งหมด",
+    "all": "ทั้งหมด",
+    "productCount": "{count} สินค้า",
+    "searchPlaceholder": "ค้นหาสินค้า...",
+    "clearSearch": "ล้างการค้นหา",
+    "notFound": "ไม่พบสินค้า",
+    "previous": "ก่อนหน้า",
+    "next": "ถัดไป"
+  },
+  "productDetail": {
+    "breadcrumbHome": "หน้าแรก",
+    "breadcrumbProducts": "สินค้า",
+    "by": "โดย",
+    "quantity": "จำนวน",
+    "decrease": "ลดลง",
+    "increase": "เพิ่มขึ้น",
+    "onDemand": "พิมพ์ตามคำสั่งซื้อ",
+    "inStock": "มีสินค้า",
+    "addToCart": "เพิ่มลงในรถเข็น",
+    "viewProducts": "ดูสินค้า",
+    "notFound": "ไม่พบสินค้า",
+    "selectSize": "กรุณาเลือกขนาด",
+    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว!"
+  },
+  "productCard": {
+    "add": "เพิ่ม",
+    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว"
+  },
+  "productVariants": {
+    "size": "ขนาด",
+    "sizePlaceholder": "S, M, L, XL"
+  },
+  "cart": {
+    "title": "รถเข็น",
+    "subtitle": "สินค้าของคุณแสดงในแผงด้านข้าง คลิกไอคอนรถเข็นที่ด้านบนเพื่อดู",
+    "openCart": "เปิดรถเข็น",
+    "checkout": "ชำระเงิน",
+    "viewProducts": "ดูสินค้า",
+    "empty": "รถเข็นของคุณว่างเปล่า",
+    "size": "ขนาด:",
+    "remove": "ลบออก",
+    "total": "รวม",
+    "clearCart": "ล้างรถเข็น",
+    "cartCount": "รถเข็น ({count})"
+  },
+  "checkout": {
+    "title": "ชำระเงิน",
+    "steps": {
+      "cart": "Cart",
+      "info": "Information",
+      "payment": "Payment",
+      "confirmation": "Confirmation"
+    },
+    "step1": {
+      "title": "Order Summary",
+      "emptyCart": "Your cart is empty",
+      "viewProducts": "View Products",
+      "continue": "Continue",
+      "bhumiShopItems": "Bhumi Shop Items",
+      "umaPencaItems": "Uma Penca Items",
+      "digitalItems": "Digital Items",
+      "sentByUmaPenca": "Sent by Uma Penca",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi)",
+      "free": "Free",
+      "total": "Total"
+    },
+    "step2": {
+      "title": "Contact Information",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "cpf": "CPF (optional)",
+      "addressSection": "Shipping Address",
+      "cep": "CEP",
+      "street": "Street / Avenue",
+      "number": "Number",
+      "complement": "Complement (optional)",
+      "neighborhood": "Neighborhood",
+      "city": "City",
+      "notes": "Notes (optional)",
+      "back": "Back",
+      "continue": "Continue",
+      "placeholders": {
+        "name": "Your name",
+        "email": "your@email.com",
+        "phone": "(11) 99999-9999",
+        "cpf": "000.000.000-00",
+        "cep": "00000-000",
+        "street": "Delivery address",
+        "number": "No.",
+        "complement": "Apt, block, etc.",
+        "neighborhood": "Neighborhood",
+        "city": "City",
+        "notes": "Additional delivery information"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailInvalid": "Invalid email",
+        "phoneInvalid": "Invalid phone",
+        "cepInvalid": "Invalid CEP"
+      }
+    },
+    "step3": {
+      "title": "Shipping & Payment",
+      "shipping": "Shipping",
+      "selectProvider": "Select Payment Provider",
+      "providerPrompt": "Your cart has items from Uma Penca. Choose how you want to pay:",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Shipping (Bhumi Shop)",
+      "shippingUmaPenca": "Shipping (Uma Penca)",
+      "free": "Free",
+      "total": "Total",
+      "back": "Back",
+      "generatePix": "Generate PIX",
+      "goToPayment": "Go to Payment",
+      "payWithMercadoPago": "Pay with Mercado Pago",
+      "goToUmaPenca": "Go to Uma Penca",
+      "confirmPayment": "Confirm Payment"
+    },
+    "stepperSteps": [
+      "Cart",
+      "Info",
+      "Shipping & Payment",
+      "Confirmation"
+    ],
+    "step4": {
+      "title": "Processing Payment",
+      "finalizePayment": "Finalize Payment",
+      "redirectDesc": "You will be redirected to the secure AbacatePay checkout.",
+      "loadingMercadoPago": "Loading Mercado Pago...",
+      "redirectingUmaPenca": "Redirecting to Uma Penca",
+      "umaPencaDesc": "Your items will be processed in the Uma Penca checkout.",
+      "goToUmaPenca": "Go to Uma Penca",
+      "continueShopping": "Continue Shopping",
+      "viewOrders": "View My Orders",
+      "pixConfirmed": "PIX payment confirmed!"
+    }
+  },
+  "payment": {
+    "title": "วิธีการชำระเงิน",
+    "pix": "PIX",
+    "pixDescription": "การชำระเงินทันที",
+    "creditCard": "บัตรเครดิต",
+    "creditCardDescription": "ผ่าน AbacatePay",
+    "pixBricks": "PIX (Mercado Pago)",
+    "pixBricksDescription": "Instant payment via Mercado Pago",
+    "umaPenca": "Uma Penca",
+    "umaPencaDescription": "T-shirts, mugs and more"
+  },
+  "pixPayment": {
+    "title": "ชำระเงิน PIX",
+    "generating": "กำลังสร้าง QR Code...",
+    "instructions": "สแกน QR Code หรือคัดลอกโค้ด PIX:",
+    "copied": "คัดลอกแล้ว!",
+    "copy": "คัดลอก",
+    "verifying": "กำลังตรวจสอบการชำระเงิน...",
+    "confirmed": "ยืนยันการชำระเงินแล้ว!",
+    "waiting": "รอการชำระเงิน...",
+    "paid": "ฉันชำระเงินแล้ว",
+    "tryAgain": "ลองอีกครั้ง"
+  },
+  "orderConfirmation": {
+    "title": "สั่งซื้อสำเร็จ!",
+    "message": "คำสั่งซื้อ {orderNumber} ของคุณถูกสร้างเรียบร้อยแล้ว",
+    "instructions": "คลิกปุ่มด้านล่างเพื่อชำระเงินให้เสร็จสิ้น:",
+    "pixInstruction": "ชำระเงิน PIX ด้านบนแล้วคลิก 'ฉันชำระเงินแล้ว' เพื่อยืนยัน",
+    "viewOrders": "ดูคำสั่งซื้อของฉัน",
+    "continueShopping": "ช้อปต่อ",
+    "goToPayment": "ไปที่การชำระเงิน"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "register": "สร้างบัญชี",
+    "fullName": "ชื่อเต็ม",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "placeholders": {
+      "name": "ชื่อของคุณ",
+      "email": "your@email.com",
+      "password": "อย่างน้อย 6 ตัวอักษร"
+    },
+    "validation": {
+      "nameRequired": "ต้องระบุชื่อ",
+      "emailRequired": "ต้องระบุอีเมล",
+      "emailInvalid": "อีเมลไม่ถูกต้อง",
+      "passwordRequired": "ต้องระบุรหัสผ่าน",
+      "passwordMinLength": "อย่างน้อย 6 ตัวอักษร"
+    },
+    "divider": "หรือ",
+    "wechat": "ดำเนินการต่อด้วย WeChat",
+    "sms": "เข้าสู่ระบบด้วย SMS",
+    "phone": "โทรศัพท์",
+    "phonePlaceholder": "+55 11 99999-9999",
+    "sendSmsCode": "ส่งรหัส SMS",
+    "codeSent": "ส่งรหัสแล้ว! ตรวจสอบโทรศัพท์ของคุณ",
+    "smsCodeSent": "ส่งรหัส SMS แล้ว!",
+    "switchToRegister": "ยังไม่มีบัญชี? สร้างบัญชี",
+    "switchToLogin": "มีบัญชีอยู่แล้ว? เข้าสู่ระบบ",
+    "errors": {
+      "wechatLogin": "ข้อผิดพลาดในการเข้าสู่ระบบด้วย WeChat",
+      "phoneRequired": "ต้องระบุเบอร์โทรศัพท์",
+      "smsCode": "ข้อผิดพลาดในการส่งรหัส SMS",
+      "processRequest": "ข้อผิดพลาดในการประมวลผลคำขอ"
+    },
+    "toast": {
+      "loginSuccess": "เข้าสู่ระบบสำเร็จ!",
+      "registerSuccess": "สร้างบัญชีสำเร็จ!"
+    }
+  },
+  "profile": {
+    "title": "โปรไฟล์ของฉัน",
+    "admin": "ผู้ดูแลระบบ",
+    "myOrders": "คำสั่งซื้อของฉัน",
+    "logout": "ออกจากระบบ",
+    "empty": "คุณต้องเข้าสู่ระบบเพื่อดูโปรไฟล์ของคุณ",
+    "login": "เข้าสู่ระบบ",
+    "toast": {
+      "logoutSuccess": "คุณออกจากระบบแล้ว",
+      "logoutError": "ข้อผิดพลาดในการออกจากระบบ"
+    }
+  },
+  "myOrders": {
+    "title": "คำสั่งซื้อของฉัน",
+    "empty": "ไม่พบคำสั่งซื้อ",
+    "viewProducts": "ดูสินค้า",
+    "status": {
+      "pending": "รอดำเนินการ",
+      "processing": "กำลังดำเนินการ",
+      "shipped": "จัดส่งแล้ว",
+      "delivered": "จัดส่งถึงแล้ว",
+      "cancelled": "ยกเลิกแล้ว"
+    },
+    "payment": {
+      "pending": "รอชำระเงิน",
+      "paid": "ชำระเงินแล้ว",
+      "failed": "ล้มเหลว",
+      "refunded": "คืนเงินแล้ว"
+    },
+    "labels": {
+      "pixPayment": "ชำระเงิน: PIX",
+      "cardPayment": "ชำระเงิน: บัตร",
+      "total": "รวม:"
+    }
+  },
+  "admin": {
+    "title": "แผงผู้ดูแลระบบ",
+    "addProduct": "+ เพิ่มสินค้า",
+    "tabs": {
+      "products": "สินค้า",
+      "categories": "หมวดหมู่"
+    },
+    "filters": {
+      "allCategories": "หมวดหมู่ทั้งหมด",
+      "searchProduct": "ค้นหาสินค้า..."
+    },
+    "table": {
+      "name": "ชื่อ",
+      "category": "หมวดหมู่",
+      "price": "ราคา",
+      "stock": "สินค้าคงคลัง",
+      "actions": "การกระทำ"
+    },
+    "stock": {
+      "onDemand": "ตามคำสั่งซื้อ",
+      "inStock": "มีสินค้า"
+    },
+    "empty": "ไม่พบสินค้า",
+    "modal": {
+      "editProduct": "แก้ไขสินค้า",
+      "newProduct": "สินค้าใหม่",
+      "productName": "ชื่อสินค้า",
+      "category": "หมวดหมู่",
+      "price": "ราคา (R$)",
+      "stockType": "ประเภทสินค้าคงคลัง",
+      "sizes": "ขนาด (คั่นด้วยเครื่องหมายจุลภาค)",
+      "description": "คำอธิบาย",
+      "image": "รูปภาพ",
+      "artist": "ศิลปิน",
+      "additionalInfo": "ข้อมูลเพิ่มเติม",
+      "sizePlaceholder": "S, M, L, XL",
+      "imagePlaceholder": "หรือวาง URL รูปภาพ",
+      "artistPlaceholder": "ชื่อศิลปิน/ผู้เขียน",
+      "newCategory": "หมวดหมู่ใหม่..."
+    },
+    "confirmations": {
+      "deleteProduct": "คุณแน่ใจหรือว่าต้องการลบสินค้านี้?",
+      "deleteCategory": "ลบหมวดหมู่นี้?"
+    },
+    "toast": {
+      "imageTooLarge": "รูปภาพใหญ่เกินไป สูงสุด 5MB",
+      "nameRequired": "ต้องระบุชื่อสินค้า",
+      "productUpdated": "อัปเดตสินค้าเรียบร้อยแล้ว",
+      "productAdded": "เพิ่มสินค้าเรียบร้อยแล้ว",
+      "productDeleted": "ลบสินค้าแล้ว",
+      "categoryAdded": "เพิ่มหมวดหมู่แล้ว",
+      "categoryDeleted": "ลบหมวดหมู่แล้ว",
+      "saveError": "ข้อผิดพลาดในการบันทึกสินค้า",
+      "deleteError": "ข้อผิดพลาดในการลบสินค้า",
+      "addCategoryError": "ข้อผิดพลาดในการเพิ่มหมวดหมู่",
+      "deleteCategoryError": "ข้อผิดพลาดในการลบหมวดหมู่"
+    }
+  },
+  "toast": {
+    "pixConfirmed": "ยืนยันการชำระเงิน PIX แล้ว!",
+    "paymentError": "ข้อผิดพลาดในการประมวลผลการชำระเงิน"
+  },
+  "theme": {
+    "lightMode": "สลับเป็นโหมดสว่าง",
+    "darkMode": "สลับเป็นโหมดมืด"
+  },
+  "stores": {
+    "products": {
+      "loadError": "ข้อผิดพลาดในการโหลดสินค้า",
+      "loadCategoriesError": "ข้อผิดพลาดในการโหลดหมวดหมู่",
+      "addError": "ข้อผิดพลาดในการเพิ่มสินค้า",
+      "updateError": "ข้อผิดพลาดในการอัปเดตสินค้า",
+      "deleteError": "ข้อผิดพลาดในการลบสินค้า",
+      "addCategoryError": "ข้อผิดพลาดในการเพิ่มหมวดหมู่",
+      "deleteCategoryError": "ข้อผิดพลาดในการลบหมวดหมู่"
+    },
+    "orders": {
+      "loadError": "ข้อผิดพลาดในการโหลดคำสั่งซื้อ",
+      "loadOrderError": "ข้อผิดพลาดในการโหลดคำสั่งซื้อ",
+      "createError": "ข้อผิดพลาดในการสร้างคำสั่งซื้อ"
+    },
+    "checkout": {
+      "createOrderError": "สร้างคำสั่งซื้อไม่สำเร็จ",
+      "paymentError": "ข้อผิดพลาดในการประมวลผลการชำระเงิน",
+      "orderSuccess": "สร้างคำสั่งซื้อเรียบร้อยแล้ว!",
+      "pixConfirmed": "ยืนยันการชำระเงิน PIX แล้ว!"
+    },
+    "shipping": {
+      "invalidCEP": "Invalid CEP or region not served",
+      "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+      "immediateDigitalDelivery": "Immediate digital delivery"
+    }
+  },
+  "shipping": {
+    "calculateShipping": "Calculate Shipping",
+    "freeShippingProgress": "Free shipping on own items!",
+    "freeShippingRemaining": "Only R$ {amount} left for free shipping",
+    "bhumiShopItems": "Bhumi Shop Items",
+    "umaPencaItems": "Uma Penca Items",
+    "digitalItems": "Digital Items",
+    "immediateDelivery": "Immediate Delivery",
+    "businessDays": "{days} business days",
+    "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
+    "immediateDigitalDelivery": "Immediate digital delivery",
+    "invalidCEP": "Invalid CEP or region not served"
+  },
+  "paymentProvider": {
+    "title": "How do you want to pay?",
+    "subtitle": "Select payment provider",
+    "close": "Close",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "umaPencaDirect": "Uma Penca Direct",
+    "umaPencaDesc": "T-shirts, mugs and more - sent by Uma Penca",
+    "abacatepay": "AbacatePay",
+    "abacatepayDesc": "PIX and Card - national processing",
+    "pixBricksIntl": "PIX Bricks International",
+    "pixBricksDesc": "International PIX - pay from anywhere",
+    "externalCheckout": "External Checkout",
+    "pix": "PIX",
+    "card": "Card",
+    "upi": "UPI",
+    "alipay": "Alipay"
+  }
+}

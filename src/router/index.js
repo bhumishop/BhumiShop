@@ -1,13 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ProductsView from '../views/ProductsView.vue'
-import ProductDetailView from '../views/ProductDetailView.vue'
-import CartView from '../views/CartView.vue'
-import AboutView from '../views/AboutView.vue'
-import VideosView from '../views/VideosView.vue'
-import AuthView from '../views/AuthView.vue'
-import MyOrdersView from '../views/MyOrdersView.vue'
-import ProfileView from '../views/ProfileView.vue'
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,47 +7,52 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: () => import('../views/HomeView.vue')
     },
     {
       path: '/produtos',
       name: 'products',
-      component: ProductsView
+      component: () => import('../views/ProductsView.vue')
     },
     {
       path: '/produtos/:id',
       name: 'product-detail',
-      component: ProductDetailView
+      component: () => import('../views/ProductDetailView.vue')
     },
     {
       path: '/carrinho',
       name: 'cart',
-      component: CartView
+      component: () => import('../views/CartView.vue')
     },
     {
-      path: '/sobre',
-      name: 'about',
-      component: AboutView
-    },
-    {
-      path: '/videos',
-      name: 'videos',
-      component: VideosView
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../views/CheckoutView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
       name: 'login',
-      component: AuthView
+      component: () => import('../views/AuthView.vue'),
+      meta: { guest: true }
     },
     {
       path: '/minhas-compras',
       name: 'my-orders',
-      component: MyOrdersView
+      component: () => import('../views/MyOrdersView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/perfil',
       name: 'profile',
-      component: ProfileView
+      component: () => import('../views/ProfileView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -65,10 +62,34 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
-    } else {
-      return { top: 0 }
+    }
+    return { top: 0 }
+  }
+})
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  if (!authStore.initialized) {
+    await authStore.initialize()
+  }
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return next({ name: 'login', query: { redirect: to.fullPath } })
+  }
+
+  if (to.meta.requiresAdmin) {
+    const isAdmin = await authStore.checkAdminRole()
+    if (!isAdmin) {
+      return next({ name: 'home' })
     }
   }
+
+  if (to.meta.guest && authStore.isLoggedIn) {
+    return next({ name: 'home' })
+  }
+
+  next()
 })
 
 export default router

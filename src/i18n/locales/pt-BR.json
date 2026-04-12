@@ -1,0 +1,417 @@
+{
+  "common": {
+    "appName": "BhumiShop",
+    "appDescription": "Loja virtual da Bhumisparsha School. Produtos com significado, arte e proposito.",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "save": "Salvar",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "search": "Buscar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "or": "ou",
+    "all": "Todos",
+    "actions": "Acoes",
+    "image": "Imagem",
+    "description": "Descricao",
+    "notes": "Observacoes",
+    "additionalInfo": "Informacoes adicionais",
+    "copyright": "© {year} Bhumisparsha School. Todos os direitos reservados.",
+    "securePayment": "Pagamento seguro via AbacatePay",
+    "contactEmail": "contato@bhumisparshaschool.org"
+  },
+  "nav": {
+    "home": "Inicio",
+    "products": "Produtos",
+    "admin": "Admin",
+    "myOrders": "Meus Pedidos",
+    "profile": "Meu Perfil",
+    "login": "Entrar",
+    "cart": "Carrinho",
+    "account": "Minha conta",
+    "contact": "Contato",
+    "menu": "Menu"
+  },
+  "home": {
+    "heroTitle1": "Arte com",
+    "heroTitle2": "Proposito",
+    "heroSubtitle": "Descubra produtos unicos da Bhumisparsha School -- livros, arte e muito mais.",
+    "viewProducts": "Ver Produtos",
+    "categories": "Categorias",
+    "highlights": "Destaques"
+  },
+  "products": {
+    "title": "Produtos",
+    "categories": "Categorias",
+    "allCategories": "Todas as categorias",
+    "all": "Todos",
+    "productCount": "{count} produto | {count} produtos",
+    "searchPlaceholder": "Buscar produtos...",
+    "clearSearch": "Limpar busca",
+    "notFound": "Nenhum produto encontrado.",
+    "previous": "Anterior",
+    "next": "Proximo"
+  },
+  "productDetail": {
+    "breadcrumbHome": "Inicio",
+    "breadcrumbProducts": "Produtos",
+    "by": "por",
+    "quantity": "Quantidade",
+    "decrease": "Diminuir",
+    "increase": "Aumentar",
+    "onDemand": "Impressao sob demanda",
+    "inStock": "Em estoque",
+    "addToCart": "Adicionar ao Carrinho",
+    "viewProducts": "Ver Produtos",
+    "notFound": "Produto nao encontrado",
+    "selectSize": "Por favor, selecione um tamanho.",
+    "addedToCart": "{name} adicionado ao carrinho!"
+  },
+  "productCard": {
+    "add": "Adicionar",
+    "addedToCart": "{name} adicionado ao carrinho"
+  },
+  "productVariants": {
+    "size": "Tamanho",
+    "sizePlaceholder": "P, M, G, GG"
+  },
+  "cart": {
+    "title": "Carrinho",
+    "subtitle": "Seus itens aparecem no painel lateral. Clique no icone do carrinho no topo para ver.",
+    "openCart": "Abrir Carrinho",
+    "checkout": "Finalizar Compra",
+    "viewProducts": "Ver Produtos",
+    "empty": "Seu carrinho esta vazio",
+    "size": "Tamanho:",
+    "remove": "Remover",
+    "total": "Total",
+    "clearCart": "Limpar carrinho",
+    "cartCount": "Carrinho ({count})"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "stepperSteps": ["Carrinho", "Informacoes", "Entrega e Pagamento", "Confirmacao"],
+    "step1": {
+      "title": "Resumo do Pedido",
+      "emptyCart": "Seu carrinho esta vazio",
+      "viewProducts": "Ver Produtos",
+      "continue": "Continuar",
+      "bhumiShopItems": "Itens Bhumi Shop",
+      "umaPencaItems": "Itens Uma Penca",
+      "digitalItems": "Itens Digitais",
+      "sentByUmaPenca": "Enviado pela Uma Penca",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Frete (Bhumi)",
+      "free": "Gratis",
+      "total": "Total"
+    },
+    "step2": {
+      "title": "Informacoes de Contato",
+      "fullName": "Nome completo",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "cpf": "CPF (opcional)",
+      "addressSection": "Endereco de Entrega",
+      "cep": "CEP",
+      "street": "Rua / Avenida",
+      "number": "Numero",
+      "complement": "Complemento (opcional)",
+      "neighborhood": "Bairro",
+      "city": "Cidade",
+      "notes": "Observacoes (opcional)",
+      "back": "Voltar",
+      "continue": "Continuar",
+      "placeholders": {
+        "name": "Seu nome",
+        "email": "seu@email.com",
+        "phone": "(11) 99999-9999",
+        "cpf": "000.000.000-00",
+        "cep": "00000-000",
+        "street": "Endereco de entrega",
+        "number": "No.",
+        "complement": "Apto, bloco, etc.",
+        "neighborhood": "Bairro",
+        "city": "Cidade",
+        "notes": "Informacoes adicionais sobre a entrega"
+      },
+      "validation": {
+        "nameRequired": "Nome e obrigatorio",
+        "emailInvalid": "E-mail invalido",
+        "phoneInvalid": "Telefone invalido",
+        "cepInvalid": "CEP invalido"
+      }
+    },
+    "step3": {
+      "title": "Entrega e Pagamento",
+      "shipping": "Frete",
+      "selectProvider": "Selecionar Provedor de Pagamento",
+      "providerPrompt": "Seu carrinho tem itens da Uma Penca. Escolha como deseja pagar:",
+      "subtotal": "Subtotal",
+      "shippingBhumi": "Frete (Bhumi Shop)",
+      "shippingUmaPenca": "Frete (Uma Penca)",
+      "free": "Gratis",
+      "total": "Total",
+      "back": "Voltar",
+      "generatePix": "Gerar PIX",
+      "goToPayment": "Ir para Pagamento",
+      "payWithMercadoPago": "Pagar com Mercado Pago",
+      "goToUmaPenca": "Ir para Uma Penca",
+      "confirmPayment": "Confirmar Pagamento"
+    },
+    "step4": {
+      "title": "Processando Pagamento",
+      "finalizePayment": "Finalizar Pagamento",
+      "redirectDesc": "Voce sera redirecionado para o checkout seguro da AbacatePay.",
+      "loadingMercadoPago": "Carregando Mercado Pago...",
+      "redirectingUmaPenca": "Redirecionando para Uma Penca",
+      "umaPencaDesc": "Seus itens serao processados no checkout da Uma Penca.",
+      "goToUmaPenca": "Ir para Uma Penca",
+      "continueShopping": "Continuar Comprando",
+      "viewOrders": "Ver Meus Pedidos",
+      "pixConfirmed": "Pagamento PIX confirmado!"
+    },
+    "steps": {
+      "cart": "Carrinho",
+      "info": "Informacoes",
+      "payment": "Pagamento",
+      "confirmation": "Confirmacao"
+    }
+  },
+  "payment": {
+    "title": "Forma de Pagamento",
+    "pix": "PIX",
+    "pixDescription": "Pagamento instantaneo via AbacatePay",
+    "creditCard": "Cartao de Credito",
+    "creditCardDescription": "Parcelas via AbacatePay",
+    "pixBricks": "PIX Bricks Internacional",
+    "pixBricksDescription": "PIX, UPI, Alipay, WeChat Pay",
+    "umaPenca": "Uma Penca",
+    "umaPencaDescription": "Camisetas, canecas e mais"
+  },
+  "pixPayment": {
+    "title": "Pagamento PIX",
+    "generating": "Gerando QR Code...",
+    "instructions": "Escaneie o QR Code ou copie o codigo PIX:",
+    "copied": "Copiado!",
+    "copy": "Copiar",
+    "verifying": "Verificando pagamento...",
+    "confirmed": "Pagamento confirmado!",
+    "waiting": "Aguardando pagamento...",
+    "paid": "Ja Paguei",
+    "tryAgain": "Tentar Novamente"
+  },
+  "orderConfirmation": {
+    "title": "Pedido Realizado!",
+    "message": "Seu pedido {orderNumber} foi criado com sucesso.",
+    "instructions": "Clique no botao abaixo para finalizar o pagamento:",
+    "pixInstruction": "Finalize o pagamento PIX acima e clique em 'Ja Paguei' para confirmar.",
+    "viewOrders": "Ver meus pedidos",
+    "continueShopping": "Continuar comprando",
+    "goToPayment": "Ir para Pagamento"
+  },
+  "auth": {
+    "login": "Entrar",
+    "register": "Criar Conta",
+    "fullName": "Nome completo",
+    "email": "E-mail",
+    "password": "Senha",
+    "placeholders": {
+      "name": "Seu nome",
+      "email": "seu@email.com",
+      "password": "Minimo 6 caracteres"
+    },
+    "validation": {
+      "nameRequired": "Nome e obrigatorio",
+      "emailRequired": "E-mail e obrigatorio",
+      "emailInvalid": "E-mail invalido",
+      "passwordRequired": "Senha e obrigatoria",
+      "passwordMinLength": "Minimo 6 caracteres"
+    },
+    "divider": "ou",
+    "wechat": "Continuar com WeChat",
+    "sms": "Entrar com SMS",
+    "phone": "Telefone",
+    "phonePlaceholder": "+55 11 99999-9999",
+    "sendSmsCode": "Enviar codigo SMS",
+    "codeSent": "Codigo enviado! Verifique seu telefone.",
+    "smsCodeSent": "Codigo SMS enviado!",
+    "switchToRegister": "Nao tem conta? Criar conta",
+    "switchToLogin": "Ja tem conta? Entrar",
+    "errors": {
+      "wechatLogin": "Erro ao entrar com WeChat",
+      "phoneRequired": "Telefone e obrigatorio",
+      "smsCode": "Erro ao enviar codigo SMS",
+      "processRequest": "Erro ao processar solicitacao"
+    },
+    "toast": {
+      "loginSuccess": "Login realizado com sucesso!",
+      "registerSuccess": "Conta criada com sucesso!"
+    }
+  },
+  "profile": {
+    "title": "Meu Perfil",
+    "admin": "Admin",
+    "myOrders": "Meus Pedidos",
+    "logout": "Sair",
+    "empty": "Voce precisa estar logado para ver seu perfil.",
+    "login": "Entrar",
+    "toast": {
+      "logoutSuccess": "Voce saiu da sua conta",
+      "logoutError": "Erro ao sair"
+    }
+  },
+  "myOrders": {
+    "title": "Meus Pedidos",
+    "empty": "Nenhum pedido encontrado",
+    "viewProducts": "Ver Produtos",
+    "status": {
+      "pending": "Pendente",
+      "processing": "Processando",
+      "shipped": "Enviado",
+      "delivered": "Entregue",
+      "cancelled": "Cancelado"
+    },
+    "payment": {
+      "pending": "Pagamento Pendente",
+      "paid": "Pago",
+      "failed": "Falhou",
+      "refunded": "Reembolsado"
+    },
+    "labels": {
+      "pixPayment": "Pagamento: PIX",
+      "cardPayment": "Pagamento: Cartao",
+      "total": "Total:"
+    }
+  },
+  "admin": {
+    "title": "Painel Admin",
+    "addProduct": "+ Adicionar Produto",
+    "tabs": {
+      "products": "Produtos",
+      "categories": "Categorias"
+    },
+    "filters": {
+      "allCategories": "Todas as categorias",
+      "searchProduct": "Buscar produto..."
+    },
+    "table": {
+      "name": "Nome",
+      "category": "Categoria",
+      "price": "Preco",
+      "stock": "Estoque",
+      "actions": "Acoes"
+    },
+    "stock": {
+      "onDemand": "Sob demanda",
+      "inStock": "Em estoque"
+    },
+    "empty": "Nenhum produto encontrado.",
+    "modal": {
+      "editProduct": "Editar Produto",
+      "newProduct": "Novo Produto",
+      "productName": "Nome do produto",
+      "category": "Categoria",
+      "price": "Preco (R$)",
+      "stockType": "Tipo de estoque",
+      "sizes": "Tamanhos (separados por virgula)",
+      "description": "Descricao",
+      "image": "Imagem",
+      "artist": "Artista",
+      "additionalInfo": "Informacoes adicionais",
+      "sizePlaceholder": "P, M, G, GG",
+      "imagePlaceholder": "Ou cole URL da imagem",
+      "artistPlaceholder": "Nome do artista/autor",
+      "newCategory": "Nova categoria..."
+    },
+    "confirmations": {
+      "deleteProduct": "Tem certeza que deseja excluir este produto?",
+      "deleteCategory": "Excluir esta categoria?"
+    },
+    "toast": {
+      "imageTooLarge": "Imagem muito grande. Maximo 5MB.",
+      "nameRequired": "Nome do produto e obrigatorio",
+      "productUpdated": "Produto atualizado com sucesso",
+      "productAdded": "Produto adicionado com sucesso",
+      "productDeleted": "Produto excluido",
+      "categoryAdded": "Categoria adicionada",
+      "categoryDeleted": "Categoria excluida",
+      "saveError": "Erro ao salvar produto",
+      "deleteError": "Erro ao excluir produto",
+      "addCategoryError": "Erro ao adicionar categoria",
+      "deleteCategoryError": "Erro ao excluir categoria"
+    }
+  },
+  "toast": {
+    "pixConfirmed": "Pagamento PIX confirmado!",
+    "paymentError": "Erro ao processar pagamento"
+  },
+  "theme": {
+    "lightMode": "Mudar para modo claro",
+    "darkMode": "Mudar para modo escuro"
+  },
+  "shipping": {
+    "calculateShipping": "Calcular Frete",
+    "freeShippingProgress": "Frete gratis para itens proprios!",
+    "freeShippingRemaining": "Faltam <strong>R$ {amount}</strong> para frete gratis",
+    "bhumiShopItems": "Itens Bhumi Shop",
+    "umaPencaItems": "Itens Uma Penca",
+    "digitalItems": "Itens Digitais",
+    "immediateDelivery": "Entrega Imediata",
+    "businessDays": "{days} dias uteis",
+    "calculatedByUmaPenca": "Envio calculado pela Uma Penca",
+    "immediateDigitalDelivery": "Entrega digital imediata",
+    "invalidCEP": "CEP invalido ou regiao nao atendida"
+  },
+  "paymentProvider": {
+    "title": "Como deseja pagar?",
+    "subtitle": "Selecione o provedor de pagamento",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "umaPencaDirect": "Uma Penca Direct",
+    "umaPencaDesc": "Camisetas, canecas e mais — enviado pela Uma Penca",
+    "abacatepay": "AbacatePay",
+    "abacatepayDesc": "PIX e Cartao — processamento nacional",
+    "pixBricksIntl": "PIX Bricks Internacional",
+    "pixBricksDesc": "PIX Internacional — pague de qualquer pais",
+    "externalCheckout": "Checkout Externo",
+    "pix": "PIX",
+    "card": "Cartao",
+    "upi": "UPI",
+    "alipay": "Alipay"
+  },
+  "stores": {
+    "products": {
+      "loadError": "Erro ao carregar produtos",
+      "loadCategoriesError": "Erro ao carregar categorias",
+      "addError": "Erro ao adicionar produto",
+      "updateError": "Erro ao atualizar produto",
+      "deleteError": "Erro ao excluir produto",
+      "addCategoryError": "Erro ao adicionar categoria",
+      "deleteCategoryError": "Erro ao excluir categoria"
+    },
+    "orders": {
+      "loadError": "Erro ao carregar pedidos",
+      "loadOrderError": "Erro ao carregar pedido",
+      "createError": "Erro ao criar pedido"
+    },
+    "checkout": {
+      "createOrderError": "Falha ao criar pedido",
+      "paymentError": "Erro ao processar pagamento",
+      "orderSuccess": "Pedido criado com sucesso!",
+      "pixConfirmed": "Pagamento PIX confirmado!"
+    },
+    "shipping": {
+      "invalidCEP": "CEP invalido ou regiao nao atendida",
+      "calculatedByUmaPenca": "Envio calculado pela Uma Penca",
+      "immediateDigitalDelivery": "Entrega digital imediata"
+    }
+  }
+}
