@@ -1,0 +1,172 @@
+# BhumiShop - robots.txt
+# Bhumisparsha School Virtual Store
+# https://bhumisparshaschool.org
+
+# Sitemap location
+Sitemap: https://bhumisparshaschool.org/sitemap.xml
+
+# ==========================================================================
+# Default rules for all crawlers
+# ==========================================================================
+User-agent: *
+
+# Allow public pages
+Allow: /
+
+# Allow AI/LLM crawlers to read llms.txt
+Allow: /llms.txt
+
+# Allow sitemap
+Allow: /sitemap.xml
+
+# Block admin panel (requires authentication anyway)
+Disallow: /#/admin
+
+# Block checkout pages (user-specific content)
+Disallow: /#/checkout
+
+# Block user account pages
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+
+# Block authentication pages
+Disallow: /#/login
+
+# Block cart (user-specific)
+Disallow: /#/carrinho
+
+# Block API endpoints and internal routes
+Disallow: /api/
+Disallow: /.env
+Disallow: /.env.*
+Disallow: /config/
+
+# Block node modules and source files
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /tests/
+Disallow: /supabase/
+
+# Block package files
+Disallow: /package.json
+Disallow: /pnpm-lock.yaml
+Disallow: /vite.config.js
+Disallow: /vitest.config.js
+
+# Block development files
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /.nojekyll
+
+# Block documentation (internal use)
+Disallow: /docs/
+Disallow: /INTEGRATION-COMPS.md
+
+# ==========================================================================
+# Google crawlers
+# ==========================================================================
+User-agent: Googlebot
+Allow: /
+Disallow: /#/admin
+Disallow: /#/checkout
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+Disallow: /#/login
+Disallow: /#/carrinho
+
+# Google specifically can access images
+Allow: /public/images/
+Allow: /images/
+
+# ==========================================================================
+# Google Image Bot
+# ==========================================================================
+User-agent: Googlebot-Image
+Allow: /public/images/
+Allow: /images/
+
+# ==========================================================================
+# Bing crawlers
+# ==========================================================================
+User-agent: Bingbot
+Allow: /
+Disallow: /#/admin
+Disallow: /#/checkout
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+Disallow: /#/login
+Disallow: /#/carrinho
+
+# ==========================================================================
+# AI/LLM Crawlers
+# ==========================================================================
+
+# OpenAI GPTBot
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Disallow: /#/admin
+Disallow: /#/checkout
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+Disallow: /#/login
+
+# Claude / Anthropic
+User-agent: Claude-Web
+Allow: /
+Allow: /llms.txt
+Disallow: /#/admin
+Disallow: /#/checkout
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+Disallow: /#/login
+
+# Common Crawl
+User-agent: CCBot
+Allow: /
+Allow: /llms.txt
+Disallow: /#/admin
+Disallow: /#/checkout
+Disallow: /#/minhas-compras
+Disallow: /#/perfil
+Disallow: /#/login
+
+# ==========================================================================
+# Social Media Crawlers
+# ==========================================================================
+
+# Facebook
+User-agent: facebookexternalhit
+Allow: /
+Allow: /images/
+
+# Twitter
+User-agent: Twitterbot
+Allow: /
+Allow: /images/
+
+# LinkedIn
+User-agent: LinkedInBot
+Allow: /
+Allow: /images/
+
+# WhatsApp
+User-agent: WhatsApp
+Allow: /
+Allow: /images/
+
+# ==========================================================================
+# Rate limiting for aggressive crawlers
+# ==========================================================================
+
+# Limit crawl rate for all bots
+Crawl-delay: 1
+
+# ==========================================================================
+# Notes
+# ==========================================================================
+# - This is a Single Page Application (SPA) using hash-based routing
+# - Most crawlers cannot execute JavaScript, so only the root URL is indexable
+# - Consider implementing Server-Side Rendering (SSR) or Static Site Generation (SSG) for better SEO
+# - The llms.txt file provides structured information for AI crawlers
+# - Sitemap includes hash-based URLs for SPA navigation

@@ -117,8 +117,7 @@ export function refreshScrollTriggers() {
 
 /**
  * Batch animate elements with ScrollTrigger
- * Best practice for staggered scroll reveals with better performance
- * than individual ScrollTriggers
+ * Improved: better easing, optimized will-change management
  */
 export function scrollBatch(targets, config = {}) {
   if (isReducedMotion) {
@@ -131,8 +130,8 @@ export function scrollBatch(targets, config = {}) {
     fromX = 0,
     fromScale = 1,
     fromRotation = 0,
-    duration = 0.6,
-    stagger = 0.1,
+    duration = 0.7,
+    stagger = 0.08,
     ease = 'power3.out',
     start = 'top 85%',
     once = true,
@@ -148,8 +147,10 @@ export function scrollBatch(targets, config = {}) {
     once,
     trigger: trigger || elements[0],
 
-    // Animate each batch
     onEnter: (batch) => {
+      // Set will-change before animation
+      batch.forEach(el => { if (el.style) el.style.willChange = 'transform, opacity' })
+
       gsap.fromTo(batch,
         {
           opacity: 0,
@@ -170,12 +171,17 @@ export function scrollBatch(targets, config = {}) {
           force3D: true,
           overwrite: true,
           ...rest,
+          onComplete: () => {
+            // Clean up will-change after animation
+            batch.forEach(el => { if (el.style) el.style.willChange = '' })
+          }
         }
       )
     },
 
-    // Also trigger on initial load if already in view
     onBatchEnter: (batch) => {
+      batch.forEach(el => { if (el.style) el.style.willChange = 'transform, opacity' })
+
       gsap.fromTo(batch,
         {
           opacity: 0,
@@ -194,6 +200,9 @@ export function scrollBatch(targets, config = {}) {
           force3D: true,
           overwrite: true,
           ...rest,
+          onComplete: () => {
+            batch.forEach(el => { if (el.style) el.style.willChange = '' })
+          }
         }
       )
     },
@@ -202,7 +211,7 @@ export function scrollBatch(targets, config = {}) {
 
 /**
  * Single element scroll reveal animation
- * Uses individual ScrollTrigger for precise control
+ * Improved: better will-change management, optimized toggles
  */
 export function scrollReveal(targets, config = {}) {
   if (isReducedMotion) {
@@ -233,7 +242,6 @@ export function scrollReveal(targets, config = {}) {
   const elements = gsap.utils.toArray(targets)
   if (!elements.length) return null
 
-  // Build from/to vars dynamically based on config
   const fromVars = {
     opacity: fromOpacity,
     force3D: true,
@@ -261,25 +269,17 @@ export function scrollReveal(targets, config = {}) {
       markers,
       toggleActions: once ? 'play none none none' : 'play reverse play reverse',
       onEnter: (self) => {
-        // Set will-change before animation starts
-        elements.forEach(el => {
-          if (el.style) el.style.willChange = 'transform, opacity'
-        })
+        elements.forEach(el => { if (el.style) el.style.willChange = 'transform, opacity' })
         if (onEnter) onEnter(self)
       },
       onLeave: (self) => {
-        // Clean up will-change after animation
         if (once) {
-          elements.forEach(el => {
-            if (el.style) el.style.willChange = ''
-          })
+          elements.forEach(el => { if (el.style) el.style.willChange = '' })
         }
         if (onLeave) onLeave(self)
       },
       onComplete: (self) => {
-        elements.forEach(el => {
-          if (el.style) el.style.willChange = ''
-        })
+        elements.forEach(el => { if (el.style) el.style.willChange = '' })
         if (onComplete) onComplete(self)
       },
       ...config.scrollTrigger
@@ -463,7 +463,7 @@ export function scaleIn(targets, config = {}) {
 
 /**
  * Staggered grid animation
- * Best for product cards, list items, etc.
+ * Improved: better easing, tighter stagger for momentum feel
  */
 export function staggerGrid(targets, config = {}) {
   if (isReducedMotion) {
@@ -477,8 +477,8 @@ export function staggerGrid(targets, config = {}) {
   const {
     fromY = 30,
     fromScale = 0.98,
-    duration = 0.5,
-    stagger = 0.08,
+    duration = 0.6,
+    stagger = 0.06,
     ease = 'power3.out',
     delay = 0,
     staggerFrom = 'start',
@@ -512,51 +512,56 @@ export function staggerGrid(targets, config = {}) {
 // ===== PAGE TRANSITIONS =====
 
 /**
- * Page enter animation
- * Used with Vue <transition> @enter hook
+ * Page enter animation with improved momentum feel
+ * Uses a subtle overshoot easing for a more dynamic entrance
  */
 export function pageEnter(el, done) {
   if (isReducedMotion) {
-    done()
-    return
+    gsap.set(el, { opacity: 1, y: 0 });
+    done();
+    return;
   }
 
-  // Set initial state
-  gsap.set(el, { opacity: 0, y: 15 })
+  // Set initial state - slightly deeper start for momentum feel
+  gsap.set(el, { opacity: 0, y: 20, scale: 0.995 });
 
   gsap.to(el, {
     opacity: 1,
     y: 0,
-    duration: 0.4,
+    scale: 1,
+    duration: 0.5,
     ease: 'power3.out',
     force3D: true,
     onComplete: () => {
-      // Refresh ScrollTrigger after page transition
-      // This fixes inconsistent scroll trigger positions
-      refreshScrollTriggers()
-      done()
+      refreshScrollTriggers();
+      done();
     },
-  })
+    onInterrupt: () => {
+      gsap.set(el, { opacity: 1, y: 0, scale: 1 });
+      done();
+    }
+  });
 }
 
 /**
- * Page leave animation
- * Used with Vue <transition> @leave hook
+ * Page leave animation with faster exit for perceived performance
  */
 export function pageLeave(el, done) {
   if (isReducedMotion) {
-    done()
-    return
+    done();
+    return;
   }
 
   gsap.to(el, {
     opacity: 0,
-    y: -15,
-    duration: 0.3,
+    y: -10,
+    scale: 0.995,
+    duration: 0.25,
     ease: 'power3.in',
     force3D: true,
     onComplete: done,
-  })
+    onInterrupt: done,
+  });
 }
 
 // ===== MICRO-INTERACTIONS =====

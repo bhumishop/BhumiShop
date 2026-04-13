@@ -5,7 +5,7 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 
 export const isDemo = !supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')
 if (isDemo) {
-  console.warn('[BhumiShop] Running in demo mode (no Supabase configured)')
+  // Silently fall back to demo mode — no console spam
 }
 
 const TIMEOUT_MS = 60000

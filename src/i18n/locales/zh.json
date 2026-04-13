@@ -25,7 +25,7 @@
     "additionalInfo": "附加信息",
     "copyright": "© {year} Bhumisparsha School。保留所有权利。",
     "securePayment": "通过AbacatePay安全支付",
-    "contactEmail": "contact@bhumisparshaschool.org"
+    "contactEmail": "contact\\@bhumisparshaschool.org"
   },
   "nav": {
     "home": "首页",
@@ -124,7 +124,12 @@
       "phone": "Phone",
       "cpf": "CPF (optional)",
       "addressSection": "Shipping Address",
+      "country": "Country",
+      "selectCountry": "Select a country",
       "cep": "CEP",
+      "postalCode": "Postal Code",
+      "zipCode": "ZIP Code",
+      "state": "State",
       "street": "Street / Avenue",
       "number": "Number",
       "complement": "Complement (optional)",
@@ -135,22 +140,26 @@
       "continue": "Continue",
       "placeholders": {
         "name": "Your name",
-        "email": "your@email.com",
+        "email": "your\\@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
+        "postalCode": "Enter postal code",
+        "zipCode": "Enter ZIP code",
         "street": "Delivery address",
         "number": "No.",
         "complement": "Apt, block, etc.",
         "neighborhood": "Neighborhood",
         "city": "City",
+        "state": "State",
         "notes": "Additional delivery information"
       },
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email",
         "phoneInvalid": "Invalid phone",
-        "cepInvalid": "Invalid CEP"
+        "cepInvalid": "Invalid CEP",
+        "postalCodeRequired": "Postal code is required"
       }
     },
     "step3": {
@@ -224,43 +233,51 @@
   },
   "auth": {
     "login": "登录",
-    "register": "注册",
-    "fullName": "姓名",
-    "email": "电子邮箱",
-    "password": "密码",
-    "placeholders": {
-      "name": "您的姓名",
-      "email": "your@email.com",
-      "password": "至少6个字符"
-    },
+    "termsSubtitle": "请接受我们的条款后继续",
+    "acceptTerms": "我接受",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "and": "和",
+    "continue": "继续",
+    "back": "返回",
+    "exploreNow": "立即探索",
+    "setLocation": "设置您的位置",
+    "setLocationSubtitle": "帮助我们个性化您的体验",
+    "searchLocation": "搜索您的城市或地址...",
+    "searching": "搜索中...",
+    "changeLocation": "更改",
     "validation": {
-      "nameRequired": "姓名为必填项",
-      "emailRequired": "邮箱为必填项",
-      "emailInvalid": "邮箱格式无效",
-      "passwordRequired": "密码为必填项",
-      "passwordMinLength": "至少6个字符"
+      "phoneRequired": "电话号码为必填项"
     },
     "divider": "或",
     "wechat": "使用微信继续",
+    "google": "使用 Google 继续",
     "sms": "使用短信登录",
     "phone": "电话",
     "phonePlaceholder": "+55 11 99999-9999",
     "sendSmsCode": "发送短信验证码",
     "codeSent": "验证码已发送！请检查手机。",
     "smsCodeSent": "短信验证码已发送！",
-    "switchToRegister": "没有账户？注册",
-    "switchToLogin": "已有账户？登录",
+    "detectMyLocation": "检测我的位置",
+    "detectingLocation": "正在检测位置...",
     "errors": {
+      "geoNotSupported": "您的浏览器不支持地理定位",
+      "geoPermissionDenied": "位置权限被拒绝。请启用位置访问。",
+      "geoTimeout": "位置请求超时。请重试。",
+      "geoUnknown": "无法检测您的位置。请重试。",
+      "geoLookupFailed": "查询地址失败。请重试。",
       "wechatLogin": "微信登录出错",
       "phoneRequired": "电话号码为必填项",
       "smsCode": "发送短信验证码出错",
-      "processRequest": "处理请求出错"
+      "processRequest": "处理请求出错",
+      "termsRequired": "请先接受条款和条件"
     },
     "toast": {
-      "loginSuccess": "登录成功！",
-      "registerSuccess": "账户创建成功！"
+      "smsCodeSent": "短信验证码已发送！"
     },
-    "google": "Continue with Google"
+    "welcome": "欢迎！",
+    "welcomeMessage": "您现在可以开始探索 Bhumi Shop 了。",
+    "exploreNow": "立即探索"
   },
   "profile": {
     "title": "我的资料",
@@ -389,7 +406,8 @@
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery"
+      "immediateDigitalDelivery": "Immediate digital delivery",
+      "internationalShipping": "International shipping rate applied"
     }
   },
   "shipping": {

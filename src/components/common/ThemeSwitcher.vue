@@ -67,11 +67,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(2.25rem, 4vw, 2.5rem);
-  height: clamp(2.25rem, 4vw, 2.5rem);
-  border-radius: var(--radius-md);
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
   overflow: hidden;
 }
@@ -79,10 +79,11 @@ onMounted(() => {
 .theme-switcher:hover {
   color: var(--accent);
   background: var(--accent-light);
+  transform: translateY(-1px);
 }
 
 .theme-switcher:active {
-  transform: scale(0.92);
+  transform: translateY(0) scale(0.96);
 }
 
 /* Icon transition */

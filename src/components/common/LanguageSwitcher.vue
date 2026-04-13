@@ -1,58 +1,25 @@
 <template>
-  <div class="language-switcher" ref="switcherRef">
-    <button
-      class="language-button"
-      @click="isOpen = !isOpen"
-      :aria-label="$t('nav.language')"
-      aria-haspopup="listbox"
-      :aria-expanded="isOpen"
-    >
+  <div class="lang-switcher" ref="rootRef">
+    <button type="button" class="lang-btn" @click="isOpen = !isOpen">
       <span class="flag">{{ currentLocale.flag }}</span>
       <span class="code">{{ currentLocale.code.toUpperCase() }}</span>
-      <svg
-        class="chevron"
-        :class="{ open: isOpen }"
-        viewBox="0 0 12 8"
-        width="12"
-        height="8"
-        fill="none"
-      >
-        <path
-          d="M1 1.5L6 6.5L11 1.5"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      <span class="arrow" :class="{ open: isOpen }">&#9662;</span>
     </button>
 
-    <Teleport to="body">
-      <Transition name="dropdown">
-        <div
-          v-if="isOpen"
-          class="language-dropdown"
-          :style="dropdownPosition"
-          role="listbox"
-        >
-          <button
-            v-for="locale in supportedLocales"
-            :key="locale.code"
-            class="language-option"
-            :class="{ active: locale.code === currentLocale.code }"
-            @click="selectLocale(locale.code)"
-            role="option"
-            :aria-selected="locale.code === currentLocale.code"
-          >
-            <span class="flag">{{ locale.flag }}</span>
-            <span class="name">{{ locale.name }}</span>
-            <svg v-if="locale.code === currentLocale.code" class="check" viewBox="0 0 16 16" width="16" height="16" fill="none">
-              <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </Transition>
-    </Teleport>
+    <div v-if="isOpen" class="lang-dropdown">
+      <button
+        v-for="loc in supportedLocales"
+        :key="loc.code"
+        type="button"
+        class="lang-option"
+        :class="{ active: loc.code === currentLocale.code }"
+        @click="pickLocale(loc.code)"
+      >
+        <span class="opt-flag">{{ loc.flag }}</span>
+        <span class="opt-name">{{ loc.name }}</span>
+        <span v-if="loc.code === currentLocale.code" class="opt-check">&#10003;</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -63,152 +30,125 @@ import { supportedLocales, changeLocale } from '@/i18n'
 
 const { locale } = useI18n()
 const isOpen = ref(false)
-const switcherRef = ref(null)
-const dropdownPosition = ref({})
+const rootRef = ref(null)
 
-const currentLocale = computed(() => {
-  return supportedLocales.find(l => l.code === locale.value) || supportedLocales[0]
-})
+const currentLocale = computed(() =>
+  supportedLocales.find(l => l.code === locale.value) || supportedLocales[0]
+)
 
-function updateDropdownPosition() {
-  if (!switcherRef.value) return
-  const rect = switcherRef.value.getBoundingClientRect()
-  dropdownPosition.value = {
-    position: 'fixed',
-    top: `${rect.bottom + 8}px`,
-    left: `${rect.left}px`,
-    zIndex: 9999
-  }
-}
-
-async function selectLocale(code) {
+async function pickLocale(code) {
   await changeLocale(code)
   isOpen.value = false
 }
 
-function handleClickOutside(event) {
-  if (switcherRef.value && !switcherRef.value.contains(event.target)) {
-    // Check if click is outside the dropdown (teleported to body)
-    const dropdown = document.querySelector('.language-dropdown')
-    if (dropdown && !dropdown.contains(event.target)) {
-      isOpen.value = false
-    }
+function outside(e) {
+  if (rootRef.value && !rootRef.value.contains(e.target)) {
+    isOpen.value = false
   }
 }
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  window.addEventListener('scroll', updateDropdownPosition)
-  window.addEventListener('resize', updateDropdownPosition)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  window.removeEventListener('scroll', updateDropdownPosition)
-  window.removeEventListener('resize', updateDropdownPosition)
-})
+onMounted(() => document.addEventListener('click', outside))
+onUnmounted(() => document.removeEventListener('click', outside))
 </script>
 
 <style scoped>
-.language-switcher {
+.lang-switcher {
   position: relative;
 }
 
-.language-button {
-  display: flex;
+.lang-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: 1px solid var(--border-color, #e2e8f0);
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid rgba(139, 92, 246, 0.18);
   border-radius: 8px;
-  background: var(--bg-primary, #fff);
-  color: var(--text-primary, #1e293b);
+  background: rgba(139, 92, 246, 0.07);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.language-button:hover {
-  border-color: var(--primary, #6366f1);
-  background: var(--bg-secondary, #f8fafc);
+.lang-btn:hover {
+  background: rgba(139, 92, 246, 0.14);
+  border-color: rgba(139, 92, 246, 0.25);
+  color: var(--text-primary);
 }
 
 .flag {
-  font-size: 1.125rem;
+  font-size: 1.1rem;
   line-height: 1;
 }
 
 .code {
-  font-weight: 600;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.chevron {
-  transition: transform 0.2s;
+.arrow {
+  font-size: 0.6rem;
+  opacity: 0.5;
+  transition: transform 0.15s ease;
 }
 
-.chevron.open {
+.arrow.open {
   transform: rotate(180deg);
 }
 
-.language-dropdown {
-  background: var(--bg-primary, #fff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 12px;
-  padding: 6px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
   min-width: 200px;
-  max-height: 320px;
-  overflow-y: auto;
+  background: var(--surface-0, #0a0a0b);
+  border: 1px solid var(--border, #1c1c1f);
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
 }
 
-.language-option {
+.lang-option {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 9px;
   border: none;
   background: none;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
-  font-size: 0.875rem;
-  color: var(--text-primary, #1e293b);
-  transition: background 0.15s;
-}
-
-.language-option:hover {
-  background: var(--bg-secondary, #f1f5f9);
-}
-
-.language-option.active {
-  background: var(--primary-light, #eef2ff);
-  color: var(--primary, #6366f1);
-  font-weight: 500;
-}
-
-.language-option .flag {
-  font-size: 1.25rem;
-}
-
-.language-option .name {
-  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: background 0.12s ease;
   text-align: left;
 }
 
-.language-option .check {
-  color: var(--primary, #6366f1);
+.lang-option:hover {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--text-primary);
 }
 
-/* Dropdown transitions */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+.lang-option.active {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent);
 }
 
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
+.opt-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.opt-name {
+  flex: 1;
+}
+
+.opt-check {
+  color: var(--accent);
+  flex-shrink: 0;
 }
 </style>

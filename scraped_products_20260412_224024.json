@@ -1,0 +1,49 @@
+[
+  {
+    "name": "Camiseta BODE DE TROMPETE - Prata Print",
+    "slug": "camiseta-bode-de-trompete",
+    "description": "Uma Penca - Tecnologia, produção e logística para que mentes criativas vendam seus produtos",
+    "short_description": null,
+    "category": "camiseta",
+    "price": 79.98,
+    "compare_at_price": null,
+    "image": "https://umapenca.imgix.net/352000/5f215990-2179-4c1b-b9eb-e18f0a5e24d3.jpg?v=1&t=2&auto=compress,format&cs=origin&q=65",
+    "images": [
+      "https://umapenca.imgix.net/352000/5f215990-2179-4c1b-b9eb-e18f0a5e24d3.jpg?v=1&t=2&auto=compress,format&cs=origin&q=65"
+    ],
+    "sizes": [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "2GG",
+      "3GG",
+      "4GG"
+    ],
+    "materials": [],
+    "tags": [
+      "camiseta",
+      "uma-penca",
+      "dropshipping"
+    ],
+    "artist": null,
+    "brand": "Prata Print",
+    "info": null,
+    "weight": 0.3,
+    "is_active": true,
+    "third_party_product_id": "352000",
+    "third_party_source": "uma-penca",
+    "third_party_product_url": "https://prataprint.bhumisparshaschool.org/camiseta/bode-de-trompete-352000.html",
+    "third_party_raw_data": {
+      "scraped_at": "2026-04-13T01:40:24.051120+00:00",
+      "url": "https://prataprint.bhumisparshaschool.org/camiseta/bode-de-trompete-352000.html",
+      "store_id": "11210",
+      "store_name": "Prata Print"
+    },
+    "metadata": {
+      "fulfillment_type": "uma_penca",
+      "external_store": "prataprint"
+    }
+  }
+]

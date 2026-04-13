@@ -25,7 +25,7 @@
     "additionalInfo": "थप जानकारी",
     "copyright": "© {year} Bhumisparsha School. सबै अधिकार सुरक्षित।",
     "securePayment": "AbacatePay मार्फत सुरक्षित भुक्तानी",
-    "contactEmail": "contact@bhumisparshaschool.org"
+    "contactEmail": "contact\\@bhumisparshaschool.org"
   },
   "nav": {
     "home": "गृह पृष्ठ",
@@ -124,7 +124,12 @@
       "phone": "Phone",
       "cpf": "CPF (optional)",
       "addressSection": "Shipping Address",
+      "country": "देश",
+      "selectCountry": "देश चयन गर्नुहोस्",
       "cep": "CEP",
+      "postalCode": "हुलाक कोड",
+      "zipCode": "ZIP कोड",
+      "state": "प्रदेश/राज्य",
       "street": "Street / Avenue",
       "number": "Number",
       "complement": "Complement (optional)",
@@ -135,7 +140,7 @@
       "continue": "Continue",
       "placeholders": {
         "name": "Your name",
-        "email": "your@email.com",
+        "email": "your\\@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
@@ -144,13 +149,17 @@
         "complement": "Apt, block, etc.",
         "neighborhood": "Neighborhood",
         "city": "City",
+        "state": "प्रदेश/राज्य",
+        "postalCode": "हुलाक कोड लेख्नुहोस्",
+        "zipCode": "ZIP कोड लेख्नुहोस्",
         "notes": "Additional delivery information"
       },
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email",
         "phoneInvalid": "Invalid phone",
-        "cepInvalid": "Invalid CEP"
+        "cepInvalid": "Invalid CEP",
+        "postalCodeRequired": "हुलाक कोड आवश्यक छ"
       }
     },
     "step3": {
@@ -224,43 +233,51 @@
   },
   "auth": {
     "login": "लगइन",
-    "register": "खाता सिर्जना",
-    "fullName": "पूरा नाम",
-    "email": "इमेल",
-    "password": "पासवर्ड",
-    "placeholders": {
-      "name": "तपाईंको नाम",
-      "email": "your@email.com",
-      "password": "कम्तीमा 6 अक्षर"
-    },
+    "termsSubtitle": "जारी राख्नु अघि कृपया हाम्रा नियमहरू स्वीकार गर्नुहोस्",
+    "acceptTerms": "म स्वीकार गर्छु",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsOfService": "सेवाका सर्तहरू",
+    "and": "र",
+    "continue": "जारी राख्नुहोस्",
+    "back": "पछाडि",
+    "detectMyLocation": "मेरो स्थान पत्ता लगाउनुहोस्",
+    "detectingLocation": "स्थान पत्ता लगाउँदै...",
+    "exploreNow": "अहिले नै अन्वेषण गर्नुहोस्",
+    "setLocation": "आफ्नो स्थान सेट गर्नुहोस्",
+    "setLocationSubtitle": "हामीलाई तपाईंको अनुभव व्यक्तिगत गर्न मद्दत गर्नुहोस्",
+    "searchLocation": "आफ्नो सहर वा ठेगाना खोज्नुहोस्...",
+    "searching": "खोज्दै...",
+    "changeLocation": "परिवर्तन",
     "validation": {
-      "nameRequired": "नाम आवश्यक छ",
-      "emailRequired": "इमेल आवश्यक छ",
-      "emailInvalid": "अमान्य इमेल",
-      "passwordRequired": "पासवर्ड आवश्यक छ",
-      "passwordMinLength": "कम्तीमा 6 अक्षर"
+      "phoneRequired": "फोन नम्बर आवश्यक छ"
     },
     "divider": "वा",
     "wechat": "WeChat बाट जारी राख्नुहोस्",
+    "google": "Google बाट जारी राख्नुहोस्",
     "sms": "SMS बाट लगइन",
     "phone": "फोन",
     "phonePlaceholder": "+55 11 99999-9999",
     "sendSmsCode": "SMS कोड पठाउनुहोस्",
     "codeSent": "कोड पठाइयो! आफ्नो फोन जाँच गर्नुहोस्।",
     "smsCodeSent": "SMS कोड पठाइयो!",
-    "switchToRegister": "खाता छैन? खाता सिर्जना गर्नुहोस्",
-    "switchToLogin": "पहिले नै खाता छ? लगइन",
     "errors": {
+      "geoNotSupported": "तपाईंको ब्राउजरले भू-स्थान समर्थन गर्दैन",
+      "geoPermissionDenied": "स्थान अनुमति अस्वीकृत गरियो। कृपया स्थान पहुँच सक्रिय गर्नुहोस्।",
+      "geoTimeout": "स्थान अनुरोधको समय सकियो। कृपया फेरि प्रयास गर्नुहोस्।",
+      "geoUnknown": "तपाईंको स्थान पत्ता लगाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
+      "geoLookupFailed": "ठेगाना खोज्न असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।",
       "wechatLogin": "WeChat लगइनमा त्रुटि",
       "phoneRequired": "फोन नम्बर आवश्यक छ",
       "smsCode": "SMS कोड पठाउन त्रुटि",
-      "processRequest": "अनुरोध प्रशोधनमा त्रुटि"
+      "processRequest": "अनुरोध प्रशोधनमा त्रुटि",
+      "termsRequired": "कृपया पहिले नियम र सर्तहरू स्वीकार गर्नुहोस्"
     },
     "toast": {
-      "loginSuccess": "सफलतापूर्वक लगइन भयो!",
-      "registerSuccess": "खाता सफलतापूर्वक सिर्जना भयो!"
+      "smsCodeSent": "SMS कोड पठाइयो!"
     },
-    "google": "Continue with Google"
+    "welcome": "स्वागत छ!",
+    "welcomeMessage": "तपाईं अब Bhumi Shop अन्वेषण गर्न तयार हुनुहुन्छ।",
+    "exploreNow": "अहिले नै अन्वेषण गर्नुहोस्"
   },
   "profile": {
     "title": "मेरो प्रोफाइल",
@@ -389,7 +406,8 @@
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery"
+      "immediateDigitalDelivery": "Immediate digital delivery",
+      "internationalShipping": "अन्तर्राष्ट्रिय ढुवानी दर लागू गरियो"
     }
   },
   "shipping": {

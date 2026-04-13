@@ -1,0 +1,161 @@
+# BhumiShop - Bhumisparsha School Virtual Store
+
+## About
+BhumiShop is the official virtual store of Bhumisparsha School, offering unique handcrafted products including books, art, t-shirts, mugs, bags, and accessories. Each product carries meaning, art and purpose, supporting the educational mission of Bhumisparsha School.
+
+## Site Information
+- **Name:** BhumiShop
+- **Description:** Virtual store of Bhumisparsha School. Products with meaning, art and purpose.
+- **URL:** https://bhumisparshaschool.org/shop
+- **Primary Language:** Portuguese (Brazil) - pt-BR
+- **Available Languages:** English (en), Portuguese (pt-BR), Chinese (zh), Japanese (ja), Spanish (es), Thai (th), Nepali (ne), Hindi (hi)
+- **Framework:** Vue.js 3 SPA with Vite
+- **Backend:** Supabase
+- **Payment Providers:** AbacatePay (PIX, Credit Card), Pix Bricks International, Uma Penca, Mercado Pago
+
+## Site Structure
+
+### Public Pages
+| Route | Name | Description |
+|-------|------|-------------|
+| `/` | Home | Landing page with hero section, categories showcase, featured products, and circular gallery |
+| `/produtos` | Products | Full product catalog with category filtering, search, and pagination |
+| `/produtos/:id` | Product Detail | Individual product page with gallery, variants (sizes), add to cart functionality |
+| `/carrinho` | Cart | Shopping cart with item management and checkout initiation |
+
+### Authenticated Pages
+| Route | Name | Description |
+|-------|------|-------------|
+| `/login` | Login/Auth | User authentication with email/password, WeChat, Google, and SMS login |
+| `/checkout` | Checkout | Multi-step checkout: Cart Summary, Contact Info, Shipping & Payment, Confirmation |
+| `/minhas-compras` | My Orders | Order history with status tracking (pending, processing, shipped, delivered, cancelled) |
+| `/perfil` | Profile | User profile management and account settings |
+
+### Admin
+| Route | Name | Description |
+|-------|------|-------------|
+| `/admin` | Admin Panel | Product and category management (requires admin role) |
+
+### System Pages
+| Route | Name | Description |
+|-------|------|-------------|
+| `/:pathMatch(.*)*` | 404 Not Found | Catch-all route for unknown URLs |
+
+## Features
+
+### Shopping Experience
+- Product catalog with categories (T-shirts, Accessories, Art, Mugs, Bags)
+- Product variants with sizes (S, M, L, XL)
+- Shopping cart with drawer UI
+- Multi-step checkout process
+- Multiple payment methods: PIX (instant), Credit Card, International payments
+- Shipping calculation with free shipping threshold
+- Order tracking and history
+
+### International Payments
+- **AbacatePay:** National Brazilian payment processing (PIX, Credit Card)
+- **Pix Bricks International:** International PIX, UPI (India), Alipay, WeChat Pay
+- **Uma Penca:** External checkout for branded merchandise (t-shirts, mugs)
+- **Mercado Pago:** Latin American payment gateway
+
+### User Authentication
+- Email/Password authentication via Supabase
+- Social login: WeChat, Google
+- SMS-based authentication
+- Role-based access (user, admin)
+
+### Internationalization
+Full i18n support with 8 languages:
+- English (en)
+- Portuguese/Brazil (pt-BR) - Default
+- Chinese (zh)
+- Japanese (ja)
+- Spanish (es)
+- Thai (th)
+- Nepali (ne)
+- Hindi (hi)
+
+### UI/UX Features
+- Dark/Light theme toggle
+- Responsive design (mobile, tablet, desktop)
+- Animated hero section with GridScan WebGL effect
+- Scroll Velocity text animations
+- Circular Gallery for featured products
+- GSAP-powered scroll animations
+- Skeleton loading states
+- Toast notifications
+
+## Product Categories
+- Camisetas (T-shirts)
+- Acessorios (Accessories)
+- Arte (Art)
+- Canecas (Mugs)
+- Bags
+
+## Key Entities
+
+### Product
+```
+{
+  id: string
+  name: string
+  description: string
+  price: number (BRL)
+  category: string (category ID)
+  image: string (base64 or URL)
+  stock_type: 'on_demand' | 'in_stock'
+  sizes: string[] (e.g., ['S', 'M', 'L', 'XL'])
+  artist: string
+  additional_info: string
+}
+```
+
+### Order
+```
+{
+  id: string
+  order_number: string
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+  payment_method: 'pix' | 'card'
+  total: number
+  items: OrderItem[]
+  shipping_address: Address
+  created_at: datetime
+}
+```
+
+### User
+```
+{
+  id: string (Supabase UUID)
+  full_name: string
+  email: string
+  phone: string
+  role: 'user' | 'admin'
+}
+```
+
+## API Integration
+- **Supabase:** Database, Authentication, Real-time subscriptions
+- **AbacatePay:** Payment processing API
+- **ViaCEP:** Brazilian CEP (postal code) lookup
+- **Mercado Pago:** Payment gateway
+- **Uma Penca:** External merchandise store
+
+## Contact
+- **Email:** contact@bhumisparshaschool.org
+- **Organization:** Bhumisparsha School
+- **Copyright:** All rights reserved
+
+## Technical Stack
+- **Frontend:** Vue 3 (Composition API)
+- **Routing:** Vue Router 5 (Hash History mode)
+- **State Management:** Pinia
+- **i18n:** vue-i18n v11
+- **Styling:** CSS Custom Properties, Scoped CSS
+- **Animations:** GSAP, Motion-V
+- **3D Effects:** Three.js, OGL, Postprocessing
+- **Build Tool:** Vite 7
+- **Testing:** Vitest, Vue Test Utils
+- **Hosting:** GitHub Pages (static)

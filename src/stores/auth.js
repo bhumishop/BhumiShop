@@ -1,19 +1,59 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase } from '../supabase'
+import { supabase, isDemo } from '../supabase'
+
+const LOCATION_STORAGE_KEY = 'bhumi_user_location'
+
+function loadSavedLocation() {
+  try {
+    const saved = localStorage.getItem(LOCATION_STORAGE_KEY)
+    return saved ? JSON.parse(saved) : null
+  } catch {
+    return null
+  }
+}
+
+function saveLocation(location) {
+  try {
+    if (location) {
+      localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(location))
+    } else {
+      localStorage.removeItem(LOCATION_STORAGE_KEY)
+    }
+  } catch {
+    // Silently fail
+  }
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(false)
   const initialized = ref(false)
   const adminRole = ref(false)
+  const userLocation = ref(loadSavedLocation())
 
   const isLoggedIn = computed(() => !!user.value)
   const userEmail = computed(() => user.value?.email || '')
   const userName = computed(() => user.value?.user_metadata?.full_name || user.value?.email?.split('@')[0] || '')
 
+  function setLocation(location) {
+    userLocation.value = location
+    saveLocation(location)
+  }
+
+  function clearLocation() {
+    userLocation.value = null
+    saveLocation(null)
+  }
+
   async function initialize() {
     if (initialized.value) return
+    if (isDemo) {
+      // Skip auth initialization in demo mode
+      initialized.value = true
+      return
+    }
+
     loading.value = true
     try {
       const { data: { session }, error } = await supabase.auth.getSession()
@@ -40,6 +80,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function _checkAdminRole() {
+    if (isDemo) {
+      adminRole.value = false
+      return
+    }
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -60,43 +104,10 @@ export const useAuthStore = defineStore('auth', () => {
     return adminRole.value
   }
 
-  async function signUp(email, password, fullName) {
-    loading.value = true
-    try {
-      const sanitizedEmail = email.trim().toLowerCase()
-      const { data, error } = await supabase.auth.signUp({
-        email: sanitizedEmail,
-        password,
-        options: {
-          data: { full_name: fullName?.trim() || '' },
-          emailRedirectTo: `${window.location.origin}/login`
-        }
-      })
-      if (error) throw error
-      user.value = data.user
-      return data
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function signIn(email, password) {
-    loading.value = true
-    try {
-      const sanitizedEmail = email.trim().toLowerCase()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: sanitizedEmail,
-        password
-      })
-      if (error) throw error
-      user.value = data.user
-      return data
-    } finally {
-      loading.value = false
-    }
-  }
-
   async function signInWithGoogle() {
+    if (isDemo) {
+      throw new Error('Google sign in is not available in demo mode')
+    }
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -113,6 +124,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithWechat() {
+    if (isDemo) {
+      throw new Error('WeChat sign in is not available in demo mode')
+    }
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'wechat',
       options: {
@@ -124,6 +138,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithPhone(phone) {
+    if (isDemo) {
+      throw new Error('Phone sign in is not available in demo mode')
+    }
     const { data, error } = await supabase.auth.signInWithOtp({
       phone,
       options: {
@@ -135,21 +152,21 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut() {
+    if (isDemo) {
+      user.value = null
+      adminRole.value = false
+      return
+    }
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     user.value = null
     adminRole.value = false
   }
 
-  async function resetPassword(email) {
-    const sanitizedEmail = email.trim().toLowerCase()
-    const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, {
-      redirectTo: `${window.location.origin}/login`
-    })
-    if (error) throw error
-  }
-
   async function updateProfile(updates) {
+    if (isDemo) {
+      throw new Error('Profile update is not available in demo mode')
+    }
     const { data, error } = await supabase.auth.updateUser({
       data: updates
     })
@@ -163,18 +180,18 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     initialized,
     adminRole,
+    userLocation,
     isLoggedIn,
     userEmail,
     userName,
     initialize,
     checkAdminRole,
-    signUp,
-    signIn,
+    setLocation,
+    clearLocation,
     signInWithGoogle,
     signInWithWechat,
     signInWithPhone,
     signOut,
-    resetPassword,
     updateProfile
   }
 })

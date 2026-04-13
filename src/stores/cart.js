@@ -27,9 +27,19 @@ export const useCartStore = defineStore('cart', () => {
   const items = ref(loadCartFromStorage())
   const isOpen = ref(false)
 
-  watch(items, (newItems) => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(newItems))
-  }, { deep: true })
+  // Throttled localStorage write — batch updates within 50ms window
+  let _saveTimer = null
+  const _saveCart = () => {
+    if (_saveTimer) return
+    _saveTimer = setTimeout(() => {
+      _saveTimer = null
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.value))
+      } catch { /* quota exceeded — silently ignore */ }
+    }, 50)
+  }
+
+  watch(items, _saveCart, { deep: true })
 
   const totalItems = computed(() => {
     return items.value.reduce((sum, item) => sum + item.quantity, 0)
