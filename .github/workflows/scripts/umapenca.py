@@ -652,9 +652,9 @@ class ProductConverter:
 
         # ── Tags ──────────────────────────────────────────────
         p.tags = [self.store_tag, "dropshipping"]
-        if type_url:
+        if type_url and type_url not in p.tags:
             p.tags.append(type_url)
-        if type_name and type_name not in p.tags:
+        if type_name and type_name.lower() not in p.tags:
             p.tags.append(type_name.lower())
 
         # ── Description ───────────────────────────────────────
@@ -897,12 +897,12 @@ class SupabaseSync:
         rows = self._get(f"subcollections?slug=eq.{target}")
         return rows[0]["id"] if rows else None
 
-    def existing_product(self, third_party_id: str) -> Optional[dict]:
+    def existing_product(self, third_party_id: str, source: str = "uma-penca") -> Optional[dict]:
         if not third_party_id:
             return None
         rows = self._get(
             f"products?third_party_product_id=eq.{third_party_id}"
-            f"&third_party_source=eq.uma-penca&select=id,slug"
+            f"&third_party_source=eq.{source}&select=id,slug"
         )
         return rows[0] if rows else None
 
@@ -942,13 +942,11 @@ class SupabaseSync:
             "is_archived":        False,
             "third_party_product_id":  product.third_party_product_id,
             "third_party_source":      product.third_party_source,
-            "third_party_product_url": product.third_party_product_url,
             "third_party_synced_at":   datetime.now(timezone.utc).isoformat(),
             "third_party_raw_data":    product.third_party_raw_data,
-            "metadata":                product.metadata,
         }
 
-        existing = self.existing_product(product.third_party_product_id or "")
+        existing = self.existing_product(product.third_party_product_id or "", product.third_party_source)
         if existing:
             resp = self._patch(f"products?id=eq.{existing['id']}", payload)
             action = "updated"
@@ -961,7 +959,7 @@ class SupabaseSync:
             return {"success": True, "action": action, "data": data}
         return {"success": False, "action": action, "error": resp.text}
 
-    def upsert_variants(self, product_id: str, variants: list) -> None:
+    def upsert_variants(self, product_id: int, variants: list) -> None:
         """Delete existing variants then re-insert fresh ones."""
         requests.delete(
             f"{self.base}/product_variants?product_id=eq.{product_id}",
@@ -1132,8 +1130,27 @@ def run(args) -> SyncResult:
     if should_sync_db:
         subcollection_slug = getattr(args, 'subcollection', 'uma-penca') or 'uma-penca'
         supabase = SupabaseSync(SUPABASE_URL, SUPABASE_KEY, subcollection_slug)
-        collection_id = supabase.get_collection_id("bhumi-print")
+
+        # Auto-detect collection from store URL if not explicitly provided
+        collection_slug = getattr(args, 'collection', None)
+        if not collection_slug:
+            parsed_store = urlparse(STORE_URL)
+            hostname = parsed_store.hostname or ""
+            path = parsed_store.path.strip("/").split("/")[0] if parsed_store.path else ""
+            if "prataprint" in hostname or "prataprint" in STORE_URL.lower():
+                collection_slug = "prata-print"
+            elif "bhumisprint" in hostname or "bhumisprint" in path:
+                collection_slug = "bhumi-print"
+            else:
+                collection_slug = "bhumi-print"  # default
+
+        collection_id = supabase.get_collection_id(collection_slug)
         subcollection_id = supabase.get_subcollection_id()
+        logger.info(f"DB sync: collection='{collection_slug}' subcollection='{subcollection_slug}'")
+        if collection_id:
+            logger.info(f"  collection_id = {collection_id}")
+        if subcollection_id:
+            logger.info(f"  subcollection_id = {subcollection_id}")
 
         for p in products:
             result.processed += 1
@@ -1213,6 +1230,7 @@ def main():
     parser.add_argument("--url",          default=None,        help="Store URL to scrape (overrides env)")
     parser.add_argument("--store-id",     default=None,        help="Store numeric ID (overrides env)")
     parser.add_argument("--subcollection", default="uma-penca", help="Subcollection slug for DB sync")
+    parser.add_argument("--collection",    default=None,        help="Collection slug for DB sync (auto-detect if not set)")
     parser.add_argument("--sync-to-db",   action="store_true", help="Sync scraped products to Supabase DB")
     args = parser.parse_args()
 
