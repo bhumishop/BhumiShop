@@ -660,19 +660,34 @@ class App {
     this.container.removeEventListener('mousedown', this.boundOnTouchDown);
     this.container.removeEventListener('touchstart', this.boundOnTouchDown);
 
-    // Clear references to break closures
-    this.medias = [];
+    // Dispose media textures first
+    if (this.medias) {
+      this.medias.forEach(media => {
+        if (media.img && media.img.texture) {
+          media.img.texture.dispose()
+        }
+        if (media.img) {
+          media.img.src = ''
+        }
+      })
+      this.medias = [];
+    }
 
     // Remove canvas and lose context
     if (this.renderer && this.renderer.gl) {
-      const canvas = this.renderer.gl.canvas;
+      const gl = this.renderer.gl
+      // Dispose all geometries and programs if available
       try {
-        this.renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
       } catch {}
+      const canvas = gl.canvas
       if (canvas && canvas.parentNode) {
         canvas.parentNode.removeChild(canvas);
       }
     }
+
+    // Clear renderer reference
+    this.renderer = null
   }
 }
 

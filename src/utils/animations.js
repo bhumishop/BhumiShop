@@ -104,15 +104,28 @@ export function createAnimationContext(scopeEl) {
 
 // ===== SCROLLTRIGGER MANAGEMENT =====
 
+// Debounce timer for ScrollTrigger refresh
+let refreshTimer = null
+
 /**
- * Refresh ScrollTrigger positions
+ * Refresh ScrollTrigger positions with debouncing
  * Call after DOM changes, route navigation, or image load
+ * Debounced to avoid excessive refresh calls during rapid navigation
  */
-export function refreshScrollTriggers() {
-  // Use requestAnimationFrame to ensure DOM has updated
-  requestAnimationFrame(() => {
-    ScrollTrigger.refresh()
-  })
+export function refreshScrollTriggers(delay = 100) {
+  if (refreshTimer) {
+    clearTimeout(refreshTimer)
+  }
+
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null
+    // Use double rAF to ensure DOM has fully updated
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh()
+      })
+    })
+  }, delay)
 }
 
 /**

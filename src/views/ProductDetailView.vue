@@ -34,8 +34,8 @@
 
         <div class="product-detail__price-row">
           <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
-          <BaseBadge :variant="product.stock === 'print-on-demand' ? 'default' : 'success'" size="xs">
-            {{ product.stock === 'print-on-demand' ? $t('productDetail.onDemand') : product.stock === 'digital' ? $t('productDetail.digital') : $t('productDetail.inStock') }}
+          <BaseBadge :variant="product.stock_type === 'print-on-demand' ? 'default' : 'success'" size="xs">
+            {{ product.stock_type === 'print-on-demand' ? $t('productDetail.onDemand') : product.stock_type === 'digital' ? $t('productDetail.digital') : $t('productDetail.inStock') }}
           </BaseBadge>
         </div>
 
@@ -187,7 +187,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useProductStore } from '../stores/products'
@@ -196,10 +196,12 @@ import { useToastStore } from '../stores/toast'
 import ProductGallery from '../components/product/ProductGallery.vue'
 import ProductVariants from '../components/product/ProductVariants.vue'
 import ProductColorSwatches from '../components/product/ProductColorSwatches.vue'
-import ProductSizeTable from '../components/product/ProductSizeTable.vue'
-import Masonry from '../components/common/Masonry.vue'
-import BaseBadge from '../components/common/BaseBadge.vue'
-import BaseButton from '../components/common/BaseButton.vue'
+
+// Lazy load heavy components
+const ProductSizeTable = defineAsyncComponent(() => import('../components/product/ProductSizeTable.vue'))
+const Masonry = defineAsyncComponent(() => import('../components/common/Masonry.vue'))
+const BaseBadge = defineAsyncComponent(() => import('../components/common/BaseBadge.vue'))
+const BaseButton = defineAsyncComponent(() => import('../components/common/BaseButton.vue'))
 
 const route = useRoute()
 const router = useRouter()
@@ -217,29 +219,85 @@ const product = computed(() => productStore.getProductById(route.params.id))
 const isLoading = computed(() => productStore.products.length === 0 && productStore.categories.length === 0)
 
 /**
+ * Parse product description once and cache the results.
+ * This avoids redundant string operations across multiple computed properties.
+ */
+const parsedProductContent = computed(() => {
+  const desc = product.value?.description || ''
+  const info = product.value?.info || ''
+  
+  if (!desc && !info) {
+    return {
+      hasSectionHeaders: false,
+      productDetailLines: [],
+      careInstructionLines: [],
+      additionalInfoLines: []
+    }
+  }
+  
+  const lowerDesc = desc.toLowerCase()
+  const hasSectionHeaders = 
+    lowerDesc.includes('detalhes do produto') ||
+    lowerDesc.includes('cuidados com a sua camiseta') ||
+    lowerDesc.includes('informações adicionais') ||
+    lowerDesc.includes('care instructions') ||
+    lowerDesc.includes('additional info')
+  
+  // Helper to parse sectioned text
+  const parseSectionedText = (text, excludeKeywords) => {
+    if (!text) return []
+    const lines = text.split('\n').map(line => line.trim()).filter(Boolean)
+    const excludeLower = excludeKeywords.map(k => k.toLowerCase())
+    
+    return lines.filter(line => {
+      const lowerLine = line.toLowerCase()
+      const isSectionHeader = 
+        lowerLine.includes('detalhes do produto') ||
+        lowerLine.includes('cuidados com a sua camiseta') ||
+        lowerLine.includes('informações adicionais') ||
+        lowerLine.includes('care instructions') ||
+        lowerLine.includes('additional info')
+      
+      const isExcluded = excludeLower.some(keyword => lowerLine.includes(keyword))
+      return !isSectionHeader && !isExcluded
+    })
+  }
+  
+  const careKeywords = ['passar do avesso', 'pano protetor', 'evitar vapor', 'cuidados', 'passadoria']
+  const additionalInfoKeywords = ['medidas podem variar', 'pode encolher']
+  const productDetailKeywords = [...careKeywords, ...additionalInfoKeywords]
+  
+  // Parse info field first (preferred source)
+  let productDetailLines = []
+  let careInstructionLines = []
+  
+  if (info) {
+    productDetailLines = parseSectionedText(info, productDetailKeywords)
+    careInstructionLines = parseSectionedText(info, careKeywords)
+  }
+  
+  // Fallback to description if info didn't yield results and has section headers
+  if (productDetailLines.length === 0 && hasSectionHeaders) {
+    productDetailLines = parseSectionedText(desc, productDetailKeywords)
+    careInstructionLines = parseSectionedText(desc, careKeywords)
+  }
+  
+  return {
+    hasSectionHeaders,
+    productDetailLines,
+    careInstructionLines,
+    additionalInfoLines: parseSectionedText(desc, additionalInfoKeywords)
+  }
+})
+
+/**
  * Check if we should show the description field.
- * Hide it if it contains structured detail sections (Detalhes do produto, Cuidados, etc.)
- * to avoid duplication with the formatted sections below.
+ * Hide it if it contains structured detail sections.
  */
 const shouldShowDescription = computed(() => {
   if (!product.value?.description) return false
-  
-  const desc = product.value.description.toLowerCase()
-  
-  // If description contains section headers, it's meant for the structured sections below
-  const hasSectionHeaders = 
-    desc.includes('detalhes do produto') ||
-    desc.includes('cuidados com a sua camiseta') ||
-    desc.includes('informações adicionais') ||
-    desc.includes('care instructions') ||
-    desc.includes('additional info')
-  
-  // Hide description if it contains section headers (will be shown in structured sections)
-  if (hasSectionHeaders) return false
-  
-  // Also hide if it's too long (likely contains mixed content)
+  if (parsedProductContent.value.hasSectionHeaders) return false
   if (product.value.description.length > 300) return false
-  
   return true
 })
 
@@ -422,8 +480,7 @@ const fulfillmentLabel = computed(() => {
 // Dynamic product details based on product type
 const productDetails = computed(() => {
   if (!product.value) return []
-  const details = []
-
+  
   // If product has a details array, use it
   if (Array.isArray(product.value.details) && product.value.details.length > 0) {
     return product.value.details
@@ -434,69 +491,13 @@ const productDetails = computed(() => {
     return Object.values(product.value.details).filter(Boolean)
   }
 
-  // Helper function to parse text with section headers
-  const parseSectionedText = (text, sectionFilter) => {
-    if (!text) return []
-    
-    const lines = text.split('\n').map(line => line.trim()).filter(Boolean)
-    
-    return lines.filter(line => {
-      const lowerLine = line.toLowerCase()
-      // Exclude section headers
-      const isSectionHeader = 
-        lowerLine.includes('detalhes do produto') ||
-        lowerLine.includes('cuidados com a sua camiseta') ||
-        lowerLine.includes('informações adicionais') ||
-        lowerLine.includes('care instructions') ||
-        lowerLine.includes('additional info')
-      
-      // Exclude lines matching filter keywords
-      const isFiltered = sectionFilter.some(keyword => lowerLine.includes(keyword))
-      
-      return !isSectionHeader && !isFiltered
-    })
-  }
-
-  // Parse product.info field if it exists
-  if (product.value.info && typeof product.value.info === 'string') {
-    const careKeywords = ['passar do avesso', 'pano protetor', 'evitar vapor', 'cuidados', 'passadoria']
-    const additionalInfoKeywords = ['medidas podem variar', 'pode encolher']
-    
-    const productDetailLines = parseSectionedText(
-      product.value.info,
-      [...careKeywords, ...additionalInfoKeywords]
-    )
-    
-    if (productDetailLines.length > 0) {
-      return productDetailLines
-    }
-  }
-
-  // Parse product.description field if it contains structured data
-  if (product.value.description && typeof product.value.description === 'string') {
-    const desc = product.value.description
-    
-    // Only parse if it looks like structured data (contains section headers)
-    const hasSectionHeaders = 
-      desc.toLowerCase().includes('detalhes do produto') ||
-      desc.toLowerCase().includes('cuidados com a sua camiseta')
-    
-    if (hasSectionHeaders) {
-      const careKeywords = ['passar do avesso', 'pano protetor', 'evitar vapor', 'cuidados']
-      const additionalInfoKeywords = ['medidas podem variar', 'pode encolher', 'informações adicionais']
-      
-      const productDetailLines = parseSectionedText(
-        desc,
-        [...careKeywords, ...additionalInfoKeywords]
-      )
-      
-      if (productDetailLines.length > 0) {
-        return productDetailLines
-      }
-    }
+  // Use parsed content if available
+  if (parsedProductContent.value.productDetailLines.length > 0) {
+    return parsedProductContent.value.productDetailLines
   }
 
   // Default details based on product type (only if no structured data found)
+  const details = []
   if (isCamiseta.value) {
     details.push(t('productDetail.defaultCamisetaMaterial'))
     details.push(t('productDetail.defaultCamisetaPrint'))
@@ -537,7 +538,12 @@ const careInstructions = computed(() => {
     return product.value.care_instructions
   }
 
-  // Try to parse care instructions from description field
+  // Use parsed content if available
+  if (parsedProductContent.value.careInstructionLines.length > 0) {
+    return parsedProductContent.value.careInstructionLines
+  }
+
+  // Try to parse care instructions from description field (legacy fallback)
   if (product.value.description && typeof product.value.description === 'string') {
     const desc = product.value.description
     const hasCareSection = desc.toLowerCase().includes('cuidados com a sua camiseta')

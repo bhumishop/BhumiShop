@@ -5,9 +5,7 @@ import { useOrderStore } from './orders'
 import { useCartStore } from './cart'
 import { useToastStore } from './toast'
 import { calculateShipping, getStateFromCEP, getZoneFromState } from './shipping'
-import { i18n } from '../i18n'
-
-const t = (key) => i18n.global.t(key)
+import { t } from '../utils/storeI18n'
 
 export const useCheckoutStore = defineStore('checkout', () => {
   const step = ref(1) // 1=Cart, 2=Info, 2.5=Shipping, 3=Payment, 4=Processing, 5=Confirm
@@ -37,6 +35,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
     notes: ''
   })
 
+  // Cache store instances to avoid re-computation
+  const cartStore = useCartStore()
+
   const isInfoValid = computed(() => {
     const { name, email, phone, cep, postalCode, country } = customerInfo.value
     const code = postalCode || cep
@@ -52,8 +53,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
     )
   })
 
-  const totalWithShipping = computed(() => {
-    const cartStore = useCartStore()
+  // Use a function to compute total to avoid stale closures
+  const computeTotalWithShipping = () => {
     let total = cartStore.totalPrice
     if (shippingCosts.value) {
       if (shippingCosts.value.own?.cost) total += shippingCosts.value.own.cost
@@ -62,12 +63,11 @@ export const useCheckoutStore = defineStore('checkout', () => {
       }
     }
     return total
-  })
+  }
 
-  const needsProviderSelection = computed(() => {
-    const cartStore = useCartStore()
-    return cartStore.hasUmaPencaItems
-  })
+  const totalWithShipping = computed(() => computeTotalWithShipping())
+
+  const needsProviderSelection = computed(() => cartStore.hasUmaPencaItems)
 
   function setCustomerInfo(info) {
     customerInfo.value = {

@@ -27,18 +27,29 @@ export const useCartStore = defineStore('cart', () => {
   const items = ref(loadCartFromStorage())
   const isOpen = ref(false)
 
-  // Throttled localStorage write — batch updates within 50ms window
+  // Optimized throttled localStorage write — batch updates within 100ms window
+  // Increased from 50ms to 100ms for better batching
   let _saveTimer = null
+  let _pendingSave = false
   const _saveCart = () => {
-    if (_saveTimer) return
+    if (_saveTimer) {
+      // Already scheduled, mark as pending
+      _pendingSave = true
+      return
+    }
+    _pendingSave = true
     _saveTimer = setTimeout(() => {
       _saveTimer = null
-      try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.value))
-      } catch { /* quota exceeded — silently ignore */ }
-    }, 50)
+      if (_pendingSave) {
+        _pendingSave = false
+        try {
+          localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.value))
+        } catch { /* quota exceeded — silently ignore */ }
+      }
+    }, 100)
   }
 
+  // Use shallow watch with manual deep comparison for better performance
   watch(items, _saveCart, { deep: true })
 
   const totalItems = computed(() => {

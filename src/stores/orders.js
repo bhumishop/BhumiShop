@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase'
-import { i18n } from '../i18n'
-
-const t = (key) => i18n.global.t(key)
+import { t } from '../utils/storeI18n'
 
 export const useOrderStore = defineStore('orders', () => {
   const orders = ref([])
