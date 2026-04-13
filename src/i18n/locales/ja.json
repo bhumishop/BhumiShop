@@ -25,7 +25,7 @@
     "additionalInfo": "追加情報",
     "copyright": "© {year} Bhumisparsha School. All rights reserved.",
     "securePayment": "AbacatePay経由の安全な支払い",
-    "contactEmail": "contact@bhumisparshaschool.org"
+    "contactEmail": "contact\\@bhumisparshaschool.org"
   },
   "nav": {
     "home": "ホーム",
@@ -124,7 +124,12 @@
       "phone": "Phone",
       "cpf": "CPF (optional)",
       "addressSection": "Shipping Address",
+      "country": "国",
+      "selectCountry": "国を選択",
       "cep": "CEP",
+      "postalCode": "郵便番号",
+      "zipCode": "ZIPコード",
+      "state": "都道府県",
       "street": "Street / Avenue",
       "number": "Number",
       "complement": "Complement (optional)",
@@ -135,7 +140,7 @@
       "continue": "Continue",
       "placeholders": {
         "name": "Your name",
-        "email": "your@email.com",
+        "email": "your\\@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
@@ -144,13 +149,17 @@
         "complement": "Apt, block, etc.",
         "neighborhood": "Neighborhood",
         "city": "City",
+        "state": "都道府県",
+        "postalCode": "郵便番号を入力",
+        "zipCode": "ZIPコードを入力",
         "notes": "Additional delivery information"
       },
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email",
         "phoneInvalid": "Invalid phone",
-        "cepInvalid": "Invalid CEP"
+        "cepInvalid": "Invalid CEP",
+        "postalCodeRequired": "郵便番号は必須です"
       }
     },
     "step3": {
@@ -224,43 +233,51 @@
   },
   "auth": {
     "login": "ログイン",
-    "register": "アカウント作成",
-    "fullName": "氏名",
-    "email": "メールアドレス",
-    "password": "パスワード",
-    "placeholders": {
-      "name": "お名前",
-      "email": "your@email.com",
-      "password": "6文字以上"
-    },
+    "termsSubtitle": "続行するには利用規約に同意してください",
+    "acceptTerms": "同意する",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "and": "および",
+    "continue": "続ける",
+    "back": "戻る",
+    "detectMyLocation": "現在地を検出",
+    "detectingLocation": "現在地を検出中...",
+    "exploreNow": "今すぐ探索",
+    "setLocation": "所在地を設定",
+    "setLocationSubtitle": "パーソナライズされた体験のために",
+    "searchLocation": "都市名または住所を検索...",
+    "searching": "検索中...",
+    "changeLocation": "変更",
     "validation": {
-      "nameRequired": "名前は必須です",
-      "emailRequired": "メールアドレスは必須です",
-      "emailInvalid": "無効なメールアドレス",
-      "passwordRequired": "パスワードは必須です",
-      "passwordMinLength": "6文字以上"
+      "phoneRequired": "電話番号は必須です"
     },
     "divider": "または",
     "wechat": "WeChatで続ける",
+    "google": "Googleで続ける",
     "sms": "SMSでログイン",
     "phone": "電話番号",
     "phonePlaceholder": "+55 11 99999-9999",
     "sendSmsCode": "SMSコードを送信",
     "codeSent": "コードを送信しました！携帯電話を確認してください。",
     "smsCodeSent": "SMSコードを送信しました！",
-    "switchToRegister": "アカウントをお持ちでないですか？アカウント作成",
-    "switchToLogin": "すでにアカウントをお持ちですか？ログイン",
     "errors": {
+      "geoNotSupported": "お使いのブラウザはジオロケーションをサポートしていません",
+      "geoPermissionDenied": "位置情報の権限が拒否されました。位置情報アクセスを有効にしてください。",
+      "geoTimeout": "位置情報リクエストがタイムアウトしました。もう一度お試しください。",
+      "geoUnknown": "現在地を検出できません。もう一度お試しください。",
+      "geoLookupFailed": "住所の検索に失敗しました。もう一度お試しください。",
       "wechatLogin": "WeChatログインエラー",
       "phoneRequired": "電話番号は必須です",
       "smsCode": "SMSコード送信エラー",
-      "processRequest": "リクエスト処理エラー"
+      "processRequest": "リクエスト処理エラー",
+      "termsRequired": "利用規約に同意してください"
     },
     "toast": {
-      "loginSuccess": "ログインしました！",
-      "registerSuccess": "アカウントが作成されました！"
+      "smsCodeSent": "SMSコードを送信しました！"
     },
-    "google": "Continue with Google"
+    "welcome": "ようこそ！",
+    "welcomeMessage": "Bhumi Shop を探索する準備ができました。",
+    "exploreNow": "今すぐ探索"
   },
   "profile": {
     "title": "マイプロフィール",
@@ -389,7 +406,8 @@
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery"
+      "immediateDigitalDelivery": "Immediate digital delivery",
+      "internationalShipping": "国際送料が適用されました"
     }
   },
   "shipping": {

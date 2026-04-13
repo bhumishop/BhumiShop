@@ -128,4 +128,21 @@ export function getFreeShippingProgress(subtotal) {
   return { progress, remaining, isFree: subtotal >= FREE_SHIPPING_ABOVE }
 }
 
+// ViaCEP API lookup for Brazilian addresses
+export async function lookupCEP(cep) {
+  const digits = cep.replace(/\D/g, '')
+  if (digits.length !== 8) return null
+
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
+    if (!response.ok) return null
+    const data = await response.json()
+    if (data.erro) return null // CEP not found
+    return data
+  } catch (err) {
+    console.error('ViaCEP lookup failed:', err)
+    return null
+  }
+}
+
 export { SHIPPING_ZONES, FREE_SHIPPING_ABOVE }

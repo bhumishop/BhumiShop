@@ -1,10 +1,112 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase } from '../supabase'
+import { supabase, isDemo } from '../supabase'
 import { i18n } from '../i18n'
 
 const PAGE_SIZE = 20
 const t = (key) => i18n.global.t(key)
+
+// Mock data for demo mode
+const mockCategories = [
+  { id: 1, name: 'Camisetas' },
+  { id: 2, name: 'Acessórios' },
+  { id: 3, name: 'Arte' }
+]
+
+const mockProducts = [
+  {
+    id: 1,
+    name: 'Camiseta Bhumisparsha - Buddha Touching Earth',
+    category: 1,
+    price: 79.90,
+    description: 'Camiseta premium com a icônica imagem do Buddha Bhumisparsha. Algodão orgânico 180g, estampa em serigrafia de alta qualidade.',
+    stock: 'print-on-demand',
+    image: '/mock/tshirt-bhumisparsha.jpg',
+    artist: 'Bhumisparsha Design',
+    info: '100% algodão orgânico\nEstampa em serigrafia\nDisponível em P, M, G, GG',
+    sizes: ['P', 'M', 'G', 'GG'],
+    fulfillment_type: 'own',
+    weight: 0.3,
+    dimensions: { width: 30, height: 40, depth: 2 },
+    shipping_zones: ['BR']
+  },
+  {
+    id: 2,
+    name: 'Caneca Meditação Zen',
+    category: 2,
+    price: 49.90,
+    description: 'Caneca de cerâmica artesanal com design zen de meditação. Capacidade 350ml.',
+    stock: 'in-stock',
+    image: '/mock/mug-zen.jpg',
+    artist: 'Studio Cerâmica',
+    info: 'Cerâmica artesanal\nCapacidade 350ml\nPode ir ao micro-ondas',
+    fulfillment_type: 'own',
+    weight: 0.4,
+    dimensions: { width: 12, height: 15, depth: 12 },
+    shipping_zones: ['BR']
+  },
+  {
+    id: 3,
+    name: 'Poster Mandala Dharma Wheel',
+    category: 3,
+    price: 39.90,
+    description: 'Poster artístico com a Roda do Dharma em estilo mandala. Impressão em papel couchê 250g.',
+    stock: 'print-on-demand',
+    image: '/mock/poster-dharma.jpg',
+    artist: 'Bhumisparsha Art',
+    info: 'Papel couchê 250g\nImpressão HD\nTamanho A3 (297x420mm)',
+    fulfillment_type: 'own',
+    weight: 0.1,
+    dimensions: { width: 32, height: 45, depth: 1 },
+    shipping_zones: ['BR']
+  },
+  {
+    id: 4,
+    name: 'Camiseta Lotus Sutra',
+    category: 1,
+    price: 84.90,
+    description: 'Camiseta com estampa do Sutra de Lótus em caligrafia tradicional. Design exclusivo.',
+    stock: 'print-on-demand',
+    image: '/mock/tshirt-lotus.jpg',
+    artist: 'Calligraphy Studio',
+    info: 'Algodão premium 180g\nEstampa DTG\nP, M, G, GG, XGG',
+    sizes: ['P', 'M', 'G', 'GG', 'XGG'],
+    fulfillment_type: 'own',
+    weight: 0.3,
+    dimensions: { width: 30, height: 40, depth: 2 },
+    shipping_zones: ['BR']
+  },
+  {
+    id: 5,
+    name: 'Ecobag Eightfold Path',
+    category: 2,
+    price: 34.90,
+    description: 'Ecobag de algodão cru com o Nobre Caminho Óctuplo. Resistente e sustentável.',
+    stock: 'in-stock',
+    image: '/mock/ecobag-eightfold.jpg',
+    artist: 'Bhumisparsha Design',
+    info: 'Algodão cru 300g\nAlças reforçadas\n40x35cm',
+    fulfillment_type: 'own',
+    weight: 0.15,
+    dimensions: { width: 40, height: 35, depth: 1 },
+    shipping_zones: ['BR']
+  },
+  {
+    id: 6,
+    name: 'Print Digital - Buddha Art',
+    category: 3,
+    price: 19.90,
+    description: 'Arte digital em alta resolução para impressão pessoal. Formato PNG 300dpi.',
+    stock: 'digital',
+    image: '/mock/digital-buddha.jpg',
+    artist: 'Digital Art Studio',
+    info: 'Arquivo digital PNG\n300dpi\nTamanho A4',
+    fulfillment_type: 'digital',
+    weight: 0,
+    dimensions: null,
+    shipping_zones: null
+  }
+]
 
 export const useProductStore = defineStore('products', () => {
   const products = ref([])
@@ -15,6 +117,7 @@ export const useProductStore = defineStore('products', () => {
   const activeCategory = ref('')
   const currentPage = ref(1)
   const totalCount = ref(0)
+  const maxPrice = ref(null) // null means no price filter
 
   const getProductById = computed(() => {
     return (id) => products.value.find(p => p.id === parseInt(id))
@@ -43,6 +146,11 @@ export const useProductStore = defineStore('products', () => {
       )
     }
 
+    // Apply price filter if set
+    if (maxPrice.value !== null && maxPrice.value !== undefined) {
+      result = result.filter(p => p.price <= maxPrice.value)
+    }
+
     return result
   })
 
@@ -57,6 +165,13 @@ export const useProductStore = defineStore('products', () => {
     loading.value = true
     error.value = null
     try {
+      if (isDemo) {
+        // Use mock data in demo mode
+        products.value = mockProducts
+        totalCount.value = mockProducts.length
+        return
+      }
+
       const { data, error: err } = await supabase
         .from('products')
         .select('*', { count: 'exact' })
@@ -76,6 +191,12 @@ export const useProductStore = defineStore('products', () => {
   async function fetchCategories() {
     error.value = null
     try {
+      if (isDemo) {
+        // Use mock categories in demo mode
+        categories.value = mockCategories
+        return
+      }
+
       const { data, error: err } = await supabase
         .from('categories')
         .select('*')
@@ -90,6 +211,9 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function addProduct(product) {
+    if (isDemo) {
+      throw new Error('Adding products is not available in demo mode')
+    }
     error.value = null
     try {
       const productData = {
@@ -126,6 +250,9 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function updateProduct(id, updates) {
+    if (isDemo) {
+      throw new Error('Updating products is not available in demo mode')
+    }
     error.value = null
     try {
       const productData = {
@@ -166,6 +293,9 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function deleteProduct(id) {
+    if (isDemo) {
+      throw new Error('Deleting products is not available in demo mode')
+    }
     error.value = null
     try {
       const { error: err } = await supabase
@@ -183,6 +313,9 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function addCategory(category) {
+    if (isDemo) {
+      throw new Error('Adding categories is not available in demo mode')
+    }
     error.value = null
     try {
       const { data, error: err } = await supabase
@@ -203,6 +336,9 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function deleteCategory(id) {
+    if (isDemo) {
+      throw new Error('Deleting categories is not available in demo mode')
+    }
     error.value = null
     try {
       const { error: err } = await supabase
@@ -226,6 +362,11 @@ export const useProductStore = defineStore('products', () => {
 
   function setActiveCategory(category) {
     activeCategory.value = category
+    currentPage.value = 1
+  }
+
+  function setMaxPrice(price) {
+    maxPrice.value = price
     currentPage.value = 1
   }
 
@@ -256,6 +397,7 @@ export const useProductStore = defineStore('products', () => {
     deleteCategory,
     setSearchQuery,
     setActiveCategory,
+    setMaxPrice,
     setPage
   }
 })

@@ -1,5 +1,18 @@
 <template>
   <footer class="footer">
+    <!-- DarkVeil background -->
+    <div class="footer__darkveil">
+      <DarkVeil
+        :hue-shift="120"
+        :noise-intensity="0"
+        :scanline-intensity="0"
+        :speed="0.5"
+        :scanline-frequency="0"
+        :warp-amount="0"
+        :resolution-scale="1"
+      />
+    </div>
+
     <div class="container">
       <div class="footer__grid">
         <div class="footer__brand">
@@ -39,6 +52,7 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 import { gsap, scrollReveal, scrollBatch, createAnimationContext } from '../../utils/animations'
+import DarkVeil from '../common/DarkVeil.vue'
 
 const currentYear = new Date().getFullYear()
 let ctx = null
@@ -97,11 +111,22 @@ onUnmounted(() => {
 <style scoped>
 .footer {
   background: var(--surface-0);
-  border-top: 1px solid var(--border);
-  padding: clamp(2rem, 5vh, 3.5rem) 0 clamp(1rem, 2vh, 1.75rem);
+  border-top: 0.0625rem solid var(--border);
+  padding: clamp(1.5rem, 5vh, 2.5rem) 0 clamp(0.75rem, 2vh, 1.25rem);
   margin-top: auto;
   position: relative;
+  overflow: hidden;
+  min-height: 12rem;
+  contain: layout style;
   transition: background var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.footer__darkveil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.15;
+  pointer-events: none;
 }
 
 .footer::before {
@@ -110,22 +135,41 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(90deg, transparent, var(--accent-subtle), var(--green-adorn), var(--accent-subtle), transparent);
   opacity: 0.5;
+  z-index: 1;
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 0.1875rem,
+      rgba(139, 92, 246, 0.008) 0.1875rem,
+      rgba(139, 92, 246, 0.008) 0.375rem
+    );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .footer__grid {
   display: grid;
   grid-template-columns: 2fr repeat(3, 1fr);
-  gap: clamp(1.25rem, 3vw, 2.5rem);
-  margin-bottom: clamp(1.25rem, 3vh, 2rem);
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-bottom: clamp(1rem, 3vh, 1.5rem);
+  position: relative;
+  z-index: 1;
 }
 
 .footer__logo {
-  font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+  font-size: clamp(0.9rem, 2.5vw, 1.25rem);
   font-weight: 700;
-  margin-bottom: clamp(0.5rem, 1.2vh, 0.75rem);
+  margin-bottom: clamp(0.375rem, 1.2vh, 0.625rem);
 }
 
 .footer__logo-text {
@@ -135,24 +179,24 @@ onUnmounted(() => {
 
 .footer__logo-accent {
   color: var(--accent);
-  text-shadow: 0 0 clamp(0.375rem, 1vw, 0.75rem) var(--accent-light);
+  text-shadow: 0 0 clamp(0.25rem, 1vw, 0.5rem) var(--accent-light);
 }
 
 .footer__desc {
   color: var(--text-secondary);
-  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
+  font-size: clamp(0.7rem, 1.5vw, 0.875rem);
   line-height: 1.6;
   max-width: min(17.5rem, 90%);
   transition: color var(--transition-smooth);
 }
 
 .footer__heading {
-  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+  font-size: clamp(0.6rem, 1.3vw, 0.75rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-primary);
-  margin-bottom: clamp(0.625rem, 1.5vh, 1rem);
+  margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem);
   transition: color var(--transition-smooth);
 }
 
@@ -160,55 +204,56 @@ onUnmounted(() => {
 .footer__col p {
   display: block;
   color: var(--text-secondary);
-  font-size: clamp(0.8rem, 1.3vw, 0.875rem);
-  padding: clamp(0.125rem, 0.3vh, 0.25rem) 0;
+  font-size: clamp(0.7rem, 1.5vw, 0.875rem);
+  padding: clamp(0.0625rem, 0.3vh, 0.1875rem) 0;
   text-decoration: none;
   transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
 .footer__col a:hover {
   color: var(--accent);
-  transform: translateX(clamp(0.125rem, 0.4vw, 0.25rem));
+  transform: translateX(clamp(0.0625rem, 0.4vw, 0.1875rem));
 }
 
 .footer__bottom {
-  border-top: 1px solid var(--border);
-  padding-top: clamp(0.875rem, 2vh, 1.5rem);
+  border-top: 0.0625rem solid var(--border);
+  padding-top: clamp(0.625rem, 2vh, 1rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+  font-size: clamp(0.6rem, 1.3vw, 0.75rem);
   color: var(--text-muted);
   transition: border-color var(--transition-smooth), color var(--transition-smooth);
 }
 
 .footer__payment {
-  font-size: clamp(0.65rem, 1vw, 0.75rem);
+  font-size: clamp(0.55rem, 1.2vw, 0.7rem);
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: clamp(0.25rem, 0.5vw, 0.375rem);
+  gap: clamp(0.1875rem, 0.6vw, 0.3125rem);
 }
 
 .footer__payment::before {
   content: '';
   display: inline-block;
-  width: clamp(0.375rem, 0.75vw, 0.5rem);
-  height: clamp(0.375rem, 0.75vw, 0.5rem);
+  width: clamp(0.25rem, 0.8vw, 0.4375rem);
+  height: clamp(0.25rem, 0.8vw, 0.4375rem);
   background: var(--green-adorn);
   border-radius: var(--radius-full);
-  box-shadow: 0 0 clamp(0.375rem, 1vw, 0.625rem) var(--green-adorn-glow);
+  box-shadow: 0 0 clamp(0.25rem, 1vw, 0.4375rem) var(--green-adorn-glow);
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {
   .footer__grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.875rem, 3vw, 1.5rem);
   }
 
   .footer__bottom {
     flex-direction: column;
-    gap: clamp(0.375rem, 1vh, 0.5rem);
+    gap: clamp(0.25rem, 1.5vh, 0.5rem);
     text-align: center;
   }
 }
@@ -217,10 +262,51 @@ onUnmounted(() => {
   .footer__grid {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: clamp(0.75rem, 3vh, 1.25rem);
   }
 
   .footer__desc {
     max-width: 100%;
+  }
+
+  .footer__col a,
+  .footer__col p {
+    padding: clamp(0.125rem, 0.5vh, 0.25rem) 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .footer {
+    padding: clamp(1rem, 4vh, 1.5rem) 0 clamp(0.5rem, 1.5vh, 0.875rem);
+  }
+
+  .footer__grid {
+    gap: clamp(0.625rem, 3vh, 1rem);
+  }
+
+  .footer__logo {
+    font-size: clamp(0.8rem, 3vw, 1rem);
+  }
+
+  .footer__desc {
+    font-size: clamp(0.65rem, 2vw, 0.8rem);
+  }
+
+  .footer__heading {
+    font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+  }
+
+  .footer__col a,
+  .footer__col p {
+    font-size: clamp(0.65rem, 2vw, 0.8rem);
+  }
+
+  .footer__bottom {
+    font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+  }
+
+  .footer__payment {
+    font-size: clamp(0.5rem, 1.5vw, 0.6rem);
   }
 }
 </style>

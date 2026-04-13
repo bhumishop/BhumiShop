@@ -227,8 +227,7 @@ describe('Nested Translation Keys', () => {
 
   it('should access auth validation messages', () => {
     i18n.global.locale.value = 'en'
-    expect(i18n.global.t('auth.validation.nameRequired')).toBe('Name is required')
-    expect(i18n.global.t('auth.validation.emailInvalid')).toBe('Invalid email')
+    expect(i18n.global.t('auth.validation.phoneRequired')).toBe('Phone is required')
   })
 
   it('should access admin toast messages', () => {

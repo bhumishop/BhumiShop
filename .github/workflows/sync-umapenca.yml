@@ -1,0 +1,173 @@
+name: Sync UmaPenca Products
+
+on:
+  schedule:
+    # Run every 6 hours (adjust as needed)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+    inputs:
+      sync_type:
+        description: 'Sync type'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - incremental
+          - products
+          - inventory
+          - pricing
+      product_id:
+        description: 'Product ID (for single product sync)'
+        required: false
+        type: string
+      upload_images:
+        description: 'Upload images to Supabase Storage'
+        required: false
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scripts/umapenca.py'
+      - '.github/workflows/sync-umapenca.yml'
+
+jobs:
+  sync-umapenca:
+    name: Sync UmaPenca Products
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      UMAPENCA_STORE_URL: ${{ secrets.UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org' }}
+      SYNC_TYPE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.sync_type || 'full' }}
+      UPLOAD_IMAGES: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.upload_images || 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests tqdm
+
+      - name: Create output directory
+        run: mkdir -p scripts/sync-umapenca/output
+
+      - name: Run UmaPenca Scraper v3
+        id: sync
+        run: |
+          # Build command
+          CMD="python .github/workflows/scripts/umapenca.py"
+
+          # Add sync type flag
+          if [ "${{ env.SYNC_TYPE }}" = "full" ]; then
+            CMD="$CMD --full"
+          fi
+
+          # Add single product flag
+          if [ -n "${{ github.event.inputs.product_id }}" ]; then
+            CMD="$CMD --product-id ${{ github.event.inputs.product_id }}"
+          fi
+
+          # Add image upload flag
+          if [ "${{ env.UPLOAD_IMAGES }}" = "true" ]; then
+            CMD="$CMD --upload-images"
+          fi
+
+          # Set output file
+          CMD="$CMD --output scripts/sync-umapenca/output/products.json"
+
+          # Run
+          echo "Running: $CMD"
+          eval $CMD
+        env:
+          DRY_RUN: ${{ github.ref != 'refs/heads/main' && 'true' || 'false' }}
+
+      - name: Generate final products.json
+        if: success()
+        run: |
+          # The scraper already generates products.json, just verify it exists
+          if [ -f "scripts/sync-umapenca/output/products.json" ]; then
+            echo "products.json generated successfully"
+            # Print summary
+            python3 -c "
+            import json
+            with open('scripts/sync-umapenca/output/products.json') as f:
+                data = json.load(f)
+            print(f\"Total products: {data.get('total_products', 0)}\")
+            print(f\"Generated at: {data.get('generated_at', 'N/A')}\")
+            # Print category breakdown
+            cats = {}
+            for p in data.get('products', []):
+                cat = p.get('category', 'unknown')
+                cats[cat] = cats.get(cat, 0) + 1
+            print('Categories:', dict(cats))
+            "
+          else
+            echo "ERROR: products.json was not generated"
+            exit 1
+          fi
+
+      - name: Upload products.json artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: products-json-${{ github.run_id }}
+          path: scripts/sync-umapenca/output/products.json
+          retention-days: 30
+
+      - name: Upload scraped data (raw)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraped-products-${{ github.run_id }}
+          path: scripts/sync-umapenca/output/
+          retention-days: 7
+
+      - name: Upload sync logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-logs-${{ github.run_id }}
+          path: |
+            scraper_v3.log
+            *.json
+          retention-days: 7
+
+      - name: Commit products.json to repository
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/sync-umapenca/output/products.json
+          git diff --staged --quiet || git commit -m "chore: update products.json from UmaPenca sync
+
+          🤖 Generated with [Qoder](https://qoder.com)"
+
+      - name: Push products.json
+        if: success() && github.ref == 'refs/heads/main'
+        run: git push
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `UmaPenca Sync Failed - Run #${{ github.run_number }}`,
+              body: `The UmaPenca sync workflow failed.\n\n**Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n**Sync Type:** ${{ env.SYNC_TYPE }}\n**Branch:** ${{ github.ref_name }}\n**Upload Images:** ${{ env.UPLOAD_IMAGES }}`,
+              labels: ['bug', 'automation']
+            })

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BhumiShop - Loading...</title>
+  <script>
+    // GitHub Pages SPA fallback - redirect to index.html while preserving path
+    (function() {
+      var path = window.location.pathname;
+
+      // Detect the base path (e.g., /bhumi-shop/ for GitHub Pages, / for localhost)
+      var pathParts = path.split('/').filter(Boolean);
+      var base = '/';
+
+      // If first segment looks like a repo name (not a route), use it as base
+      var routes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin'];
+      if (pathParts.length > 0 && !routes.includes(pathParts[0]) && !pathParts[0].match(/^[\d]/)) {
+        base = '/' + pathParts[0] + '/';
+      }
+
+      // Only redirect if we're not already at index.html
+      if (!path.endsWith('/index.html') && path !== base) {
+        // Store the path (relative to base) so index.html can use it
+        var relativePath = path.replace(base, '/') || '/';
+        sessionStorage.setItem('spa-redirect-path', relativePath + window.location.search + window.location.hash);
+        // Redirect to index.html
+        window.location.href = base + 'index.html';
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>

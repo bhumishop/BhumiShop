@@ -176,7 +176,7 @@ export function useGSAPAnimations() {
     if (prefersReducedMotion) return { destroy: () => {} }
 
     return magneticEffect(element, {
-      strength: config.strength || 30,
+      strength: config.strength || 9,
       ...config,
     })
   }

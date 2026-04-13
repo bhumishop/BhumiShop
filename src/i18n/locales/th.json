@@ -25,7 +25,7 @@
     "additionalInfo": "ข้อมูลเพิ่มเติม",
     "copyright": "© {year} Bhumisparsha School สงวนลิขสิทธิ์",
     "securePayment": "การชำระเงินที่ปลอดภัยผ่าน AbacatePay",
-    "contactEmail": "contact@bhumisparshaschool.org"
+    "contactEmail": "contact\\@bhumisparshaschool.org"
   },
   "nav": {
     "home": "หน้าแรก",
@@ -124,7 +124,12 @@
       "phone": "Phone",
       "cpf": "CPF (optional)",
       "addressSection": "Shipping Address",
+      "country": "ประเทศ",
+      "selectCountry": "เลือกประเทศ",
       "cep": "CEP",
+      "postalCode": "รหัสไปรษณีย์",
+      "zipCode": "รหัส ZIP",
+      "state": "รัฐ/จังหวัด",
       "street": "Street / Avenue",
       "number": "Number",
       "complement": "Complement (optional)",
@@ -135,7 +140,7 @@
       "continue": "Continue",
       "placeholders": {
         "name": "Your name",
-        "email": "your@email.com",
+        "email": "your\\@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
@@ -144,13 +149,17 @@
         "complement": "Apt, block, etc.",
         "neighborhood": "Neighborhood",
         "city": "City",
+        "state": "รัฐ/จังหวัด",
+        "postalCode": "ใส่รหัสไปรษณีย์",
+        "zipCode": "ใส่รหัส ZIP",
         "notes": "Additional delivery information"
       },
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email",
         "phoneInvalid": "Invalid phone",
-        "cepInvalid": "Invalid CEP"
+        "cepInvalid": "Invalid CEP",
+        "postalCodeRequired": "ต้องระบุรหัสไปรษณีย์"
       }
     },
     "step3": {
@@ -224,43 +233,51 @@
   },
   "auth": {
     "login": "เข้าสู่ระบบ",
-    "register": "สร้างบัญชี",
-    "fullName": "ชื่อเต็ม",
-    "email": "อีเมล",
-    "password": "รหัสผ่าน",
-    "placeholders": {
-      "name": "ชื่อของคุณ",
-      "email": "your@email.com",
-      "password": "อย่างน้อย 6 ตัวอักษร"
-    },
+    "termsSubtitle": "โปรดยอมรับข้อกำหนดของเราก่อนดำเนินการต่อ",
+    "acceptTerms": "ฉันยอมรับ",
+    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+    "termsOfService": "ข้อกำหนดในการให้บริการ",
+    "and": "และ",
+    "continue": "ดำเนินการต่อ",
+    "back": "ย้อนกลับ",
+    "detectMyLocation": "ตรวจจับตำแหน่งของฉัน",
+    "detectingLocation": "กำลังตรวจจับตำแหน่ง...",
+    "exploreNow": "สำรวจเลย",
+    "setLocation": "ตั้งค่าตำแหน่งของคุณ",
+    "setLocationSubtitle": "ช่วยเราปรับแต่งประสบการณ์ของคุณ",
+    "searchLocation": "ค้นหาเมืองหรือที่อยู่ของคุณ...",
+    "searching": "กำลังค้นหา...",
+    "changeLocation": "เปลี่ยน",
     "validation": {
-      "nameRequired": "ต้องระบุชื่อ",
-      "emailRequired": "ต้องระบุอีเมล",
-      "emailInvalid": "อีเมลไม่ถูกต้อง",
-      "passwordRequired": "ต้องระบุรหัสผ่าน",
-      "passwordMinLength": "อย่างน้อย 6 ตัวอักษร"
+      "phoneRequired": "ต้องระบุเบอร์โทรศัพท์"
     },
     "divider": "หรือ",
     "wechat": "ดำเนินการต่อด้วย WeChat",
+    "google": "ดำเนินการต่อด้วย Google",
     "sms": "เข้าสู่ระบบด้วย SMS",
     "phone": "โทรศัพท์",
     "phonePlaceholder": "+55 11 99999-9999",
     "sendSmsCode": "ส่งรหัส SMS",
     "codeSent": "ส่งรหัสแล้ว! ตรวจสอบโทรศัพท์ของคุณ",
     "smsCodeSent": "ส่งรหัส SMS แล้ว!",
-    "switchToRegister": "ยังไม่มีบัญชี? สร้างบัญชี",
-    "switchToLogin": "มีบัญชีอยู่แล้ว? เข้าสู่ระบบ",
     "errors": {
+      "geoNotSupported": "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง",
+      "geoPermissionDenied": "ปฏิเสธสิทธิ์การเข้าถึงตำแหน่ง กรุณาเปิดการเข้าถึงตำแหน่ง",
+      "geoTimeout": "คำขอตำแหน่งหมดเวลา กรุณาลองอีกครั้ง",
+      "geoUnknown": "ไม่สามารถตรวจจับตำแหน่งของคุณได้ กรุณาลองอีกครั้ง",
+      "geoLookupFailed": "ไม่สามารถค้นหาที่อยู่ได้ กรุณาลองอีกครั้ง",
       "wechatLogin": "ข้อผิดพลาดในการเข้าสู่ระบบด้วย WeChat",
       "phoneRequired": "ต้องระบุเบอร์โทรศัพท์",
       "smsCode": "ข้อผิดพลาดในการส่งรหัส SMS",
-      "processRequest": "ข้อผิดพลาดในการประมวลผลคำขอ"
+      "processRequest": "ข้อผิดพลาดในการประมวลผลคำขอ",
+      "termsRequired": "โปรดยอมรับข้อกำหนดและเงื่อนไขก่อน"
     },
     "toast": {
-      "loginSuccess": "เข้าสู่ระบบสำเร็จ!",
-      "registerSuccess": "สร้างบัญชีสำเร็จ!"
+      "smsCodeSent": "ส่งรหัส SMS แล้ว!"
     },
-    "google": "Continue with Google"
+    "welcome": "ยินดีต้อนรับ!",
+    "welcomeMessage": "คุณพร้อมที่จะสำรวจ Bhumi Shop แล้ว",
+    "exploreNow": "สำรวจเลย"
   },
   "profile": {
     "title": "โปรไฟล์ของฉัน",
@@ -389,7 +406,8 @@
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery"
+      "immediateDigitalDelivery": "Immediate digital delivery",
+      "internationalShipping": "ใช้อัตราค่าจัดส่งระหว่างประเทศ"
     }
   },
   "shipping": {

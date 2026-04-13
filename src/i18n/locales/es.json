@@ -25,7 +25,7 @@
     "additionalInfo": "Informacion adicional",
     "copyright": "© {year} Bhumisparsha School. Todos los derechos reservados.",
     "securePayment": "Pago seguro via AbacatePay",
-    "contactEmail": "contacto@bhumisparshaschool.org"
+    "contactEmail": "contacto\\@bhumisparshaschool.org"
   },
   "nav": {
     "home": "Inicio",
@@ -124,7 +124,12 @@
       "phone": "Phone",
       "cpf": "CPF (optional)",
       "addressSection": "Shipping Address",
+      "country": "País",
+      "selectCountry": "Selecciona un país",
       "cep": "CEP",
+      "postalCode": "Código postal",
+      "zipCode": "Código ZIP",
+      "state": "Estado/Provincia",
       "street": "Street / Avenue",
       "number": "Number",
       "complement": "Complement (optional)",
@@ -144,13 +149,17 @@
         "complement": "Apt, block, etc.",
         "neighborhood": "Neighborhood",
         "city": "City",
+        "state": "Estado/Provincia",
+        "postalCode": "Ingresa código postal",
+        "zipCode": "Ingresa código ZIP",
         "notes": "Additional delivery information"
       },
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email",
         "phoneInvalid": "Invalid phone",
-        "cepInvalid": "Invalid CEP"
+        "cepInvalid": "Invalid CEP",
+        "postalCodeRequired": "El código postal es obligatorio"
       }
     },
     "step3": {
@@ -224,43 +233,51 @@
   },
   "auth": {
     "login": "Iniciar Sesion",
-    "register": "Crear Cuenta",
-    "fullName": "Nombre completo",
-    "email": "Correo electronico",
-    "password": "Contrasena",
-    "placeholders": {
-      "name": "Tu nombre",
-      "email": "tu@email.com",
-      "password": "Minimo 6 caracteres"
-    },
+    "termsSubtitle": "Acepta nuestros terminos antes de continuar",
+    "acceptTerms": "Acepto los",
+    "privacyPolicy": "Politica de Privacidad",
+    "termsOfService": "Terminos de Servicio",
+    "and": "y",
+    "continue": "Continuar",
+    "back": "Volver",
+    "detectMyLocation": "Detectar mi ubicación",
+    "detectingLocation": "Detectando ubicación...",
+    "exploreNow": "Explorar Ahora",
+    "setLocation": "Establecer Ubicacion",
+    "setLocationSubtitle": "Ayudanos a personalizar tu experiencia",
+    "searchLocation": "Busca tu ciudad o direccion...",
+    "searching": "Buscando...",
+    "changeLocation": "Cambiar",
     "validation": {
-      "nameRequired": "El nombre es obligatorio",
-      "emailRequired": "El correo electronico es obligatorio",
-      "emailInvalid": "Correo electronico invalido",
-      "passwordRequired": "La contrasena es obligatoria",
-      "passwordMinLength": "Minimo 6 caracteres"
+      "phoneRequired": "El telefono es obligatorio"
     },
     "divider": "o",
     "wechat": "Continuar con WeChat",
+    "google": "Continuar con Google",
     "sms": "Entrar con SMS",
     "phone": "Telefono",
     "phonePlaceholder": "+55 11 99999-9999",
     "sendSmsCode": "Enviar codigo SMS",
     "codeSent": "¡Codigo enviado! Revisa tu telefono.",
     "smsCodeSent": "¡Codigo SMS enviado!",
-    "switchToRegister": "¿No tienes cuenta? Crear cuenta",
-    "switchToLogin": "¿Ya tienes cuenta? Iniciar Sesion",
     "errors": {
+      "geoNotSupported": "La geolocalización no es compatible con tu navegador",
+      "geoPermissionDenied": "Permiso de ubicación denegado. Por favor, habilita el acceso a la ubicación.",
+      "geoTimeout": "La solicitud de ubicación agotó el tiempo de espera. Por favor, inténtalo de nuevo.",
+      "geoUnknown": "No se pudo detectar tu ubicación. Por favor, inténtalo de nuevo.",
+      "geoLookupFailed": "Error al buscar la dirección. Por favor, inténtalo de nuevo.",
       "wechatLogin": "Error al entrar con WeChat",
       "phoneRequired": "El telefono es obligatorio",
       "smsCode": "Error al enviar codigo SMS",
-      "processRequest": "Error al procesar solicitud"
+      "processRequest": "Error al procesar solicitud",
+      "termsRequired": "Debes aceptar los terminos y condiciones primero"
     },
     "toast": {
-      "loginSuccess": "¡Inicio de sesion exitoso!",
-      "registerSuccess": "¡Cuenta creada con exito!"
+      "smsCodeSent": "¡Codigo SMS enviado!"
     },
-    "google": "Continue with Google"
+    "welcome": "¡Bienvenido!",
+    "welcomeMessage": "Ya estás listo para explorar Bhumi Shop.",
+    "exploreNow": "Explorar Ahora"
   },
   "profile": {
     "title": "Mi Perfil",
@@ -389,7 +406,8 @@
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery"
+      "immediateDigitalDelivery": "Immediate digital delivery",
+      "internationalShipping": "Tarifa de envío internacional aplicada"
     }
   },
   "shipping": {

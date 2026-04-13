@@ -25,8 +25,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
     email: '',
     phone: '',
     taxId: '',
+    country: 'BR',
     address: '',
     cep: '',
+    postalCode: '',
     number: '',
     complement: '',
     neighborhood: '',
@@ -36,12 +38,17 @@ export const useCheckoutStore = defineStore('checkout', () => {
   })
 
   const isInfoValid = computed(() => {
-    const { name, email, phone, cep } = customerInfo.value
+    const { name, email, phone, cep, postalCode, country } = customerInfo.value
+    const code = postalCode || cep
+    const validPostal = country === 'BR'
+      ? code.replace(/\D/g, '').length === 8
+      : code.trim().length > 0
+
     return (
       name.trim().length >= 2 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
-      cep.replace(/\D/g, '').length === 8
+      validPostal
     )
   })
 
@@ -68,8 +75,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
       email: (info.email || '').trim().toLowerCase(),
       phone: (info.phone || '').trim(),
       taxId: (info.taxId || '').trim(),
+      country: (info.country || 'BR').trim(),
       address: (info.address || '').trim(),
       cep: (info.cep || '').trim(),
+      postalCode: (info.postalCode || info.cep || '').trim(),
       number: (info.number || '').trim(),
       complement: (info.complement || '').trim(),
       neighborhood: (info.neighborhood || '').trim(),
@@ -81,7 +90,32 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
   function calculateShippingCost() {
     const cartStore = useCartStore()
+    const country = customerInfo.value.country || 'BR'
     const cep = customerInfo.value.cep.replace(/\D/g, '')
+
+    // For non-Brazil orders, use flat international rate
+    if (country !== 'BR') {
+      const intlItems = cartStore.items.filter(item => item.fulfillment_type !== 'digital')
+      if (intlItems.length === 0) {
+        shippingCosts.value = {
+          own: { cost: 0, days: null },
+          uma_penca: { cost: null, days: null },
+          digital: { cost: 0, days: null, note: t('stores.shipping.immediateDigitalDelivery') }
+        }
+        return
+      }
+
+      // Flat international shipping rate
+      const intlRate = 45.00
+      shippingCosts.value = {
+        own: { cost: intlRate, days: '10-20', note: t('stores.shipping.internationalShipping') },
+        uma_penca: { cost: null, days: null, note: t('stores.shipping.calculatedByUmaPenca') },
+        digital: { cost: 0, days: null, note: t('stores.shipping.immediateDigitalDelivery') }
+      }
+      return
+    }
+
+    // Brazil: require 8-digit CEP
     if (cep.length !== 8) {
       shippingCosts.value = null
       return
@@ -210,7 +244,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
       info.neighborhood ? `- ${info.neighborhood}` : '',
       info.city ? info.city : '',
       info.state ? ` - ${info.state}` : '',
-      info.cep ? `CEP: ${info.cep}` : ''
+      info.postalCode || info.cep ? `${info.country === 'BR' ? 'CEP' : 'ZIP'}: ${info.postalCode || info.cep}` : '',
+      info.country ? info.country : ''
     ].filter(Boolean)
     return parts.join(', ')
   }
@@ -255,8 +290,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
       email: '',
       phone: '',
       taxId: '',
+      country: 'BR',
       address: '',
       cep: '',
+      postalCode: '',
       number: '',
       complement: '',
       neighborhood: '',

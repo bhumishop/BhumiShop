@@ -1,7 +1,12 @@
 <template>
   <Teleport to="body">
-    <div v-if="cartStore.isOpen" class="drawer-overlay" @click="cartStore.closeDrawer()"></div>
-    <div class="drawer" :class="{ 'drawer--open': cartStore.isOpen }">
+    <div
+      v-if="cartStore.isOpen"
+      class="drawer-overlay"
+      :class="{ 'drawer-overlay--visible': overlayVisible }"
+      @click="cartStore.closeDrawer()"
+    ></div>
+    <div class="drawer" :class="{ 'drawer--open': cartStore.isOpen }" :aria-hidden="!cartStore.isOpen">
       <div class="drawer__header">
         <h2 class="drawer__title">{{ $t('cart.cartCount', { count: cartStore.totalItems }) }}</h2>
         <button class="drawer__close" @click="cartStore.closeDrawer()" :aria-label="$t('common.close')">
@@ -63,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { gsap } from '../../utils/animations'
 import { useCartStore } from '../../stores/cart'
@@ -71,8 +76,7 @@ import BaseButton from '../common/BaseButton.vue'
 
 const cartStore = useCartStore()
 const router = useRouter()
-const drawerRef = ref(null)
-const overlayRef = ref(null)
+const overlayVisible = ref(false)
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let drawerTween = null
 let overlayTween = null
@@ -91,8 +95,9 @@ function goToCheckout() {
 // Watch for drawer state changes
 watch(() => cartStore.isOpen, async (isOpen) => {
   await nextTick()
-  
+
   if (isOpen) {
+    overlayVisible.value = true
     animateDrawerOpen()
   } else {
     animateDrawerClose()
@@ -104,111 +109,73 @@ function animateDrawerOpen() {
 
   const overlay = document.querySelector('.drawer-overlay')
   const drawer = document.querySelector('.drawer')
+  if (!overlay || !drawer) return
 
-  // Kill previous tweens
   if (overlayTween) overlayTween.kill()
   if (drawerTween) drawerTween.kill()
   if (itemsTween) itemsTween.kill()
   if (footerTween) footerTween.kill()
 
-  // Overlay fade
   overlayTween = gsap.fromTo(overlay,
     { opacity: 0 },
-    {
-      opacity: 1,
-      duration: 0.35,
-      ease: 'power2.out',
-      force3D: true,
-      overwrite: true,
-    }
+    { opacity: 1, duration: 0.3, ease: 'power2.out', force3D: true, overwrite: true }
   )
 
-  // Drawer slide with spring overshoot
   drawerTween = gsap.fromTo(drawer,
     { x: '100%' },
-    {
-      x: '0%',
-      duration: 0.5,
-      ease: 'elastic.out(1, 0.75)',
-      force3D: true,
-      overwrite: true,
-    }
+    { x: '0%', duration: 0.45, ease: 'power3.out', force3D: true, overwrite: true }
   )
 
-  // Animate items with staggered spring
   itemsTween = gsap.fromTo('.drawer__item',
-    { opacity: 0, x: 40, scale: 0.95 },
+    { opacity: 0, x: 30 },
     {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      duration: 0.45,
-      stagger: 0.07,
-      ease: 'back.out(1.4)',
-      force3D: true,
-      delay: 0.15,
-      overwrite: 'auto',
+      opacity: 1, x: 0, duration: 0.4, stagger: 0.06, ease: 'power3.out',
+      force3D: true, delay: 0.1, overwrite: 'auto',
     }
   )
 
-  // Footer slides up
   footerTween = gsap.fromTo('.drawer__footer',
-    { opacity: 0, y: 20 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.4,
-      ease: 'power3.out',
-      force3D: true,
-      delay: 0.2,
-      overwrite: true,
-    }
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out', force3D: true, delay: 0.15, overwrite: true }
   )
 }
 
 function animateDrawerClose() {
-  if (prefersReducedMotion) return
+  if (prefersReducedMotion) {
+    overlayVisible.value = false
+    return
+  }
 
   const overlay = document.querySelector('.drawer-overlay')
   const drawer = document.querySelector('.drawer')
+  if (!overlay || !drawer) return
 
-  // Kill previous tweens
   if (overlayTween) overlayTween.kill()
   if (drawerTween) drawerTween.kill()
   if (itemsTween) itemsTween.kill()
   if (footerTween) footerTween.kill()
 
-  // Items fade out first
   itemsTween = gsap.to('.drawer__item', {
-    opacity: 0,
-    x: 20,
-    scale: 0.98,
-    duration: 0.2,
-    stagger: 0.03,
-    ease: 'power2.in',
-    force3D: true,
-    overwrite: 'auto',
+    opacity: 0, x: 15, duration: 0.15, stagger: 0.02,
+    ease: 'power2.in', force3D: true, overwrite: 'auto',
   })
 
-  // Overlay fade
   overlayTween = gsap.to(overlay, {
-    opacity: 0,
-    duration: 0.3,
-    ease: 'power2.in',
-    force3D: true,
-    overwrite: true,
+    opacity: 0, duration: 0.25, ease: 'power2.in', force3D: true, overwrite: true,
+    onComplete: () => { overlayVisible.value = false }
   })
 
-  // Drawer slide out with acceleration
   drawerTween = gsap.to(drawer, {
-    x: '100%',
-    duration: 0.4,
-    ease: 'power3.in',
-    force3D: true,
-    delay: 0.05,
-    overwrite: true,
+    x: '100%', duration: 0.35, ease: 'power3.in', force3D: true, overwrite: true,
   })
 }
+
+onUnmounted(() => {
+  if (overlayTween) overlayTween.kill()
+  if (drawerTween) drawerTween.kill()
+  if (itemsTween) itemsTween.kill()
+  if (footerTween) footerTween.kill()
+})
 </script>
 
 <style scoped>
@@ -219,12 +186,13 @@ function animateDrawerClose() {
   backdrop-filter: blur(clamp(0.25rem, 0.75vw, 0.5rem));
   -webkit-backdrop-filter: blur(clamp(0.25rem, 0.75vw, 0.5rem));
   z-index: 200;
-  animation: fade-in 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.drawer-overlay--visible {
+  pointer-events: auto;
 }
 
 .drawer {
@@ -240,13 +208,16 @@ function animateDrawerClose() {
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  transition: transform var(--transition-smooth);
+  transition: none;
   box-shadow: var(--shadow-xl), var(--glow-accent);
   border-left: 1px solid var(--border);
+  contain: layout style paint;
+  pointer-events: none;
 }
 
 .drawer--open {
   transform: translateX(0);
+  pointer-events: auto;
 }
 
 .drawer__header {
@@ -314,6 +285,8 @@ function animateDrawerClose() {
   flex: 1;
   overflow-y: auto;
   padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1.25rem, 2.5vw, 1.5rem);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .drawer__item {
@@ -322,7 +295,6 @@ function animateDrawerClose() {
   padding: clamp(0.75rem, 1.5vh, 1rem) 0;
   border-bottom: 1px solid var(--surface-2);
   position: relative;
-  animation: fade-in-left 0.3s ease;
 }
 
 .drawer__item-img {

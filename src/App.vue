@@ -1,16 +1,43 @@
 <template>
   <div class="app-root">
-    <AppHeader />
-    <main class="app-main">
-      <router-view v-slot="{ Component }">
-        <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </main>
-    <AppFooter />
-    <CartDrawer />
-    <ToastContainer />
+    <!-- Preloader -->
+    <Preloader />
+
+    <!-- Noise overlay - global subtle texture -->
+    <Noise
+      :pattern-size="250"
+      :pattern-scale-x="1"
+      :pattern-scale-y="1"
+      :pattern-alpha="5"
+    />
+
+    <!-- Click spark effect -->
+    <ClickSpark
+      spark-color="#8b5cf6"
+      :spark-size="10"
+      :spark-radius="20"
+      :spark-count="10"
+      :duration="500"
+      easing="ease-out"
+      :extra-scale="1.1"
+    >
+      <div class="app-content-wrapper">
+        <!-- Velvet texture overlay -->
+        <div class="velvet-texture" aria-hidden="true"></div>
+        <div class="velvet-gradient" aria-hidden="true"></div>
+        <AppHeader />
+        <main class="app-main">
+          <router-view v-slot="{ Component }">
+            <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
+              <component :is="Component" />
+            </transition>
+          </router-view>
+        </main>
+        <AppFooter />
+        <CartDrawer />
+        <ToastContainer />
+      </div>
+    </ClickSpark>
   </div>
 </template>
 
@@ -20,14 +47,19 @@ import { useRoute } from 'vue-router'
 import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
+import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import CartDrawer from './components/layout/CartDrawer.vue'
 import ToastContainer from './components/common/BaseToast.vue'
+import ClickSpark from './components/common/ClickSpark.vue'
+import Preloader from './components/common/Preloader.vue'
+import Noise from './components/common/Noise.vue'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 const route = useRoute()
+const { updateMetaTags } = useSEO()
 
 function onPageEnter(el, done) {
   pageEnter(el, done)
@@ -37,12 +69,30 @@ function onPageLeave(el, done) {
   pageLeave(el, done)
 }
 
-// Refresh ScrollTrigger on every route change
-// This is critical: scroll positions change when navigating between pages
+// Update SEO meta tags on route change
+function updateRouteSEO() {
+  const routeName = route.name
+  const seoConfig = routeSEO[routeName]
+
+  if (seoConfig) {
+    updateMetaTags(seoConfig)
+
+    // Add noindex if specified
+    if (seoConfig.noindex) {
+      const meta = document.querySelector('meta[name="robots"]')
+      if (meta) {
+        meta.setAttribute('content', 'noindex, nofollow')
+      }
+    }
+  }
+}
+
+// Refresh ScrollTrigger and update SEO on every route change
 watch(() => route.path, () => {
   // Wait for DOM to update, then refresh
   requestAnimationFrame(() => {
     refreshScrollTriggers()
+    updateRouteSEO()
   })
 })
 
@@ -50,6 +100,7 @@ onMounted(() => {
   authStore.initialize()
   themeStore.init()
   initGlobalAnimations()
+  updateRouteSEO()
 })
 
 onUnmounted(() => {
@@ -62,10 +113,43 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.app-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 .app-main {
   flex: 1;
-  padding-top: var(--header-height);
+  padding-top: var(--header-height-fixed, 4rem);
+  position: relative;
+  z-index: 1;
+}
+
+/* Velvet texture - must be behind all content */
+.velvet-texture {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.01) 1px, rgba(255,255,255,0.01) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
+  background-size: 100% 3px, 3px 100%;
+  background-repeat: repeat;
+}
+
+.velvet-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: none;
 }
 </style>

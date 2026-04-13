@@ -10,6 +10,7 @@
     :disabled="disabled || loading"
     @click="handleClick"
   >
+    <span class="btn__texture" aria-hidden="true"></span>
     <span v-if="loading" class="btn__spinner"></span>
     <slot />
   </button>
@@ -128,6 +129,33 @@ onMounted(() => {
   line-height: 1;
   position: relative;
   overflow: hidden;
+}
+
+.btn__texture {
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.015) 1px,
+      rgba(255, 255, 255, 0.015) 2px
+    );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+  z-index: 2;
 }
 
 .btn__ripple {

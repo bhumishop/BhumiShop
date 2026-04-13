@@ -64,27 +64,27 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   align-items: center;
-  width: clamp(12rem, 25vw, 15rem);
+  width: clamp(10rem, 20vw, 14rem);
 }
 
 .search-bar__icon {
   position: absolute;
-  left: clamp(0.625rem, 1.2vw, 0.75rem);
+  left: 0.625rem;
   color: var(--text-muted);
   pointer-events: none;
-  transition: color var(--transition-fast);
+  transition: color 0.2s ease;
 }
 
 .search-bar__input {
   width: 100%;
-  padding: clamp(0.4rem, 0.8vw, 0.5rem) clamp(1.75rem, 3vw, 2rem) clamp(0.4rem, 0.8vw, 0.5rem) clamp(2rem, 3.5vw, 2.25rem);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
-  background: var(--surface-1);
+  padding: 0.4375rem 1.75rem 0.4375rem 2rem;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(139, 92, 246, 0.04);
   color: var(--text-primary);
   outline: none;
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-bar__input::placeholder {
@@ -92,9 +92,9 @@ onUnmounted(() => {
 }
 
 .search-bar__input:focus {
-  border-color: var(--accent);
-  background: var(--surface-0);
-  box-shadow: 0 0 0 clamp(0.125rem, 0.4vw, 0.25rem) var(--accent-light);
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
 }
 
 .search-bar__input:focus ~ .search-bar__icon {
@@ -103,11 +103,11 @@ onUnmounted(() => {
 
 .search-bar__clear {
   position: absolute;
-  right: clamp(0.375rem, 0.8vw, 0.5rem);
+  right: 0.375rem;
   display: flex;
   align-items: center;
   color: var(--text-muted);
-  transition: color var(--transition-fast);
+  transition: color 0.2s ease;
 }
 
 .search-bar__clear:hover {
