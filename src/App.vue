@@ -24,7 +24,6 @@
       <div class="app-content-wrapper">
         <!-- Velvet texture overlay -->
         <div class="velvet-texture" aria-hidden="true"></div>
-        <div class="velvet-gradient" aria-hidden="true"></div>
         <AppHeader />
         <main class="app-main">
           <router-view v-slot="{ Component }">
@@ -52,12 +51,32 @@ import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 
-// Lazy load heavy visual effect components
-const CartDrawer = defineAsyncComponent(() => import('./components/layout/CartDrawer.vue'))
-const ToastContainer = defineAsyncComponent(() => import('./components/common/BaseToast.vue'))
-const ClickSpark = defineAsyncComponent(() => import('./components/common/ClickSpark.vue'))
-const Preloader = defineAsyncComponent(() => import('./components/common/Preloader.vue'))
-const Noise = defineAsyncComponent(() => import('./components/common/Noise.vue'))
+// Lazy load heavy visual effect components with error handling
+const CartDrawer = defineAsyncComponent({
+  loader: () => import('./components/layout/CartDrawer.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
+const ToastContainer = defineAsyncComponent({
+  loader: () => import('./components/common/BaseToast.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
+const ClickSpark = defineAsyncComponent({
+  loader: () => import('./components/common/ClickSpark.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
+const Preloader = defineAsyncComponent({
+  loader: () => import('./components/common/Preloader.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
+const Noise = defineAsyncComponent({
+  loader: () => import('./components/common/Noise.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
@@ -153,13 +172,5 @@ onUnmounted(() => {
     repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
   background-size: 100% 3px, 3px 100%;
   background-repeat: repeat;
-}
-
-.velvet-gradient {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  display: none;
 }
 </style>

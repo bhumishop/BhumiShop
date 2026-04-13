@@ -27,15 +27,19 @@ export function prefetchImage(url, priority = 'low') {
   pendingPrefetches++
 
   const img = new Image()
+  activeImageLoads.add(img)
+
   img.onload = () => {
     imageCache.set(url, true)
     prefetchQueue.delete(url)
     pendingPrefetches--
+    activeImageLoads.delete(img)
     maintainCacheSize()
   }
   img.onerror = () => {
     prefetchQueue.delete(url)
     pendingPrefetches--
+    activeImageLoads.delete(img)
   }
   img.src = url
 }
@@ -107,9 +111,17 @@ export function prefetchProductImages(products, maxCount = 12) {
 }
 
 /**
- * Clear the image cache
+ * Clear the image cache and cancel all pending prefetches
  */
 export function clearImageCache() {
+  // Cancel all active image loads
+  for (const img of activeImageLoads) {
+    img.onload = null
+    img.onerror = null
+    img.src = ''
+  }
+  activeImageLoads.clear()
+
   imageCache.clear()
   prefetchQueue.clear()
   pendingPrefetches = 0

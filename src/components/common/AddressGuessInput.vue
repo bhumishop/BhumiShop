@@ -145,7 +145,7 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              <span>{{ suggestion.display_name }}</span>
+              <span v-html="sanitizeHTML(suggestion.display_name)"></span>
             </button>
           </div>
         </transition>
@@ -170,6 +170,33 @@
 <script setup>
 import { ref, reactive, computed, watch, onUnmounted } from 'vue'
 import { lookupCEP, getStateFromCEP } from '../../stores/shipping'
+
+function sanitizeHTML(str) {
+  if (typeof str !== 'string') return ''
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
+function sanitizeAddressField(str) {
+  if (typeof str !== 'string') return ''
+  return str.replace(/[<>"'&]/g, '').trim()
+}
+
+function validateAddressNumber(str) {
+  if (typeof str !== 'string') return ''
+  // For Brazil, allow only numbers and common address number patterns
+  const cleaned = str.trim()
+  if (!cleaned) return ''
+  // Allow numeric only or alphanumeric (like "10A", "S/N", "1234")
+  if (/^[A-Za-z]*\d+[A-Za-z]*$/.test(cleaned) || cleaned.toLowerCase() === 's/n') {
+    return cleaned
+  }
+  // If it's purely numeric, allow it
+  if (/^\d+$/.test(cleaned)) return cleaned
+  // For other cases, strip dangerous characters and return
+  return cleaned.replace(/[<>"'&]/g, '').trim()
+}
 
 const props = defineProps({
   country: { type: String, default: 'BR' },
@@ -235,6 +262,10 @@ const formattedAddress = computed(() => {
 // Functions
 function onPostalInput() {
   postalError.value = ''
+  // Sanitize postal input to only allow valid characters
+  if (props.country === 'BR') {
+    postalInput.value = postalInput.value.replace(/[^\d-]/g, '').slice(0, 9)
+  }
 }
 
 function onPostalBlur() {
@@ -405,19 +436,19 @@ function selectSuggestion(suggestion) {
   const addr = suggestion.address || {}
 
   resolvedAddress.value = {
-    address: addr.road || addr.street || addr.pedestrian || '',
-    number: addr.house_number || '',
+    address: sanitizeAddressField(addr.road || addr.street || addr.pedestrian || ''),
+    number: sanitizeAddressField(addr.house_number || ''),
     complement: '',
-    neighborhood: addr.suburb || addr.neighborhood || addr.quarter || '',
-    city: addr.city || addr.town || addr.municipality || addr.village || '',
-    state: addr.state || ''
+    neighborhood: sanitizeAddressField(addr.suburb || addr.neighborhood || addr.quarter || ''),
+    city: sanitizeAddressField(addr.city || addr.town || addr.municipality || addr.village || ''),
+    state: sanitizeAddressField(addr.state || '')
   }
 
   Object.assign(editFields, resolvedAddress.value)
   addressConfirmed.value = false
 
   emit('address-resolved', {
-    postalCode: postalInput.value,
+    postalCode: sanitizeAddressField(postalInput.value),
     ...resolvedAddress.value
   })
 }
@@ -431,9 +462,18 @@ function startEditing() {
 function confirmAddress() {
   addressConfirmed.value = true
   editingMode.value = false
+  
+  // Validate and sanitize address number
+  const validatedNumber = validateAddressNumber(editFields.number)
+  
   emit('address-updated', {
-    postalCode: postalInput.value,
-    ...editFields
+    postalCode: sanitizeAddressField(postalInput.value),
+    address: sanitizeAddressField(editFields.address),
+    number: validatedNumber,
+    complement: sanitizeAddressField(editFields.complement),
+    neighborhood: sanitizeAddressField(editFields.neighborhood),
+    city: sanitizeAddressField(editFields.city),
+    state: sanitizeAddressField(editFields.state)
   })
 }
 

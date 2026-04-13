@@ -15,7 +15,7 @@ export function usePixBricks() {
   async function loadSDK(publicKey) {
     const key = publicKey || import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY
     if (!key) {
-      throw new Error(t('stores.products.loadError'))
+      throw new Error('MercadoPago public key not configured')
     }
 
     if (window.MercadoPago) {
@@ -32,7 +32,7 @@ export function usePixBricks() {
         bricksBuilder = mpInstance.bricks()
         resolve()
       }
-      script.onerror = () => reject(new Error(t('stores.products.loadError')))
+      script.onerror = () => reject(new Error('Failed to load MercadoPago SDK'))
       document.head.appendChild(script)
     })
   }

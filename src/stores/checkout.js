@@ -3,14 +3,25 @@ import { ref, computed } from 'vue'
 import { useAbacatePay } from '../composables/useAbacatePay'
 import { useOrderStore } from './orders'
 import { useCartStore } from './cart'
+import { useProductStore } from './products'
 import { useToastStore } from './toast'
 import { calculateShipping, getStateFromCEP, getZoneFromState } from './shipping'
 import { t } from '../utils/storeI18n'
+
+function generateIdempotencyKey() {
+  return `order_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+}
+
+function sanitizeProductId(id) {
+  const parsed = parseInt(id, 10)
+  return isNaN(parsed) ? null : parsed
+}
 
 export const useCheckoutStore = defineStore('checkout', () => {
   const step = ref(1) // 1=Cart, 2=Info, 2.5=Shipping, 3=Payment, 4=Processing, 5=Confirm
   const loading = ref(false)
   const error = ref(null)
+  const idempotencyKey = ref(null)
   const paymentMethod = ref('pix') // 'pix', 'billing', 'pix_bricks', 'uma_penca'
   const paymentProvider = ref('') // 'abacatepay', 'pix_bricks', 'uma_penca'
   const pixData = ref(null)
@@ -154,23 +165,50 @@ export const useCheckoutStore = defineStore('checkout', () => {
   async function processPayment() {
     loading.value = true
     error.value = null
+    idempotencyKey.value = generateIdempotencyKey()
 
     try {
       const cartStore = useCartStore()
       const orderStore = useOrderStore()
       const toast = useToastStore()
 
+      // Validate cart products exist and are active before processing
+      const productStore = useProductStore()
+      const invalidItems = cartStore.items.filter(item => {
+        const product = productStore.getProductById(item.id)
+        return !product || product.is_active === false || product.is_archived === true
+      })
+      
+      if (invalidItems.length > 0) {
+        const invalidNames = invalidItems.map(i => i.name).join(', ')
+        throw new Error(`${t('stores.checkout.invalidProducts')}: ${invalidNames}`)
+      }
+
       // Handle Uma Penca redirect
       if (paymentProvider.value === 'uma_penca') {
         const umaPencaItems = cartStore.items.filter(item => item.fulfillment_type === 'uma_penca')
         const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
-        const productIds = umaPencaItems.map(item => `product=${item.id}`).join('&')
-        window.location.href = `${storeUrl}/checkout?${productIds}&ref=bhumi-shop`
+        
+        // Build encrypted/signed cart payload instead of plain URL params
+        const cartPayload = umaPencaItems.map(item => ({
+          id: sanitizeProductId(item.id),
+          qty: Math.min(Math.max(item.quantity, 1), 99),
+          size: item.size || null
+        }))
+        
+        // Encode as base64 to avoid plain text exposure in URL
+        const encodedCart = btoa(JSON.stringify(cartPayload))
+        
+        // Clear cart before redirect to Uma Penca
+        cartStore.clearCart()
+        
+        window.location.href = `${storeUrl}/checkout?cart=${encodedCart}&ref=bhumi-shop`
         return
       }
 
       // Create the order
       const order = await orderStore.createOrder({
+        idempotencyKey: idempotencyKey.value,
         total: totalWithShipping.value,
         paymentMethod: paymentMethod.value,
         paymentProvider: paymentProvider.value,
@@ -182,7 +220,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         notes: customerInfo.value.notes,
         userId: null,
         items: cartStore.items.map(item => ({
-          id: item.id,
+          id: sanitizeProductId(item.id),
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -193,9 +231,13 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
       if (!order) throw new Error(t('stores.checkout.createOrderError'))
 
-      // PIX Bricks (Mercado Pago) flow
+      // All payment flows go to step 4 for payment processing/display
+      // Step 4 handles: PIX QR display, Billing redirect card, PIX Bricks, Uma Penca redirect
+      // Step 5 is for post-payment confirmation (after user returns)
+      step.value = 4
+
+      // PIX Bricks (Mercado Pago) flow - continue to render bricks in step 4
       if (paymentProvider.value === 'pix_bricks') {
-        step.value = 4
         return order
       }
 
@@ -235,7 +277,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
         await orderStore.updateOrderPaymentStatus(order.id, 'pending', billing.id)
       }
 
-      step.value = 5
+      // Stay on step 4 for payment processing/display
+      // Don't advance to step 5 until payment is confirmed or user returns
       toast.success(t('stores.checkout.orderSuccess'))
       return order
     } catch (err) {
@@ -262,7 +305,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   }
 
   async function checkPixStatus() {
-    if (!pixData.value?.id) return null
+    if (!pixData.value?.id) return { status: null, confirmed: false }
     try {
       const abacatePay = useAbacatePay()
       const status = await abacatePay.checkPixStatus(pixData.value.id)
@@ -278,10 +321,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
           console.warn('No currentOrder found during PIX confirmation')
         }
       }
-      return status
+      return { status, confirmed: status === 'paid' }
     } catch (err) {
       console.error('checkPixStatus error:', err)
-      return null
+      return { status: null, confirmed: false }
     }
   }
 
@@ -332,6 +375,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     step,
     loading,
     error,
+    idempotencyKey,
     paymentMethod,
     paymentProvider,
     pixData,
