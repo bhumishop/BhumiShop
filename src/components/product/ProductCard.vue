@@ -122,7 +122,7 @@ const categoryName = computed(() => {
 
 const isUmaPenca = computed(() => props.product.fulfillment_type === 'uma_penca')
 const isDigital = computed(() => props.product.fulfillment_type === 'digital')
-const isOnDemand = computed(() => props.product.stock === 'print-on-demand')
+const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand')
 
 function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')

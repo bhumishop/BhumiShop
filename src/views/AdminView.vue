@@ -61,8 +61,8 @@
               <td><BaseBadge variant="accent" size="xs">{{ getCategoryName(product.category) }}</BaseBadge></td>
               <td class="admin-mono">R$ {{ formatPrice(product.price) }}</td>
               <td>
-                <BaseBadge :variant="product.stock === 'print-on-demand' ? 'default' : 'success'" size="xs">
-                  {{ product.stock === 'print-on-demand' ? $t('admin.stock.onDemand') : $t('admin.stock.inStock') }}
+                <BaseBadge :variant="product.stock_type === 'print-on-demand' ? 'default' : 'success'" size="xs">
+                  {{ product.stock_type === 'print-on-demand' ? $t('admin.stock.onDemand') : $t('admin.stock.inStock') }}
                 </BaseBadge>
               </td>
               <td>
@@ -113,13 +113,14 @@
         <div class="admin-form__row">
           <div class="admin-form__field">
             <label class="admin-form__label">{{ $t('admin.modal.stockType') }}</label>
-            <select v-model="productForm.stock" class="admin-select">
+            <select v-model="productForm.stock_type" class="admin-select">
               <option value="print-on-demand">{{ $t('admin.stock.onDemand') }}</option>
-              <option value="estoque">{{ $t('admin.stock.inStock') }}</option>
+              <option value="in-stock">{{ $t('admin.stock.inStock') }}</option>
+              <option value="digital">{{ $t('productDetail.digital') }}</option>
             </select>
           </div>
-          <BaseInput v-model="productForm.sizes" :label="$t('admin.modal.sizes')" :placeholder="$t('admin.modal.sizePlaceholder')" />
         </div>
+        <div class="admin-form__row">
         <div class="admin-form__field">
           <label class="admin-form__label">{{ $t('admin.modal.description') }}</label>
           <textarea v-model="productForm.description" rows="3" class="admin-textarea"></textarea>
@@ -175,11 +176,10 @@ const defaultForm = {
   category: '',
   price: '',
   description: '',
-  stock: 'print-on-demand',
+  stock_type: 'print-on-demand',
   image: '',
   artist: '',
-  info: '',
-  sizes: ''
+  info: ''
 }
 
 const productForm = reactive({ ...defaultForm })
@@ -228,11 +228,10 @@ function editProduct(product) {
     category: product.category || '',
     price: product.price || '',
     description: product.description || '',
-    stock: product.stock || 'print-on-demand',
+    stock_type: product.stock_type || 'print-on-demand',
     image: product.image || '',
     artist: product.artist || '',
-    info: product.info || '',
-    sizes: product.sizes ? product.sizes.join(', ') : ''
+    info: product.info || ''
   })
   showModal.value = true
 }
@@ -273,13 +272,10 @@ async function handleSaveProduct() {
       category: productForm.category,
       price: parseFloat(productForm.price) || 0,
       description: productForm.description.trim(),
-      stock: productForm.stock,
+      stock_type: productForm.stock_type,
       image: productForm.image.trim(),
       artist: productForm.artist.trim(),
-      info: productForm.info.trim(),
-      sizes: productForm.sizes
-        ? productForm.sizes.split(',').map(s => s.trim()).filter(Boolean)
-        : null
+      info: productForm.info.trim()
     }
 
     if (editingProduct.value) {

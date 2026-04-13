@@ -3,8 +3,7 @@
 // - own items: calculated based on weight, dimensions, CEP destination
 // - digital items: no shipping
 
-import { i18n } from '../i18n'
-const t = (key) => i18n.global.t(key)
+import { t } from '../utils/storeI18n'
 
 const SHIPPING_ZONES = {
   'southeast': { states: ['SP', 'RJ', 'MG', 'ES'], base: 12.90, perKg: 3.50, days: '3-5' },

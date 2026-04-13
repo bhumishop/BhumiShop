@@ -401,7 +401,7 @@ const gridScanStore = useGridScanStore();
 
 const MAX_SCANS = 8;
 
-let cleanupAnimation: () => void = () => {};
+let cleanupAnimation: (() => void) | null = null;
 
 const srgbColor = (hex: string): THREE.Color => {
   const c = new THREE.Color(hex);
@@ -731,7 +731,7 @@ const setupAnimation = () => {
   };
   rafId = requestAnimationFrame(tick);
 
-  cleanupAnimation = () => {
+  cleanupAnimation = (): void => {
     if (rafId) cancelAnimationFrame(rafId);
     if (leaveTimer) clearTimeout(leaveTimer);
 
@@ -744,9 +744,16 @@ const setupAnimation = () => {
 
     unwatchProps();
 
+    // Dispose WebGL resources in order
     material.dispose();
     geometry.dispose();
     if (composer) composer.dispose();
+
+    // Force WebGL context cleanup
+    const gl = renderer.getContext()
+    if (gl) {
+      renderer.forceContextLoss()
+    }
     renderer.dispose();
     if (container.contains(renderer.domElement)) {
       container.removeChild(renderer.domElement);
@@ -759,6 +766,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  cleanupAnimation();
+  cleanupAnimation?.();
 });
 </script>

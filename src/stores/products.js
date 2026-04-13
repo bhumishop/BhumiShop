@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase, isDemo } from '../supabase'
-import { i18n } from '../i18n'
+import { t } from '../utils/storeI18n'
 
 const PAGE_SIZE = 20
-const t = (key) => i18n.global.t(key)
+
+// Cache TTL: 5 minutes for product data
+const CACHE_TTL = 5 * 60 * 1000
+let productsCache = null
+let categoriesCache = null
+let cacheTimestamp = 0
 
 /**
  * Normalize category matching to handle singular/plural inconsistencies.
@@ -17,6 +22,22 @@ function normalizeCategoryMatch(productCat, categoryId) {
     .replace(/s$/, '')  // remove trailing 's'
     .replace(/es$/, 'e') // remove 'es'
   return normalize(productCat) === normalize(categoryId)
+}
+
+/**
+ * Check if cache is still valid
+ */
+function isCacheValid() {
+  return productsCache && categoriesCache && (Date.now() - cacheTimestamp) < CACHE_TTL
+}
+
+/**
+ * Clear the data cache
+ */
+function clearCache() {
+  productsCache = null
+  categoriesCache = null
+  cacheTimestamp = 0
 }
 
 // Mock data for demo mode
@@ -33,15 +54,22 @@ const mockProducts = [
     category: 1,
     price: 79.90,
     description: 'Camiseta premium com a icônica imagem do Buddha Bhumisparsha. Algodão orgânico 180g, estampa em serigrafia de alta qualidade.',
-    stock: 'print-on-demand',
+    stock_type: 'print-on-demand',
+    stock_quantity: 0,
     image: '/mock/tshirt-bhumisparsha.jpg',
     artist: 'Bhumisparsha Design',
     info: '100% algodão orgânico\nEstampa em serigrafia\nDisponível em P, M, G, GG',
-    sizes: ['P', 'M', 'G', 'GG'],
+    materials: ['algodão'],
+    tags: ['buddha', 'camiseta'],
     fulfillment_type: 'own',
     weight: 0.3,
     dimensions: { width: 30, height: 40, depth: 2 },
-    shipping_zones: ['BR']
+    shipping_zones: ['BR'],
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'camiseta-bhumisparsha',
+    is_featured: false
   },
   {
     id: 2,
@@ -49,14 +77,22 @@ const mockProducts = [
     category: 2,
     price: 49.90,
     description: 'Caneca de cerâmica artesanal com design zen de meditação. Capacidade 350ml.',
-    stock: 'in-stock',
+    stock_type: 'in-stock',
+    stock_quantity: 50,
     image: '/mock/mug-zen.jpg',
     artist: 'Studio Cerâmica',
     info: 'Cerâmica artesanal\nCapacidade 350ml\nPode ir ao micro-ondas',
+    materials: ['cerâmica'],
+    tags: ['zen', 'caneca'],
     fulfillment_type: 'own',
     weight: 0.4,
     dimensions: { width: 12, height: 15, depth: 12 },
-    shipping_zones: ['BR']
+    shipping_zones: ['BR'],
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'caneca-meditacao-zen',
+    is_featured: false
   },
   {
     id: 3,
@@ -64,14 +100,22 @@ const mockProducts = [
     category: 3,
     price: 39.90,
     description: 'Poster artístico com a Roda do Dharma em estilo mandala. Impressão em papel couchê 250g.',
-    stock: 'print-on-demand',
+    stock_type: 'print-on-demand',
+    stock_quantity: 0,
     image: '/mock/poster-dharma.jpg',
     artist: 'Bhumisparsha Art',
     info: 'Papel couchê 250g\nImpressão HD\nTamanho A3 (297x420mm)',
+    materials: ['papel'],
+    tags: ['mandala', 'poster'],
     fulfillment_type: 'own',
     weight: 0.1,
     dimensions: { width: 32, height: 45, depth: 1 },
-    shipping_zones: ['BR']
+    shipping_zones: ['BR'],
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'poster-mandala-dharma-wheel',
+    is_featured: false
   },
   {
     id: 4,
@@ -79,15 +123,22 @@ const mockProducts = [
     category: 1,
     price: 84.90,
     description: 'Camiseta com estampa do Sutra de Lótus em caligrafia tradicional. Design exclusivo.',
-    stock: 'print-on-demand',
+    stock_type: 'print-on-demand',
+    stock_quantity: 0,
     image: '/mock/tshirt-lotus.jpg',
     artist: 'Calligraphy Studio',
     info: 'Algodão premium 180g\nEstampa DTG\nP, M, G, GG, XGG',
-    sizes: ['P', 'M', 'G', 'GG', 'XGG'],
+    materials: ['algodão'],
+    tags: ['lotus', 'camiseta'],
     fulfillment_type: 'own',
     weight: 0.3,
     dimensions: { width: 30, height: 40, depth: 2 },
-    shipping_zones: ['BR']
+    shipping_zones: ['BR'],
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'camiseta-lotus-sutra',
+    is_featured: false
   },
   {
     id: 5,
@@ -95,14 +146,22 @@ const mockProducts = [
     category: 2,
     price: 34.90,
     description: 'Ecobag de algodão cru com o Nobre Caminho Óctuplo. Resistente e sustentável.',
-    stock: 'in-stock',
+    stock_type: 'in-stock',
+    stock_quantity: 100,
     image: '/mock/ecobag-eightfold.jpg',
     artist: 'Bhumisparsha Design',
     info: 'Algodão cru 300g\nAlças reforçadas\n40x35cm',
+    materials: ['algodão'],
+    tags: ['ecobag', 'eightfold'],
     fulfillment_type: 'own',
     weight: 0.15,
     dimensions: { width: 40, height: 35, depth: 1 },
-    shipping_zones: ['BR']
+    shipping_zones: ['BR'],
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'ecobag-eightfold-path',
+    is_featured: false
   },
   {
     id: 6,
@@ -110,14 +169,22 @@ const mockProducts = [
     category: 3,
     price: 19.90,
     description: 'Arte digital em alta resolução para impressão pessoal. Formato PNG 300dpi.',
-    stock: 'digital',
+    stock_type: 'digital',
+    stock_quantity: 999,
     image: '/mock/digital-buddha.jpg',
     artist: 'Digital Art Studio',
     info: 'Arquivo digital PNG\n300dpi\nTamanho A4',
+    materials: [],
+    tags: ['digital', 'buddha'],
     fulfillment_type: 'digital',
     weight: 0,
     dimensions: null,
-    shipping_zones: null
+    shipping_zones: null,
+    compare_at_price: null,
+    short_description: null,
+    brand: null,
+    slug: 'print-digital-buddha-art',
+    is_featured: false
   }
 ]
 
@@ -132,6 +199,10 @@ export const useProductStore = defineStore('products', () => {
   const totalCount = ref(0)
   const maxPrice = ref(null) // null means no price filter
 
+  // Cache for related products to avoid recomputation
+  const relatedProductsCache = new Map()
+  let cacheVersion = 0
+
   const getProductById = computed(() => {
     return (id) => products.value.find(p => p.id === parseInt(id))
   })
@@ -143,12 +214,29 @@ export const useProductStore = defineStore('products', () => {
     }
   })
 
+  // Invalidate cache when products change
+  function invalidateRelatedCache() {
+    cacheVersion++
+    relatedProductsCache.clear()
+  }
+
+  // Optimized related products with caching
   const getRelatedProducts = computed(() => {
     return (productId, limit = 8) => {
+      const cacheKey = `${productId}-${limit}-v${cacheVersion}`
+      if (relatedProductsCache.has(cacheKey)) {
+        return relatedProductsCache.get(cacheKey)
+      }
+
       const product = products.value.find(p => p.id === parseInt(productId))
       if (!product) return []
 
       const otherProducts = products.value.filter(p => p.id !== parseInt(productId))
+
+      // Pre-compute product words once to avoid recomputation per product
+      const productWords = product.name
+        ? new Set(product.name.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+        : new Set()
 
       // Score each product based on matching criteria
       const scored = otherProducts.map(p => {
@@ -175,19 +263,18 @@ export const useProductStore = defineStore('products', () => {
           score += 5
         }
 
-        // Similar name (word overlap)
-        if (product.name && p.name) {
-          const productWords = new Set(product.name.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+        // Similar name (word overlap) - use pre-computed words
+        if (p.name && productWords.size > 0) {
           const otherWords = p.name.toLowerCase().split(/\s+/).filter(w => productWords.has(w))
           score += otherWords.length * 3
         }
 
-        // Similar price range (within 30%)
+        // Similar price range (within 30%) - use ratio instead of division
         if (product.price && p.price) {
-          const priceDiff = Math.abs(product.price - p.price) / product.price
-          if (priceDiff <= 0.3) {
+          const priceRatio = p.price / product.price
+          if (priceRatio >= 0.7 && priceRatio <= 1.3) {
             score += 4
-          } else if (priceDiff <= 0.5) {
+          } else if (priceRatio >= 0.5 && priceRatio <= 1.5) {
             score += 2
           }
         }
@@ -201,11 +288,14 @@ export const useProductStore = defineStore('products', () => {
       })
 
       // Sort by score descending and return top N
-      return scored
+      const result = scored
         .sort((a, b) => b.score - a.score)
         .filter(item => item.score > 0)
         .slice(0, limit)
         .map(item => item.product)
+
+      relatedProductsCache.set(cacheKey, result)
+      return result
     }
   })
 
@@ -281,17 +371,61 @@ export const useProductStore = defineStore('products', () => {
         // Use mock data in demo mode
         products.value = mockProducts
         totalCount.value = mockProducts.length
+        invalidateRelatedCache()
         return
       }
 
+      // Check cache first
+      if (isCacheValid() && productsCache) {
+        products.value = productsCache
+        totalCount.value = productsCache.length
+        loading.value = false
+        return
+      }
+
+      // Only select columns that actually exist in the database schema
       const { data, error: err } = await supabase
         .from('products')
-        .select('*', { count: 'exact' })
+        .select(`
+          id,
+          name,
+          slug,
+          category,
+          price,
+          compare_at_price,
+          description,
+          short_description,
+          stock_type,
+          stock_quantity,
+          fulfillment_type,
+          image,
+          images,
+          color_swatches,
+          artist,
+          brand,
+          info,
+          materials,
+          tags,
+          weight,
+          dimensions,
+          shipping_zones,
+          collection_id,
+          subcollection_id,
+          is_active,
+          is_featured,
+          is_archived,
+          created_at
+        `, { count: 'exact' })
         .order('id', { ascending: false })
 
       if (err) throw err
       products.value = data || []
       totalCount.value = data?.length || 0
+
+      // Update cache
+      productsCache = products.value
+      cacheTimestamp = Date.now()
+      invalidateRelatedCache()
     } catch (err) {
       error.value = err.message || t('stores.products.loadError')
       console.error('fetchProducts error:', err)
@@ -309,13 +443,24 @@ export const useProductStore = defineStore('products', () => {
         return
       }
 
+      // Check cache first
+      if (isCacheValid() && categoriesCache) {
+        categories.value = categoriesCache
+        return
+      }
+
+      // Only select columns that are actually used
       const { data, error: err } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, is_active, sort_order')
         .order('name')
 
       if (err) throw err
       categories.value = data || []
+
+      // Update cache
+      categoriesCache = categories.value
+      cacheTimestamp = Date.now()
     } catch (err) {
       error.value = err.message || t('stores.products.loadCategoriesError')
       console.error('fetchCategories error:', err)
@@ -333,13 +478,15 @@ export const useProductStore = defineStore('products', () => {
         category: product.category,
         price: parseFloat(product.price) || 0,
         description: (product.description || '').trim(),
-        stock: product.stock || 'print-on-demand',
+        stock_type: product.stock_type || 'print-on-demand',
+        stock_quantity: product.stock_quantity ?? 0,
         image: product.image || '',
         images: product.images || [],
         color_swatches: product.color_swatches || [],
         artist: (product.artist || '').trim(),
         info: (product.info || '').trim(),
-        sizes: product.sizes || null,
+        materials: product.materials || null,
+        tags: product.tags || [],
         fulfillment_type: product.fulfillment_type || 'own',
         weight: parseFloat(product.weight) || 0.3,
         dimensions: product.dimensions || null,
@@ -354,6 +501,8 @@ export const useProductStore = defineStore('products', () => {
       if (err) throw err
       if (data && data[0]) {
         products.value.unshift(data[0])
+        clearCache()
+        invalidateRelatedCache()
       }
       return data?.[0]
     } catch (err) {
@@ -374,13 +523,15 @@ export const useProductStore = defineStore('products', () => {
         category: updates.category,
         price: parseFloat(updates.price) || 0,
         description: (updates.description || '').trim(),
-        stock: updates.stock || 'print-on-demand',
+        stock_type: updates.stock_type || 'print-on-demand',
+        stock_quantity: updates.stock_quantity ?? 0,
         image: updates.image || '',
         images: updates.images || [],
         color_swatches: updates.color_swatches || [],
         artist: (updates.artist || '').trim(),
         info: (updates.info || '').trim(),
-        sizes: updates.sizes || null,
+        materials: updates.materials || null,
+        tags: updates.tags || [],
         fulfillment_type: updates.fulfillment_type || 'own',
         weight: parseFloat(updates.weight) || 0.3,
         dimensions: updates.dimensions || null,
@@ -398,6 +549,7 @@ export const useProductStore = defineStore('products', () => {
         const index = products.value.findIndex(p => p.id === id)
         if (index !== -1) {
           products.value[index] = data[0]
+          invalidateRelatedCache()
         }
       }
       return data?.[0]
@@ -421,6 +573,7 @@ export const useProductStore = defineStore('products', () => {
 
       if (err) throw err
       products.value = products.value.filter(p => p.id !== id)
+      invalidateRelatedCache()
     } catch (err) {
       error.value = err.message || t('stores.products.deleteError')
       console.error('deleteProduct error:', err)

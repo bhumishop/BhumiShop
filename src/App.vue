@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch, computed } from 'vue'
+import { onMounted, onUnmounted, watch, computed, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
@@ -51,11 +51,13 @@ import { useCartStore } from './stores/cart'
 import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
-import CartDrawer from './components/layout/CartDrawer.vue'
-import ToastContainer from './components/common/BaseToast.vue'
-import ClickSpark from './components/common/ClickSpark.vue'
-import Preloader from './components/common/Preloader.vue'
-import Noise from './components/common/Noise.vue'
+
+// Lazy load heavy visual effect components
+const CartDrawer = defineAsyncComponent(() => import('./components/layout/CartDrawer.vue'))
+const ToastContainer = defineAsyncComponent(() => import('./components/common/BaseToast.vue'))
+const ClickSpark = defineAsyncComponent(() => import('./components/common/ClickSpark.vue'))
+const Preloader = defineAsyncComponent(() => import('./components/common/Preloader.vue'))
+const Noise = defineAsyncComponent(() => import('./components/common/Noise.vue'))
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
@@ -95,11 +97,9 @@ watch(() => route.path, () => {
   // Close cart drawer on navigation
   cartStore.closeDrawer()
 
-  // Wait for DOM to update, then refresh
-  requestAnimationFrame(() => {
-    refreshScrollTriggers()
-    updateRouteSEO()
-  })
+  // Debounced refresh - animations.js handles the timing
+  refreshScrollTriggers(150)
+  updateRouteSEO()
 })
 
 onMounted(() => {

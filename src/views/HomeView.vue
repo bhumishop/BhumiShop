@@ -23,10 +23,7 @@
           :vintage-noise-intensity="0.08"
           :vintage-resolution-scale="0.25"
         />
-        <div
-          class="hero__cursor-glow"
-          :style="cursorGlowStyle"
-        ></div>
+      <div class="hero__cursor-glow"></div>
         <div class="hero__grid-overlay"></div>
       </div>
 
@@ -124,38 +121,41 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductStore } from '../stores/products'
 import { scrollReveal, scrollBatch, staggerGrid, createAnimationContext, refreshScrollTriggers } from '../utils/animations'
+import { prefetchProductImages } from '../utils/imagePrefetch'
 import ProductGrid from '../components/product/ProductGrid.vue'
-import CircularGallery from '../components/common/CircularGallery.vue'
-import GridScan from '../components/common/GridScan.vue'
+
+// Lazy load heavy visual components
+const CircularGallery = defineAsyncComponent(() => import('../components/common/CircularGallery.vue'))
+const GridScan = defineAsyncComponent(() => import('../components/common/GridScan.vue'))
 
 const router = useRouter()
 const productStore = useProductStore()
 const featuredRef = ref(null)
+const heroRef = ref(null)
 let ctx = null
 let productAnim = null
 
-// Hero mouse tracking - throttled with rAF
-const cursorGlowStyle = ref({})
+// Hero mouse tracking - direct DOM manipulation to avoid Vue reactivity overhead
 let heroMouseRafId = 0
+let cursorGlowElement = null
 
 function handleHeroMouseMove(e) {
   if (heroMouseRafId) return
   heroMouseRafId = requestAnimationFrame(() => {
     heroMouseRafId = 0
     const el = e.currentTarget
-    if (!el) return
+    if (!el || !cursorGlowElement) return
     const rect = el.getBoundingClientRect()
     if (!rect || rect.width === 0) return
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
 
-    cursorGlowStyle.value = {
-      background: `radial-gradient(circle 400px at ${x}% ${y}%, rgba(139, 92, 246, 0.12), transparent 70%)`
-    }
+    // Direct DOM manipulation instead of Vue reactive update
+    cursorGlowElement.style.background = `radial-gradient(circle 400px at ${x}% ${y}%, rgba(139, 92, 246, 0.12), transparent 70%)`
   })
 }
 
@@ -173,7 +173,13 @@ onMounted(async () => {
     await productStore.fetchCategories()
   }
 
+  // Cache cursor glow element reference
+  cursorGlowElement = document.querySelector('.hero__cursor-glow')
+
   await new Promise(r => requestAnimationFrame(r))
+
+  // Prefetch product images after initial render
+  prefetchProductImages(productStore.products, 12)
 
   ctx = createAnimationContext()
 
@@ -241,6 +247,7 @@ onUnmounted(() => {
   if (ctx) ctx.revert()
   if (productAnim) productAnim.kill()
   if (heroMouseRafId) cancelAnimationFrame(heroMouseRafId)
+  cursorGlowElement = null
   ctx = null
   productAnim = null
   heroMouseRafId = 0
