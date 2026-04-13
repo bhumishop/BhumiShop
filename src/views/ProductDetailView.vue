@@ -1,5 +1,5 @@
 <template>
-  <div class="product-detail container" v-if="product">
+  <div v-if="product" class="product-detail container">
     <nav class="product-detail__breadcrumb">
       <router-link to="/">{{ $t('productDetail.breadcrumbHome') }}</router-link>
       <span class="product-detail__sep">/</span>
@@ -52,9 +52,15 @@
         </div>
       </div>
     </div>
+
+    <ProductMandala
+      v-if="product && relatedProducts.length > 0"
+      :current-product="product"
+      :related-products="relatedProducts"
+    />
   </div>
 
-  <div v-else-if="productStore.loading" class="product-detail container">
+  <div v-else-if="isLoading" class="product-detail container">
     <div class="product-detail__layout">
       <BaseSkeleton variant="image" class="product-detail__skeleton-gallery" />
       <div class="product-detail__skeleton-info">
@@ -82,6 +88,7 @@ import { useProductStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useToastStore } from '../stores/toast'
 import ProductGallery from '../components/product/ProductGallery.vue'
+import ProductMandala from '../components/product/ProductMandala.vue'
 import ProductVariants from '../components/product/ProductVariants.vue'
 import BaseBadge from '../components/common/BaseBadge.vue'
 import BaseButton from '../components/common/BaseButton.vue'
@@ -99,20 +106,41 @@ const quantity = ref(1)
 const addingToCart = ref(false)
 
 const product = computed(() => productStore.getProductById(route.params.id))
+const isLoading = computed(() => productStore.products.length === 0 && productStore.categories.length === 0)
 
 const productImages = computed(() => {
   if (!product.value) return []
-  const img = product.value.image
-  if (img && (img.startsWith('data:') || img.startsWith('http'))) {
-    return [img]
+  const images = []
+
+  // Prefer the images array if available
+  if (Array.isArray(product.value.images) && product.value.images.length > 0) {
+    product.value.images.forEach(img => {
+      if (img && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('/'))) {
+        images.push(img)
+      }
+    })
   }
-  return []
+
+  // Fallback to single image
+  if (images.length === 0) {
+    const img = product.value.image
+    if (img && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('/'))) {
+      images.push(img)
+    }
+  }
+
+  return images
 })
 
 const categoryName = computed(() => {
   if (!product.value) return ''
   const cat = productStore.categories.find(c => c.id === product.value.category)
   return cat?.name || product.value.category || ''
+})
+
+const relatedProducts = computed(() => {
+  if (!product.value) return []
+  return productStore.getRelatedProducts(route.params.id, 8)
 })
 
 onMounted(async () => {

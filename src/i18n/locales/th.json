@@ -72,7 +72,9 @@
     "viewProducts": "ดูสินค้า",
     "notFound": "ไม่พบสินค้า",
     "selectSize": "กรุณาเลือกขนาด",
-    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว!"
+    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว!",
+    "relatedItems": "สินค้าที่เกี่ยวข้อง",
+    "relatedSubtitle": "ค้นพบสินค้าที่คล้ายกันที่คุณอาจชอบ"
   },
   "productCard": {
     "add": "เพิ่ม",

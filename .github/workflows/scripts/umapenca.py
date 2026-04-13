@@ -52,6 +52,12 @@ from urllib.parse import urljoin, urlparse, urlunparse, unquote
 import requests
 
 try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
+try:
     from tqdm import tqdm
     HAS_TQDM = True
 except ImportError:
@@ -213,6 +219,66 @@ def strip_imgix_transforms(url: str) -> str:
     if "imgix.net" not in parsed.netloc:
         return url
     return urlunparse(parsed._replace(query=""))
+
+
+def is_grey_or_empty_image(img_bytes: bytes, threshold: float = 0.95) -> bool:
+    """Check if an image is essentially grey/empty.
+    
+    Returns True if the image is mostly grey (placeholder/empty image).
+    This detects images where most pixels have very low saturation or
+    are very similar to each other (grey/blank placeholders).
+    """
+    if not HAS_PIL:
+        # If PIL not available, can't check - assume valid
+        return False
+    
+    try:
+        img = Image.open(io.BytesIO(img_bytes))
+        img = img.convert('RGB')
+        
+        # Get image stats
+        pixels = list(img.getdata())
+        total_pixels = len(pixels)
+        
+        if total_pixels == 0:
+            return True
+        
+        # Check if image is mostly grey (low variance in R, G, B channels)
+        # Grey images have very similar R, G, B values across pixels
+        r_vals = [p[0] for p in pixels]
+        g_vals = [p[1] for p in pixels]
+        b_vals = [p[2] for p in pixels]
+        
+        avg_r = sum(r_vals) / total_pixels
+        avg_g = sum(g_vals) / total_pixels
+        avg_b = sum(b_vals) / total_pixels
+        
+        # Check if all channels are very similar (grey)
+        channel_diff = abs(avg_r - avg_g) + abs(avg_g - avg_b) + abs(avg_r - avg_b)
+        
+        # If channels are very similar (within 10-15 units), likely grey
+        if channel_diff < 30:
+            # Also check variance - grey placeholders have low variance
+            var_r = sum((x - avg_r) ** 2 for x in r_vals) / total_pixels
+            var_g = sum((x - avg_g) ** 2 for x in g_vals) / total_pixels
+            var_b = sum((x - avg_b) ** 2 for x in b_vals) / total_pixels
+            
+            avg_variance = (var_r + var_g + var_b) / 3
+            
+            # Low variance means very uniform/grey image
+            # Threshold: if variance < 200, it's likely a grey placeholder
+            if avg_variance < 200:
+                return True
+        
+        # Also check if image is very small (might be a tiny placeholder)
+        if img.width < 50 or img.height < 50:
+            return True
+            
+        return False
+        
+    except Exception as e:
+        logger.warning(f"Error checking if image is grey: {e}")
+        return False
 
 
 def make_slug(name: str, existing: set) -> str:
@@ -736,15 +802,33 @@ class ImageDownloader:
         """Download all images for a product. Returns list of local paths."""
         pid = product.third_party_product_id or product.slug or "unknown"
         local_paths = []
+        
+        # Check if this is a t-shirt (camiseta) product
+        is_tshirt = product.category in ("camiseta", "camisetas")
+        
         for idx, url in enumerate(product.images):
             dest = self._dest_path(url, pid, idx)
             if dest.exists():
                 local_paths.append(str(dest))
                 continue
-            ok = self.client.download_binary(url, dest)
-            if ok:
-                local_paths.append(str(dest))
-                self.downloaded += 1
+            
+            # For t-shirts, download first to check if grey/empty
+            img_bytes = self.client.download_bytes(url)
+            if not img_bytes:
+                continue
+                
+            # Skip grey/empty images for t-shirts
+            if is_tshirt and is_grey_or_empty_image(img_bytes):
+                logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
+                continue
+            
+            # Save to disk
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest, "wb") as fh:
+                fh.write(img_bytes)
+            local_paths.append(str(dest))
+            self.downloaded += 1
+            
         product.local_image_paths = local_paths
         return local_paths
 
@@ -820,10 +904,18 @@ class SupabaseStorageUploader:
         pid = product.third_party_product_id or product.slug or "unknown"
         uploaded_urls = []
 
+        # Check if this is a t-shirt (camiseta) product
+        is_tshirt = product.category in ("camiseta", "camisetas")
+
         for idx, url in enumerate(product.images):
             # Download image bytes
             img_bytes = client.download_bytes(url)
             if not img_bytes:
+                continue
+
+            # For t-shirts, check if image is grey/empty and skip it
+            if is_tshirt and is_grey_or_empty_image(img_bytes):
+                logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
                 continue
 
             # Determine content type

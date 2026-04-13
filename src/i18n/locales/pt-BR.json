@@ -72,11 +72,22 @@
     "viewProducts": "Ver Produtos",
     "notFound": "Produto nao encontrado",
     "selectSize": "Por favor, selecione um tamanho.",
-    "addedToCart": "{name} adicionado ao carrinho!"
+    "addedToCart": "{name} adicionado ao carrinho!",
+    "relatedItems": "Produtos Relacionados",
+    "relatedSubtitle": "Descubra itens semelhantes que você pode gostar"
   },
   "productCard": {
     "add": "Adicionar",
-    "addedToCart": "{name} adicionado ao carrinho"
+    "addedToCart": "{name} adicionado ao carrinho",
+    "quickAdd": "Adição Rápida",
+    "addToCart": "Adicionar ao carrinho",
+    "badges": {
+      "umaPenca": "Uma Penca",
+      "digital": "Digital",
+      "printOnDemand": "Impressão sob demanda",
+      "bundle": "Pacote",
+      "madeToOrder": "Feito sob encomenda"
+    }
   },
   "productVariants": {
     "size": "Tamanho",
@@ -92,8 +103,10 @@
     "size": "Tamanho:",
     "remove": "Remover",
     "total": "Total",
+    "subtotal": "Subtotal",
     "clearCart": "Limpar carrinho",
-    "cartCount": "Carrinho ({count})"
+    "cartCount": "Carrinho ({count})",
+    "umaPencaNote": "Itens UmaPenca sao finalizados em loja separada"
   },
   "checkout": {
     "title": "Checkout",

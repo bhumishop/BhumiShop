@@ -115,10 +115,11 @@
       </div>
     </div>
 
-    <!-- Step 2: Customer Info + CEP -->
+    <!-- Step 2: Customer Info + Address Guessing Game -->
     <div v-if="checkoutStore.step === 2" class="checkout-page__step">
       <h2 class="checkout-page__step-title">{{ $t('checkout.step2.title') }}</h2>
       <form class="checkout-page__form" @submit.prevent="goToShippingStep">
+        <!-- Basic info -->
         <div class="checkout-page__form-grid">
           <BaseInput v-model="customerInfo.name" :label="$t('checkout.step2.fullName')" :placeholder="$t('checkout.step2.placeholders.name')" required :error="errors.name" />
           <BaseInput v-model="customerInfo.email" :label="$t('checkout.step2.email')" type="email" :placeholder="$t('checkout.step2.placeholders.email')" required :error="errors.email" />
@@ -126,40 +127,40 @@
           <BaseInput v-model="customerInfo.taxId" :label="$t('checkout.step2.cpf')" :placeholder="$t('checkout.step2.placeholders.cpf')" />
         </div>
 
-        <div class="checkout-page__form-section">
-          <h3 class="checkout-page__form-section-title">{{ $t('checkout.step2.addressSection') }}</h3>
-          <div class="checkout-page__form-grid">
-            <div class="checkout-page__country-selector">
-              <label class="checkout-page__label">{{ $t('checkout.step2.country') }}</label>
-              <select v-model="customerInfo.country" class="checkout-page__select">
-                <option value="">{{ $t('checkout.step2.selectCountry') }}</option>
-                <option v-for="c in countryOptions" :key="c.code" :value="c.code">{{ c.name }}</option>
-              </select>
-            </div>
-            <BaseInput v-model="customerInfo.postalCode" :label="postalCodeLabel" :placeholder="postalCodePlaceholder" required :error="errors.cep" @blur="onPostalCodeBlur" />
-            <BaseInput v-model="customerInfo.address" :label="$t('checkout.step2.street')" :placeholder="$t('checkout.step2.placeholders.street')" />
-            <BaseInput v-model="customerInfo.number" :label="$t('checkout.step2.number')" :placeholder="$t('checkout.step2.placeholders.number')" />
-            <BaseInput v-model="customerInfo.complement" :label="$t('checkout.step2.complement')" :placeholder="$t('checkout.step2.placeholders.complement')" />
-            <BaseInput v-model="customerInfo.neighborhood" :label="$t('checkout.step2.neighborhood')" :placeholder="$t('checkout.step2.placeholders.neighborhood')" />
-            <BaseInput v-model="customerInfo.city" :label="$t('checkout.step2.city')" :placeholder="$t('checkout.step2.placeholders.city')" />
-            <BaseInput v-model="customerInfo.state" :label="$t('checkout.step2.state')" :placeholder="$t('checkout.step2.placeholders.state')" />
+        <!-- Address guessing game -->
+        <div class="checkout-page__address-game">
+          <div class="checkout-page__address-game-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <h3 class="checkout-page__address-game-title">{{ $t('checkout.addressGuessTitle') }}</h3>
           </div>
+          <p class="checkout-page__address-game-desc">{{ $t('checkout.addressGuessDesc') }}</p>
+
+          <AddressGuessInput
+            ref="addressGuessRef"
+            :country="customerInfo.country"
+            :initial-postal-code="customerInfo.postalCode"
+            :initial-address="{
+              address: customerInfo.address,
+              number: customerInfo.number,
+              complement: customerInfo.complement,
+              neighborhood: customerInfo.neighborhood,
+              city: customerInfo.city,
+              state: customerInfo.state
+            }"
+            @address-resolved="onAddressResolved"
+            @address-updated="onAddressUpdated"
+          />
         </div>
 
+        <!-- Notes -->
         <BaseInput v-model="customerInfo.notes" :label="$t('checkout.step2.notes')" :placeholder="$t('checkout.step2.placeholders.notes')" />
 
         <div class="checkout-page__nav">
-          <PixelCard
-            variant="default"
-            :gap="3"
-            :speed="25"
-            colors="#fce7f3,fbcfe8,f9a8d4"
-            :no-focus="false"
-            class-name="checkout-pixel-card"
-          >
-            <BaseButton variant="secondary" @click="checkoutStore.prevStep()">{{ $t('checkout.step2.back') }}</BaseButton>
-          </PixelCard>
-          <BaseButton variant="primary" :disabled="!checkoutStore.isInfoValid" type="submit">{{ $t('checkout.step2.continue') }}</BaseButton>
+          <BaseButton variant="secondary" rainbow @click="checkoutStore.prevStep()">{{ $t('checkout.step2.back') }}</BaseButton>
+          <BaseButton variant="primary" rainbow :disabled="!checkoutStore.isInfoValid" type="submit">{{ $t('checkout.step2.continue') }}</BaseButton>
         </div>
       </form>
     </div>
@@ -217,18 +218,10 @@
       </div>
 
       <div class="checkout-page__nav">
-        <PixelCard
-          variant="default"
-          :gap="3"
-          :speed="25"
-          colors="#fce7f3,fbcfe8,f9a8d4"
-          :no-focus="false"
-          class-name="checkout-pixel-card"
-        >
-          <BaseButton variant="secondary" @click="checkoutStore.prevStep()">{{ $t('checkout.step3.back') }}</BaseButton>
-        </PixelCard>
+        <BaseButton variant="secondary" rainbow @click="checkoutStore.prevStep()">{{ $t('checkout.step3.back') }}</BaseButton>
         <BaseButton
           variant="primary"
+          rainbow
           :loading="checkoutStore.loading"
           :disabled="!canProceedToPayment"
           @click="handlePayment"
@@ -339,10 +332,10 @@ import { useOrderStore } from '../stores/orders'
 import { useToastStore } from '../stores/toast'
 import { useAuthStore } from '../stores/auth'
 import { usePixBricks } from '../composables/usePixBricks'
-import { getStateFromCEP, lookupCEP } from '../stores/shipping'
+import { getStateFromCEP } from '../stores/shipping'
 import BaseButton from '../components/common/BaseButton.vue'
 import BaseInput from '../components/common/BaseInput.vue'
-import PixelCard from '../components/common/PixelCard.vue'
+import AddressGuessInput from '../components/common/AddressGuessInput.vue'
 import CheckoutStepper from '../components/checkout/CheckoutStepper.vue'
 import PaymentMethod from '../components/checkout/PaymentMethod.vue'
 import PaymentProviderPopup from '../components/checkout/PaymentProviderPopup.vue'
@@ -359,35 +352,11 @@ const toast = useToastStore()
 const authStore = useAuthStore()
 
 const shippingCalcRef = ref(null)
+const addressGuessRef = ref(null)
 const checkingPix = ref(false)
 const pixPaid = ref(false)
 const pixBricksRendered = ref(false)
-const cepLoading = ref(false)
 let pixPollingTimer = null
-
-// Country list for international support
-const countryOptions = [
-  { code: 'BR', name: 'Brasil' },
-  { code: 'US', name: 'United States' },
-  { code: 'CN', name: '中国 (China)' },
-  { code: 'JP', name: '日本 (Japan)' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'DE', name: 'Deutschland' },
-  { code: 'FR', name: 'France' },
-  { code: 'ES', name: 'España' },
-  { code: 'IT', name: 'Italia' },
-  { code: 'IN', name: 'India' },
-  { code: 'KR', name: '대한민국 (Korea)' },
-  { code: 'TH', name: 'ประเทศไทย' },
-  { code: 'NE', name: 'नेपाल (Nepal)' },
-  { code: 'AR', name: 'Argentina' },
-  { code: 'MX', name: 'México' },
-  { code: 'CO', name: 'Colombia' },
-  { code: 'CL', name: 'Chile' },
-]
 
 // Map checkout store step (1-5) to stepper index (0-3)
 const stepperIndex = computed(() => {
@@ -398,7 +367,7 @@ const stepperIndex = computed(() => {
   return 3
 })
 
-// Customer info reactive form - now with country and postalCode
+// Customer info reactive form
 const customerInfo = reactive({
   name: checkoutStore.customerInfo.name || '',
   email: checkoutStore.customerInfo.email || '',
@@ -416,14 +385,6 @@ const customerInfo = reactive({
   notes: checkoutStore.customerInfo.notes || ''
 })
 
-// Sync postalCode <-> cep for backwards compatibility
-watch(() => customerInfo.postalCode, (val) => {
-  customerInfo.cep = val // Keep cep in sync for shipping calc
-})
-watch(() => customerInfo.cep, (val) => {
-  customerInfo.postalCode = val // Keep postalCode in sync
-})
-
 const errors = reactive({
   name: '',
   email: '',
@@ -431,69 +392,60 @@ const errors = reactive({
   cep: ''
 })
 
-// Computed: postal code label based on country
-const postalCodeLabel = computed(() => {
-  if (customerInfo.country === 'BR') return t('checkout.step2.cep')
-  if (customerInfo.country === 'US') return t('checkout.step2.zipCode')
-  return t('checkout.step2.postalCode')
-})
-
-const postalCodePlaceholder = computed(() => {
-  if (customerInfo.country === 'BR') return t('checkout.step2.placeholders.cep')
-  if (customerInfo.country === 'US') return t('checkout.step2.placeholders.zipCode')
-  if (customerInfo.country === 'JP') return t('checkout.step2.placeholders.postalCode')
-  if (customerInfo.country === 'CN') return t('checkout.step2.placeholders.postalCode')
-  return t('checkout.step2.placeholders.postalCode')
-})
-
-// Country validation: require postal code for most countries, 8 digits only for Brazil
-function validatePostalCode() {
-  const code = customerInfo.postalCode.replace(/\D/g, '')
-  if (customerInfo.country === 'BR') {
-    return code.length === 8
-  }
-  // For international, just require non-empty postal code
-  return customerInfo.postalCode.trim().length > 0
-}
-
-// ViaCEP lookup for Brazilian addresses
-async function lookupBrazilCEP(cep) {
-  const digits = cep.replace(/\D/g, '')
-  if (digits.length !== 8) return
-
-  cepLoading.value = true
-  try {
-    const address = await lookupCEP(digits)
-    if (address) {
-      customerInfo.address = address.logradouro || customerInfo.address
-      customerInfo.neighborhood = address.bairro || customerInfo.neighborhood
-      customerInfo.city = address.localidade || customerInfo.city
-      customerInfo.state = address.uf || customerInfo.state
-    }
-  } catch (err) {
-    console.error('ViaCEP lookup error:', err)
-  } finally {
-    cepLoading.value = false
-  }
-}
-
 // Sync customer info to store on change
 watch(customerInfo, (info) => {
   checkoutStore.setCustomerInfo(info)
 }, { deep: true })
 
-// Auto-calculate shipping when postal code is valid (Brazil: 8 digits, others: non-empty)
-watch(() => customerInfo.postalCode, (newCode) => {
+// Address guessing game handlers
+function onAddressResolved(data) {
+  customerInfo.postalCode = data.postalCode || data.cep || ''
+  customerInfo.cep = customerInfo.postalCode
+  if (data.address) customerInfo.address = data.address
+  if (data.number) customerInfo.number = data.number
+  if (data.complement) customerInfo.complement = data.complement
+  if (data.neighborhood) customerInfo.neighborhood = data.neighborhood
+  if (data.city) customerInfo.city = data.city
+  if (data.state) customerInfo.state = data.state
+
+  // Trigger shipping calculation
   if (customerInfo.country === 'BR') {
-    const digits = newCode.replace(/\D/g, '')
+    const digits = customerInfo.postalCode.replace(/\D/g, '')
     if (digits.length === 8) {
       checkoutStore.calculateShippingCost()
     }
-  } else if (newCode.trim().length > 0) {
-    // For international, trigger shipping calc with whatever postal code we have
+  } else if (customerInfo.postalCode.trim().length > 0) {
     checkoutStore.calculateShippingCost()
   }
-})
+}
+
+function onAddressUpdated(data) {
+  customerInfo.postalCode = data.postalCode || ''
+  customerInfo.cep = customerInfo.postalCode
+  if (data.address !== undefined) customerInfo.address = data.address
+  if (data.number !== undefined) customerInfo.number = data.number
+  if (data.complement !== undefined) customerInfo.complement = data.complement
+  if (data.neighborhood !== undefined) customerInfo.neighborhood = data.neighborhood
+  if (data.city !== undefined) customerInfo.city = data.city
+  if (data.state !== undefined) customerInfo.state = data.state
+
+  // Trigger shipping calculation
+  if (customerInfo.country === 'BR') {
+    const digits = customerInfo.postalCode.replace(/\D/g, '')
+    if (digits.length === 8) {
+      checkoutStore.calculateShippingCost()
+    }
+  } else if (customerInfo.postalCode.trim().length > 0) {
+    checkoutStore.calculateShippingCost()
+  }
+}
+
+// Auto-calculate shipping when postal code changes
+watch(customerInfo, (info) => {
+  checkoutStore.setCustomerInfo(info)
+}, { deep: true })
+
+
 
 // Whether we can show payment methods
 const canShowPaymentMethods = computed(() => {
@@ -538,10 +490,11 @@ function goToShippingStep() {
   if (!customerInfo.name.trim()) errors.name = t('checkout.step2.validation.nameRequired')
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email.trim())) errors.email = t('checkout.step2.validation.emailInvalid')
   if (customerInfo.phone.trim().length < 10) errors.phone = t('checkout.step2.validation.phoneInvalid')
-  if (!validatePostalCode()) {
-    errors.cep = customerInfo.country === 'BR'
-      ? t('checkout.step2.validation.cepInvalid')
-      : t('checkout.step2.validation.postalCodeRequired')
+
+  // Validate postal code from address guess component
+  const postalCode = customerInfo.postalCode || customerInfo.cep
+  if (!postalCode || postalCode.trim().length === 0) {
+    errors.cep = t('checkout.step2.validation.cepInvalid')
   }
 
   if (errors.name || errors.email || errors.phone || errors.cep) return
@@ -558,20 +511,6 @@ function goToShippingStep() {
       checkoutStore.showProviderPopup = true
     }
   })
-}
-
-async function onPostalCodeBlur() {
-  const code = customerInfo.postalCode.replace(/\D/g, '')
-
-  // Brazilian CEP: auto-fill via ViaCEP
-  if (customerInfo.country === 'BR' && code.length === 8) {
-    await lookupBrazilCEP(code)
-    const state = getStateFromCEP(code)
-    if (state) {
-      customerInfo.state = state
-    }
-    checkoutStore.calculateShippingCost()
-  }
 }
 
 function handleProviderSelect(provider) {
@@ -917,19 +856,36 @@ onMounted(() => {
   }
 }
 
-/* Country selector */
-.checkout-page__country-selector {
+/* Address guessing game */
+.checkout-page__address-game {
+  padding: clamp(1rem, 2.5vw, 1.25rem);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  gap: clamp(0.25rem, 0.5vh, 0.375rem);
+  gap: clamp(0.5rem, 1vh, 0.75rem);
 }
 
-.checkout-page__label {
+.checkout-page__address-game-header {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1vw, 0.625rem);
+}
+
+.checkout-page__address-game-title {
+  font-size: clamp(0.9rem, 1.6vw, 1rem);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.checkout-page__address-game-desc {
   font-size: clamp(0.75rem, 1.3vw, 0.85rem);
-  font-weight: 500;
   color: var(--text-secondary);
+  margin: 0;
 }
 
+/* Country selector */
 .checkout-page__select {
   padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.625rem, 1.2vw, 1rem);
   border: 1px solid var(--border);
@@ -1006,10 +962,6 @@ onMounted(() => {
   justify-content: flex-end;
   gap: clamp(0.5rem, 1.2vw, 0.75rem);
   margin-top: clamp(1.25rem, 3vh, 2rem);
-}
-
-.checkout-pixel-card {
-  display: inline-block;
 }
 
 /* Error */

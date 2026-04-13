@@ -4,12 +4,17 @@
       v-if="cartStore.isOpen"
       class="drawer-overlay"
       :class="{ 'drawer-overlay--visible': overlayVisible }"
-      @click="cartStore.closeDrawer()"
+      @click="handleOverlayClick"
     ></div>
     <div class="drawer" :class="{ 'drawer--open': cartStore.isOpen }" :aria-hidden="!cartStore.isOpen">
       <div class="drawer__header">
         <h2 class="drawer__title">{{ $t('cart.cartCount', { count: cartStore.totalItems }) }}</h2>
-        <button class="drawer__close" @click="cartStore.closeDrawer()" :aria-label="$t('common.close')">
+        <button
+          type="button"
+          class="drawer__close"
+          @click.stop="handleClose"
+          :aria-label="$t('common.close')"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -22,29 +27,42 @@
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
         </svg>
         <p>{{ $t('cart.empty') }}</p>
-        <BaseButton variant="primary" size="sm" @click="cartStore.closeDrawer(); $router.push('/produtos')">
+        <BaseButton variant="primary" size="sm" @click="handleCloseAndNavigate">
           {{ $t('cart.viewProducts') }}
         </BaseButton>
       </div>
 
       <div v-else class="drawer__content">
         <div class="drawer__items">
-          <div v-for="item in cartStore.items" :key="`${item.id}_${item.size || 'default'}`" class="drawer__item">
+          <div
+            v-for="item in cartStore.items"
+            :key="`${item.id}_${item.size || 'default'}`"
+            class="drawer__item"
+            :class="getItemClass(item)"
+          >
             <div class="drawer__item-img">
               <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" />
               <div v-else class="drawer__item-placeholder">{{ item.name?.charAt(0) || '?' }}</div>
             </div>
             <div class="drawer__item-info">
-              <h4 class="drawer__item-name">{{ item.name }}</h4>
+              <div class="drawer__item-name-row">
+                <h4 class="drawer__item-name">{{ item.name }}</h4>
+                <FulfillmentBadge v-if="shouldShowBadge(item)" :type="item.fulfillment_type" size="sm" />
+              </div>
               <p v-if="item.size" class="drawer__item-size">{{ $t('cart.size') }}: {{ item.size }}</p>
               <p class="drawer__item-price">R$ {{ formatPrice(item.price) }}</p>
               <div class="drawer__item-qty">
-                <button @click="cartStore.updateQuantity(item.id, item.quantity - 1, item.size)" :aria-label="$t('productDetail.decrease')">−</button>
+                <button type="button" @click="cartStore.updateQuantity(item.id, item.quantity - 1, item.size)" :aria-label="$t('productDetail.decrease')">−</button>
                 <span>{{ item.quantity }}</span>
-                <button @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.size)" :aria-label="$t('productDetail.increase')">+</button>
+                <button type="button" @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.size)" :aria-label="$t('productDetail.increase')">+</button>
               </div>
             </div>
-            <button class="drawer__item-remove" @click="cartStore.removeItem(item.id, item.size)" :aria-label="$t('cart.remove')">
+            <button
+              type="button"
+              class="drawer__item-remove"
+              @click.stop="cartStore.removeItem(item.id, item.size)"
+              :aria-label="$t('cart.remove')"
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
@@ -52,15 +70,37 @@
           </div>
         </div>
 
+        <!-- UmaPenca info banner -->
+        <div v-if="cartStore.hasUmaPencaItems" class="drawer__uma-penca-banner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>{{ $t('cart.umaPencaNote') || 'Items from UmaPenca will be checked out separately' }}</span>
+        </div>
+
         <div class="drawer__footer">
-          <div class="drawer__total">
-            <span>{{ $t('cart.total') }}</span>
-            <span class="drawer__total-price">R$ {{ formatPrice(cartStore.totalPrice) }}</span>
+          <div class="drawer__totals">
+            <div class="drawer__total-line">
+              <span>{{ $t('cart.subtotal') || 'Subtotal' }}</span>
+              <span>R$ {{ formatPrice(cartStore.totalPrice) }}</span>
+            </div>
+            <div class="drawer__total-line drawer__total-line--final">
+              <span>{{ $t('cart.total') }}</span>
+              <span class="drawer__total-price">R$ {{ formatPrice(cartStore.totalPrice) }}</span>
+            </div>
           </div>
-          <BaseButton variant="primary" full @click="goToCheckout">
+          <BaseButton
+            type="button"
+            variant="primary"
+            full
+            @click="handleCheckout"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
             {{ $t('cart.checkout') }}
           </BaseButton>
-          <button class="drawer__clear" @click="cartStore.clearCart()">{{ $t('cart.clearCart') }}</button>
+          <button type="button" class="drawer__clear" @click="handleClearCart">{{ $t('cart.clearCart') }}</button>
         </div>
       </div>
     </div>
@@ -73,11 +113,13 @@ import { useRouter } from 'vue-router'
 import { gsap } from '../../utils/animations'
 import { useCartStore } from '../../stores/cart'
 import BaseButton from '../common/BaseButton.vue'
+import FulfillmentBadge from '../common/FulfillmentBadge.vue'
 
 const cartStore = useCartStore()
 const router = useRouter()
 const overlayVisible = ref(false)
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const isClosing = ref(false)
 let drawerTween = null
 let overlayTween = null
 let itemsTween = null
@@ -87,9 +129,42 @@ function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')
 }
 
-function goToCheckout() {
+// Close handler that bypasses animation blocking
+function handleClose() {
+  if (isClosing.value) return
+  isClosing.value = true
   cartStore.closeDrawer()
+  // Reset closing state after animation completes
+  setTimeout(() => { isClosing.value = false }, 400)
+}
+
+function handleOverlayClick() {
+  if (isClosing.value) return
+  handleClose()
+}
+
+function handleCloseAndNavigate() {
+  handleClose()
+  router.push('/produtos')
+}
+
+function handleCheckout() {
+  handleClose()
   router.push('/checkout')
+}
+
+function handleClearCart() {
+  cartStore.clearCart()
+}
+
+function getItemClass(item) {
+  if (item.fulfillment_type === 'uma_penca') return 'drawer__item--uma-penca'
+  if (item.fulfillment_type === 'digital') return 'drawer__item--digital'
+  return ''
+}
+
+function shouldShowBadge(item) {
+  return item.fulfillment_type && item.fulfillment_type !== 'own'
 }
 
 // Watch for drawer state changes
@@ -98,6 +173,7 @@ watch(() => cartStore.isOpen, async (isOpen) => {
 
   if (isOpen) {
     overlayVisible.value = true
+    isClosing.value = false
     animateDrawerOpen()
   } else {
     animateDrawerClose()
@@ -227,6 +303,7 @@ onUnmounted(() => {
   padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 2.5vw, 1.5rem);
   border-bottom: 1px solid var(--border);
   position: relative;
+  flex-shrink: 0;
 }
 
 .drawer__header::after {
@@ -254,6 +331,11 @@ onUnmounted(() => {
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   transition: all var(--transition-fast);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  z-index: 10;
 }
 
 .drawer__close:hover {
@@ -297,6 +379,16 @@ onUnmounted(() => {
   position: relative;
 }
 
+.drawer__item--uma-penca {
+  border-left: 3px solid #8b5cf6;
+  padding-left: clamp(0.5rem, 1.2vw, 0.75rem);
+}
+
+.drawer__item--digital {
+  border-left: 3px solid #10b981;
+  padding-left: clamp(0.5rem, 1.2vw, 0.75rem);
+}
+
 .drawer__item-img {
   width: clamp(3.5rem, 8vw, 4rem);
   height: clamp(3.5rem, 8vw, 4rem);
@@ -326,6 +418,12 @@ onUnmounted(() => {
 .drawer__item-info {
   flex: 1;
   min-width: 0;
+}
+
+.drawer__item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
 .drawer__item-name {
@@ -369,6 +467,9 @@ onUnmounted(() => {
   font-size: clamp(0.8rem, 1.3vw, 0.875rem);
   color: var(--text-secondary);
   transition: all var(--transition-fast);
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .drawer__item-qty button:hover {
@@ -392,17 +493,37 @@ onUnmounted(() => {
   right: 0;
   color: var(--text-muted);
   transition: color var(--transition-fast);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.25rem;
 }
 
 .drawer__item-remove:hover {
   color: var(--danger);
 }
 
+/* UmaPenca banner */
+.drawer__uma-penca-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: clamp(0.625rem, 1.2vw, 0.75rem) clamp(1.25rem, 2.5vw, 1.5rem);
+  background: rgba(139, 92, 246, 0.08);
+  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  font-size: clamp(0.7rem, 1.2vw, 0.75rem);
+  color: #7c3aed;
+  flex-shrink: 0;
+}
+
+/* Footer */
 .drawer__footer {
   padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 2.5vw, 1.5rem);
   border-top: 1px solid var(--border);
   background: var(--surface-1);
   position: relative;
+  flex-shrink: 0;
 }
 
 .drawer__footer::before {
@@ -416,13 +537,25 @@ onUnmounted(() => {
   opacity: 0.4;
 }
 
-.drawer__total {
+.drawer__totals {
+  margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+}
+
+.drawer__total-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+  padding: clamp(0.25rem, 0.5vh, 0.375rem) 0;
   font-size: clamp(0.8rem, 1.4vw, 0.875rem);
   color: var(--text-secondary);
+}
+
+.drawer__total-line--final {
+  padding-top: clamp(0.5rem, 1vh, 0.75rem);
+  margin-top: clamp(0.25rem, 0.5vh, 0.375rem);
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .drawer__total-price {
@@ -439,6 +572,10 @@ onUnmounted(() => {
   color: var(--text-muted);
   text-decoration: underline;
   transition: color var(--transition-fast);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.25rem;
 }
 
 .drawer__clear:hover {

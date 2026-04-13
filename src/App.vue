@@ -34,7 +34,7 @@
           </router-view>
         </main>
         <AppFooter />
-        <CartDrawer />
+        <CartDrawer v-if="!isCartRoute" />
         <ToastContainer />
       </div>
     </ClickSpark>
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
@@ -60,6 +60,7 @@ const authStore = useAuthStore()
 const themeStore = useThemeStore()
 const route = useRoute()
 const { updateMetaTags } = useSEO()
+const isCartRoute = computed(() => route.name === 'cart')
 
 function onPageEnter(el, done) {
   pageEnter(el, done)
