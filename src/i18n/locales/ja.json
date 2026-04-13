@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "製品",
+    "subtitle": "手作りコレクションを発見",
     "categories": "カテゴリー",
     "allCategories": "すべてのカテゴリー",
     "all": "すべて",
@@ -149,7 +150,9 @@
     "remove": "削除",
     "total": "合計",
     "clearCart": "カートをクリア",
-    "cartCount": "カート ({count})"
+    "cartCount": "カート ({count})",
+    "subtotal": "小計",
+    "umaPencaNote": "UmaPenca製品は別のストアでチェックアウトされます"
   },
   "checkout": {
     "title": "チェックアウト",
@@ -491,5 +494,13 @@
     "card": "Card",
     "upi": "UPI",
     "alipay": "Alipay"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "デジタル",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "UmaPenca外部ストアでチェックアウト",
+    "digitalTooltip": "デジタル製品 - 即時配信",
+    "uiclapTooltip": "Uiclapによるオンデマンド印刷"
   }
 }

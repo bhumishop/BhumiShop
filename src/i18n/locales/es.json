@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "Productos",
+    "subtitle": "Descubre nuestra colección de productos artesanales",
     "categories": "Categorias",
     "allCategories": "Todas las categorias",
     "all": "Todos",
@@ -149,7 +150,8 @@
     "remove": "Eliminar",
     "total": "Total",
     "clearCart": "Vaciar carrito",
-    "cartCount": "Carrito ({count})"
+    "cartCount": "Carrito ({count})",
+    "umaPencaNote": "Los articulos UmaPenca se pagan en una tienda separada"
   },
   "checkout": {
     "title": "Checkout",
@@ -491,5 +493,13 @@
     "card": "Tarjeta",
     "upi": "UPI",
     "alipay": "Alipay"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "Digital",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "Checkout via tienda externa UmaPenca",
+    "digitalTooltip": "Producto digital - entrega instantanea",
+    "uiclapTooltip": "Impresion bajo demanda via Uiclap"
   }
 }

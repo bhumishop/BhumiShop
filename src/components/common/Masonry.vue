@@ -41,6 +41,7 @@
               class="masonry-item__img"
               loading="lazy"
               decoding="async"
+              @error="handleImageError(item.id, $event)"
             />
             <!-- Hover overlay -->
             <div class="masonry-item__overlay" />
@@ -91,6 +92,17 @@ const props = withDefaults(defineProps<MasonryProps>(), {
 
 const isLoading = ref(true);
 const containerRef = ref<HTMLDivElement | null>(null);
+
+/** Track broken images per item ID */
+const brokenImages = ref<Set<string>>(new Set());
+
+function handleImageError(itemId: string, event: Event) {
+  const img = event.target as HTMLImageElement;
+  brokenImages.value.add(itemId);
+  // Replace with a colored placeholder SVG
+  const name = (props.items.find(i => i.id === itemId)?.name || 'Product').replace(/'/g, '&#39;');
+  img.src = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect fill="#f0f0f5" width="400" height="400"/><text x="50%" y="45%" font-family="system-ui" font-size="16" fill="#999" text-anchor="middle">${name}</text><text x="50%" y="55%" font-family="system-ui" font-size="12" fill="#bbb" text-anchor="middle">Image unavailable</text></svg>`)}`;
+}
 
 /** Responsive column count based on viewport width */
 const responsiveColumns = ref(props.columns);

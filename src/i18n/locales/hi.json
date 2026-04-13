@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "उत्पाद",
+    "subtitle": "हमारी हस्तनिर्मित संग्रह की खोज करें",
     "categories": "श्रेणियाँ",
     "allCategories": "सभी श्रेणियाँ",
     "all": "सभी",
@@ -140,7 +141,9 @@
     "remove": "हटाएं",
     "total": "कुल",
     "clearCart": "कार्ट खाली करें",
-    "cartCount": "कार्ट ({count})"
+    "cartCount": "कार्ट ({count})",
+    "subtotal": "उप-योग",
+    "umaPencaNote": "UmaPenca आइटम अलग स्टोर में चेकआउट होते हैं"
   },
   "checkout": {
     "title": "चेकआउट",
@@ -487,5 +490,13 @@
     "card": "Card",
     "upi": "UPI",
     "alipay": "Alipay"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "डिजिटल",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "UmaPenca बाह्य स्टोर के माध्यम से चेकआउट",
+    "digitalTooltip": "डिजिटल उत्पाद - तत्काल वितरण",
+    "uiclapTooltip": "Uiclap के माध्यम से मांग पर मुद्रण"
   }
 }
