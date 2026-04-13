@@ -80,7 +80,7 @@ interface MasonryProps {
   columns?: number;
   gap?: number;
   showInfo?: boolean;
-  onItemClick?: (item: MasonryItem) => void;
+  onItemClick?: (_item: MasonryItem) => void;
 }
 
 const props = withDefaults(defineProps<MasonryProps>(), {
@@ -132,8 +132,8 @@ onUnmounted(() => {
   if (resizeTimer) clearTimeout(resizeTimer);
 });
 
-/** Distribute items into columns for CSS masonry layout */
-const columns = computed(() => {
+/** Distribute items into columns for CSS masonry layout - used for potential JS fallback */
+const _columns = computed(() => {
   const colCount = responsiveColumns.value;
   const result: MasonryItem[][] = Array.from({ length: colCount }, () => []);
 

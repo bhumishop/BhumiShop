@@ -74,7 +74,7 @@ describe('useGSAPAnimations Composable', () => {
   })
 
   describe('mountAnimation', () => {
-    it('should animate element on mount', () => {
+    it('should animate element on mount', async () => {
       const el = document.createElement('div')
       el.className = 'mount-test'
       el.style.opacity = '0'
@@ -96,13 +96,15 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(10)
+      // Advance timers and wait for GSAP ticker
+      vi.advanceTimersByTime(100)
+      await nextTick()
 
       // Element should be animated in
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
     })
 
-    it('should handle fadeInLeft type', () => {
+    it('should handle fadeInLeft type', async () => {
       const el = document.createElement('div')
       el.className = 'mount-left'
       el.style.opacity = '0'
@@ -124,11 +126,12 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(10)
+      vi.advanceTimersByTime(100)
+      await nextTick()
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
     })
 
-    it('should handle fadeInRight type', () => {
+    it('should handle fadeInRight type', async () => {
       const el = document.createElement('div')
       el.className = 'mount-right'
       el.style.opacity = '0'
@@ -150,11 +153,12 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(10)
+      vi.advanceTimersByTime(100)
+      await nextTick()
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
     })
 
-    it('should handle scaleIn type', () => {
+    it('should handle scaleIn type', async () => {
       const el = document.createElement('div')
       el.className = 'mount-scale'
       el.style.opacity = '0'
@@ -176,7 +180,8 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(10)
+      vi.advanceTimersByTime(100)
+      await nextTick()
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
     })
 
@@ -457,7 +462,7 @@ describe('usePageTransition Composable', () => {
     expect(transition.onLeave).toBeDefined()
   })
 
-  it('should call done callback on enter', () => {
+  it('should call done callback on enter', async () => {
     const el = document.createElement('div')
     el.style.width = '100px'
     el.style.height = '100px'
@@ -475,12 +480,14 @@ describe('usePageTransition Composable', () => {
     const done = vi.fn()
 
     transition.onEnter(el, done)
-    vi.advanceTimersByTime(500)
+    // Advance timers enough for animation to complete
+    vi.advanceTimersByTime(1000)
+    await nextTick()
 
     expect(done).toHaveBeenCalled()
   })
 
-  it('should call done callback on leave', () => {
+  it('should call done callback on leave', async () => {
     const el = document.createElement('div')
     el.style.width = '100px'
     el.style.height = '100px'
@@ -498,7 +505,9 @@ describe('usePageTransition Composable', () => {
     const done = vi.fn()
 
     transition.onLeave(el, done)
-    vi.advanceTimersByTime(400)
+    // Advance timers enough for animation to complete
+    vi.advanceTimersByTime(800)
+    await nextTick()
 
     expect(done).toHaveBeenCalled()
   })

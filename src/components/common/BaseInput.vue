@@ -24,7 +24,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const props = defineProps({
+const _props = defineProps({
   modelValue: { type: [String, Number], default: '' },
   label: String,
   placeholder: String,

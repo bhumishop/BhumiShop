@@ -169,7 +169,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onUnmounted } from 'vue'
-import { lookupCEP, getStateFromCEP } from '../../stores/shipping'
+import { lookupCEP } from '../../stores/shipping'
 
 function sanitizeHTML(str) {
   if (typeof str !== 'string') return ''

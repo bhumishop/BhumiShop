@@ -329,7 +329,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          VITE_BASE_URL: /bhumi-shop/
+          VITE_BASE_URL: /BhumiShop/
         run: pnpm build
 
       - name: Configure Pages

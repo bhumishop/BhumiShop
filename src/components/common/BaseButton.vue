@@ -20,7 +20,7 @@
 import { ref, onMounted } from 'vue'
 import { gsap } from '../../utils/animations'
 
-const props = defineProps({
+const _props = defineProps({
   variant: {
     type: String,
     default: 'primary',
@@ -39,7 +39,7 @@ const props = defineProps({
 
 const emit = defineEmits(['click'])
 const buttonRef = ref(null)
-const rippleRef = ref(null)
+const _rippleRef = ref(null)
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function handleClick(event) {

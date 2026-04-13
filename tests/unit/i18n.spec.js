@@ -143,7 +143,7 @@ describe('Translation Functions', () => {
   it('should translate simple keys correctly in Portuguese', () => {
     i18n.global.locale.value = 'pt-BR'
     expect(i18n.global.t('common.appName')).toBe('BhumiShop')
-    expect(i18n.global.t('nav.home')).toBe('Inicio')
+    expect(i18n.global.t('nav.home')).toBe('Início')
     expect(i18n.global.t('nav.products')).toBe('Produtos')
     expect(i18n.global.t('common.close')).toBe('Fechar')
   })
