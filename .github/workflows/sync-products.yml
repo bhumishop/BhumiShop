@@ -27,7 +27,7 @@ on:
         type: boolean
         default: true
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - '.github/workflows/scripts/umapenca.py'
       - '.github/workflows/scripts/uiclap.py'
@@ -151,7 +151,7 @@ jobs:
           retention-days: 30
 
       - name: Commit and push products.json
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/master'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -231,7 +231,7 @@ jobs:
           retention-days: 30
 
       - name: Commit and push products.json
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/master'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

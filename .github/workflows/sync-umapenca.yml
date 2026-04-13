@@ -42,7 +42,7 @@ on:
         type: boolean
         default: true
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - '.github/workflows/scripts/umapenca.py'
       - '.github/workflows/sync-umapenca.yml'
@@ -193,7 +193,7 @@ jobs:
           retention-days: 7
 
       - name: Commit products.json to repository
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/master'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -203,7 +203,7 @@ jobs:
           🤖 Generated with [Qoder](https://qoder.com)"
 
       - name: Push products.json
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/master'
         run: git push
 
   notify-failure:

@@ -248,6 +248,10 @@ class Client:
         self.delay = delay
         self.session = requests.Session()
         self.session.headers.update(HEADERS)
+        # images.uiclap.com has a cert mismatch — disable verify for that host
+        self.session.mount("https://images.uiclap.com", requests.adapters.HTTPAdapter(max_retries=3))
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._last = 0.0
 
     def _wait(self):
@@ -260,7 +264,9 @@ class Client:
         for attempt in range(MAX_RETRIES):
             try:
                 self._wait()
-                resp = self.session.get(url, timeout=30, allow_redirects=True)
+                # Disable verify for images.uiclap.com
+                verify = "images.uiclap.com" not in url
+                resp = self.session.get(url, timeout=30, allow_redirects=True, verify=verify)
                 if resp.status_code == 429:
                     wait = int(resp.headers.get("Retry-After", RETRY_DELAY * (attempt + 1)))
                     logger.warning(f"Rate-limited, waiting {wait}s…")
@@ -281,7 +287,8 @@ class Client:
     def download_bytes(self, url: str) -> Optional[bytes]:
         try:
             self._wait()
-            resp = self.session.get(url, timeout=60, stream=True, allow_redirects=True)
+            verify = "images.uiclap.com" not in url
+            resp = self.session.get(url, timeout=60, stream=True, allow_redirects=True, verify=verify)
             resp.raise_for_status()
             return resp.content
         except Exception as exc:
