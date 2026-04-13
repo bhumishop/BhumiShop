@@ -336,9 +336,9 @@ jobs:
           pnpm build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/setup-pages@v5
         with:
-          static_site_generator: automatic
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
