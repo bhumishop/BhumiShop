@@ -65,6 +65,17 @@ export const useCheckoutStore = defineStore('checkout', () => {
     return total
   }
 
+  // Compute total shipping cost including all fulfillment types
+  const computeShippingCostTotal = () => {
+    if (!shippingCosts.value) return 0
+    let total = 0
+    if (shippingCosts.value.own?.cost) total += shippingCosts.value.own.cost
+    if (shippingCosts.value.uma_penca?.cost && paymentProvider.value !== 'uma_penca') {
+      total += shippingCosts.value.uma_penca.cost
+    }
+    return total
+  }
+
   const totalWithShipping = computed(() => computeTotalWithShipping())
 
   const needsProviderSelection = computed(() => cartStore.hasUmaPencaItems)
@@ -91,7 +102,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   function calculateShippingCost() {
     const cartStore = useCartStore()
     const country = customerInfo.value.country || 'BR'
-    const cep = customerInfo.value.cep.replace(/\D/g, '')
+    const cep = (customerInfo.value.cep || '').replace(/\D/g, '')
 
     // For non-Brazil orders, use flat international rate
     if (country !== 'BR') {
@@ -167,7 +178,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         customerEmail: customerInfo.value.email,
         customerPhone: customerInfo.value.phone,
         shippingAddress: formatAddress(customerInfo.value),
-        shippingCost: shippingCosts.value?.own?.cost || 0,
+        shippingCost: computeShippingCostTotal(),
         notes: customerInfo.value.notes,
         userId: null,
         items: cartStore.items.map(item => ({
@@ -258,8 +269,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
       if (status === 'paid') {
         const orderStore = useOrderStore()
         const toast = useToastStore()
-        await orderStore.updateOrderPaymentStatus(orderStore.currentOrder?.id, 'paid', pixData.value.id)
-        toast.success(t('stores.checkout.pixConfirmed'))
+        const orderId = orderStore.currentOrder?.id
+        if (orderId) {
+          await orderStore.updateOrderPaymentStatus(orderId, 'paid', pixData.value.id)
+          toast.success(t('stores.checkout.pixConfirmed'))
+        } else {
+          // Fallback: try to find order by pix_key
+          console.warn('No currentOrder found during PIX confirmation')
+        }
       }
       return status
     } catch (err) {

@@ -2,17 +2,21 @@ import { supabase } from '../supabase'
 
 const FUNCTION_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`
 
-function getAuthHeaders() {
-  const session = supabase.auth.getSession()
-  return session?.access_token
-    ? { Authorization: `Bearer ${session.access_token}` }
-    : {}
+async function getAuthHeaders() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token
+      ? { Authorization: `Bearer ${session.access_token}` }
+      : {}
+  } catch {
+    return {}
+  }
 }
 
 async function callEdgeFunction(name, body) {
   const headers = {
     'Content-Type': 'application/json',
-    ...getAuthHeaders()
+    ...(await getAuthHeaders())
   }
 
   const response = await fetch(`${FUNCTION_BASE}/${name}`, {

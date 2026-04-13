@@ -97,6 +97,10 @@ watch(() => route.path, () => {
   // Close cart drawer on navigation
   cartStore.closeDrawer()
 
+  // Clean up old ScrollTrigger instances before refreshing
+  revertGlobalAnimations()
+  initGlobalAnimations()
+
   // Debounced refresh - animations.js handles the timing
   refreshScrollTriggers(150)
   updateRouteSEO()

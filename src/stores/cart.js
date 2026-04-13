@@ -9,6 +9,18 @@ function sanitizeText(str) {
   return str.replace(/[<>"'&]/g, '').trim()
 }
 
+function sanitizeObject(obj) {
+  const sanitized = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string') {
+      sanitized[key] = sanitizeText(value)
+    } else if (value !== null && value !== undefined) {
+      sanitized[key] = value
+    }
+  }
+  return sanitized
+}
+
 function loadCartFromStorage() {
   try {
     const saved = localStorage.getItem(CART_STORAGE_KEY)
@@ -118,15 +130,16 @@ export const useCartStore = defineStore('cart', () => {
       const newQty = Math.min(existing.quantity + quantity, MAX_QUANTITY)
       items.value[existingIndex] = { ...existing, quantity: newQty }
     } else {
+      const sanitizedProduct = sanitizeObject(product)
       items.value.push({
-        id: product.id,
-        name: sanitizeText(product.name || ''),
+        id: sanitizedProduct.id,
+        name: sanitizedProduct.name || '',
         price: Number(product.price) || 0,
-        image: product.image || '',
-        category: product.category || '',
+        image: sanitizedProduct.image || '',
+        category: sanitizedProduct.category || '',
         quantity,
-        size,
-        fulfillment_type: product.fulfillment_type || 'own',
+        size: sanitizedProduct.size || null,
+        fulfillment_type: sanitizedProduct.fulfillment_type || 'own',
         weight: product.weight || 0.3,
         dimensions: product.dimensions || null,
         shipping_zones: product.shipping_zones || null

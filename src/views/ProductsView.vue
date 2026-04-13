@@ -134,13 +134,13 @@ function setPage(page) {
 
 function getCategoryIcon(name) {
   const icons = {
-    'Camisetas': '\U0001f455',
-    'Acess\xf3rios': '\U0001f392',
-    'Arte': '\U0001f3a8',
-    'Canecas': '\u2615',
-    'Bags': '\U0001f45c'
+    'Camisetas': '👕',
+    'Acessórios': '🎒',
+    'Arte': '🎨',
+    'Canecas': '☕',
+    'Bags': '👜'
   }
-  return icons[name] || '\U0001f4e6'
+  return icons[name] || '📦'
 }
 
 function setCategory(catId) {

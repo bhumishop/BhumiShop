@@ -203,16 +203,16 @@ export const useProductStore = defineStore('products', () => {
   const relatedProductsCache = new Map()
   let cacheVersion = 0
 
-  const getProductById = computed(() => {
-    return (id) => products.value.find(p => p.id === parseInt(id))
-  })
+  // These are regular functions, not computed, since they return functions
+  // Using computed for function-returning is an anti-pattern
+  function getProductById(id) {
+    return products.value.find(p => p.id === parseInt(id))
+  }
 
-  const getProductsByCategory = computed(() => {
-    return (category) => {
-      if (category === 'todos' || !category) return products.value
-      return products.value.filter(p => p.category && normalizeCategoryMatch(p.category, category))
-    }
-  })
+  function getProductsByCategory(category) {
+    if (category === 'todos' || !category) return products.value
+    return products.value.filter(p => p.category && normalizeCategoryMatch(p.category, category))
+  }
 
   // Invalidate cache when products change
   function invalidateRelatedCache() {
@@ -220,84 +220,82 @@ export const useProductStore = defineStore('products', () => {
     relatedProductsCache.clear()
   }
 
-  // Optimized related products with caching
-  const getRelatedProducts = computed(() => {
-    return (productId, limit = 8) => {
-      const cacheKey = `${productId}-${limit}-v${cacheVersion}`
-      if (relatedProductsCache.has(cacheKey)) {
-        return relatedProductsCache.get(cacheKey)
+  // Optimized related products with caching (regular function, not computed)
+  function getRelatedProducts(productId, limit = 8) {
+    const cacheKey = `${productId}-${limit}-v${cacheVersion}`
+    if (relatedProductsCache.has(cacheKey)) {
+      return relatedProductsCache.get(cacheKey)
+    }
+
+    const product = products.value.find(p => p.id === parseInt(productId))
+    if (!product) return []
+
+    const otherProducts = products.value.filter(p => p.id !== parseInt(productId))
+
+    // Pre-compute product words once to avoid recomputation per product
+    const productWords = product.name
+      ? new Set(product.name.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+      : new Set()
+
+    // Score each product based on matching criteria
+    const scored = otherProducts.map(p => {
+      let score = 0
+
+      // Tags match (highest priority)
+      if (product.tags && p.tags && Array.isArray(product.tags) && Array.isArray(p.tags)) {
+        const commonTags = product.tags.filter(tag => p.tags.includes(tag))
+        score += commonTags.length * 10
       }
 
-      const product = products.value.find(p => p.id === parseInt(productId))
-      if (!product) return []
+      // Same collection
+      if (product.collection_id && p.collection_id && product.collection_id === p.collection_id) {
+        score += 15
+      }
 
-      const otherProducts = products.value.filter(p => p.id !== parseInt(productId))
+      // Same subcollection
+      if (product.subcollection_id && p.subcollection_id && product.subcollection_id === p.subcollection_id) {
+        score += 20
+      }
 
-      // Pre-compute product words once to avoid recomputation per product
-      const productWords = product.name
-        ? new Set(product.name.toLowerCase().split(/\s+/).filter(w => w.length > 2))
-        : new Set()
+      // Same category (legacy)
+      if (product.category && p.category && product.category === p.category) {
+        score += 5
+      }
 
-      // Score each product based on matching criteria
-      const scored = otherProducts.map(p => {
-        let score = 0
+      // Similar name (word overlap) - use pre-computed words
+      if (p.name && productWords.size > 0) {
+        const otherWords = p.name.toLowerCase().split(/\s+/).filter(w => productWords.has(w))
+        score += otherWords.length * 3
+      }
 
-        // Tags match (highest priority)
-        if (product.tags && p.tags && Array.isArray(product.tags) && Array.isArray(p.tags)) {
-          const commonTags = product.tags.filter(tag => p.tags.includes(tag))
-          score += commonTags.length * 10
+      // Similar price range (within 30%) - use ratio instead of division
+      if (product.price && p.price) {
+        const priceRatio = p.price / product.price
+        if (priceRatio >= 0.7 && priceRatio <= 1.3) {
+          score += 4
+        } else if (priceRatio >= 0.5 && priceRatio <= 1.5) {
+          score += 2
         }
+      }
 
-        // Same collection
-        if (product.collection_id && p.collection_id && product.collection_id === p.collection_id) {
-          score += 15
-        }
+      // Same artist
+      if (product.artist && p.artist && product.artist === p.artist) {
+        score += 6
+      }
 
-        // Same subcollection
-        if (product.subcollection_id && p.subcollection_id && product.subcollection_id === p.subcollection_id) {
-          score += 20
-        }
+      return { product: p, score }
+    })
 
-        // Same category (legacy)
-        if (product.category && p.category && product.category === p.category) {
-          score += 5
-        }
+    // Sort by score descending and return top N
+    const result = scored
+      .sort((a, b) => b.score - a.score)
+      .filter(item => item.score > 0)
+      .slice(0, limit)
+      .map(item => item.product)
 
-        // Similar name (word overlap) - use pre-computed words
-        if (p.name && productWords.size > 0) {
-          const otherWords = p.name.toLowerCase().split(/\s+/).filter(w => productWords.has(w))
-          score += otherWords.length * 3
-        }
-
-        // Similar price range (within 30%) - use ratio instead of division
-        if (product.price && p.price) {
-          const priceRatio = p.price / product.price
-          if (priceRatio >= 0.7 && priceRatio <= 1.3) {
-            score += 4
-          } else if (priceRatio >= 0.5 && priceRatio <= 1.5) {
-            score += 2
-          }
-        }
-
-        // Same artist
-        if (product.artist && p.artist && product.artist === p.artist) {
-          score += 6
-        }
-
-        return { product: p, score }
-      })
-
-      // Sort by score descending and return top N
-      const result = scored
-        .sort((a, b) => b.score - a.score)
-        .filter(item => item.score > 0)
-        .slice(0, limit)
-        .map(item => item.product)
-
-      relatedProductsCache.set(cacheKey, result)
-      return result
-    }
-  })
+    relatedProductsCache.set(cacheKey, result)
+    return result
+  }
 
   const filteredProducts = computed(() => {
     let result = products.value.filter(p => p.is_active !== false && p.is_archived !== true)

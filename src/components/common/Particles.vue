@@ -297,7 +297,9 @@ const cleanup = () => {
     }
     try {
       gl.getExtension('WEBGL_lose_context')?.loseContext();
-    } catch {}
+    } catch (e) {
+      // Ignore errors during context disposal
+    }
   }
   renderer = null;
   camera = null;

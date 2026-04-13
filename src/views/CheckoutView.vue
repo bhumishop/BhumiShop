@@ -325,7 +325,7 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import { useCheckoutStore } from '../stores/checkout'
 import { useOrderStore } from '../stores/orders'
@@ -345,6 +345,7 @@ import OrderConfirmation from '../components/checkout/OrderConfirmation.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const cartStore = useCartStore()
 const checkoutStore = useCheckoutStore()
 const orderStore = useOrderStore()
@@ -366,6 +367,7 @@ const addressGuessRef = ref(null)
 const checkingPix = ref(false)
 const pixPaid = ref(false)
 const pixBricksRendered = ref(false)
+const isProcessingPayment = ref(false)
 let pixPollingTimer = null
 
 // Map checkout store step (1-5) to stepper index (0-3)
@@ -450,10 +452,21 @@ function onAddressUpdated(data) {
   }
 }
 
-// Auto-calculate shipping when postal code changes
-watch(customerInfo, (info) => {
-  checkoutStore.setCustomerInfo(info)
-}, { deep: true })
+// Auto-calculate shipping when postal code changes (debounced)
+let shippingDebounceTimer = null
+watch(() => customerInfo.postalCode, (newCep) => {
+  if (shippingDebounceTimer) clearTimeout(shippingDebounceTimer)
+  shippingDebounceTimer = setTimeout(() => {
+    if (customerInfo.country === 'BR') {
+      const digits = (newCep || '').replace(/\D/g, '')
+      if (digits.length === 8) {
+        checkoutStore.calculateShippingCost()
+      }
+    } else if ((newCep || '').trim().length > 0) {
+      checkoutStore.calculateShippingCost()
+    }
+  }, 500)
+})
 
 
 
@@ -528,6 +541,9 @@ function handleProviderSelect(provider) {
 }
 
 async function handlePayment() {
+  if (isProcessingPayment.value) return
+  isProcessingPayment.value = true
+
   try {
     const order = await checkoutStore.processPayment()
 
@@ -541,6 +557,8 @@ async function handlePayment() {
 
     // Start PIX polling if AbacatePay PIX
     if (checkoutStore.paymentMethod === 'pix' && checkoutStore.pixData) {
+      // Clear any existing polling timer before starting new one
+      if (pixPollingTimer) clearInterval(pixPollingTimer)
       startPixPolling()
     }
 
@@ -551,6 +569,8 @@ async function handlePayment() {
     }
   } catch (err) {
     toast.error(err.message || t('stores.checkout.paymentError'))
+  } finally {
+    isProcessingPayment.value = false
   }
 }
 
@@ -622,6 +642,15 @@ async function checkPixPayment() {
 
 onUnmounted(() => {
   if (pixPollingTimer) clearInterval(pixPollingTimer)
+  if (shippingDebounceTimer) clearTimeout(shippingDebounceTimer)
+})
+
+// Stop pix polling when navigating away from checkout
+watch(() => route.path, (newPath) => {
+  if (!newPath.startsWith('/checkout') && pixPollingTimer) {
+    clearInterval(pixPollingTimer)
+    pixPollingTimer = null
+  }
 })
 
 // Auto-fill checkout form from auth store's saved location on mount

@@ -679,7 +679,9 @@ class App {
       // Dispose all geometries and programs if available
       try {
         gl.getExtension('WEBGL_lose_context')?.loseContext();
-      } catch {}
+      } catch (e) {
+        // Ignore errors during context disposal
+      }
       const canvas = gl.canvas
       if (canvas && canvas.parentNode) {
         canvas.parentNode.removeChild(canvas);
