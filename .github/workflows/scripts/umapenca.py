@@ -221,30 +221,36 @@ def strip_imgix_transforms(url: str) -> str:
     return urlunparse(parsed._replace(query=""))
 
 
-def is_grey_or_empty_image(img_bytes: bytes, threshold: float = 0.95) -> bool:
-    """Check if an image is essentially grey/empty.
+def is_grey_or_empty_image(img_bytes: bytes, threshold_grey: float = 0.98) -> bool:
+    """Check if an image is essentially grey/empty/placeholder.
     
-    Returns True if the image is mostly grey (placeholder/empty image).
-    This detects images where most pixels have very low saturation or
-    are very similar to each other (grey/blank placeholders).
+    Returns True if the image should be skipped (grey/blank placeholder).
+    Uses multiple detection strategies:
+    1. Low saturation - grey images have very similar R, G, B values
+    2. Low variance - uniform/grey images have minimal pixel variation  
+    3. Small dimensions - tiny placeholders
+    4. Near-uniform color - almost all pixels identical
     """
     if not HAS_PIL:
-        # If PIL not available, can't check - assume valid
         return False
     
     try:
         img = Image.open(io.BytesIO(img_bytes))
         img = img.convert('RGB')
         
-        # Get image stats
-        pixels = list(img.getdata())
-        total_pixels = len(pixels)
+        width, height = img.size
+        total_pixels = width * height
         
         if total_pixels == 0:
             return True
         
-        # Check if image is mostly grey (low variance in R, G, B channels)
-        # Grey images have very similar R, G, B values across pixels
+        # Small images are likely placeholders
+        if width < 100 or height < 100:
+            return True
+        
+        pixels = list(img.getdata())
+        
+        # Strategy 1: Check channel similarity (grey detection)
         r_vals = [p[0] for p in pixels]
         g_vals = [p[1] for p in pixels]
         b_vals = [p[2] for p in pixels]
@@ -253,31 +259,104 @@ def is_grey_or_empty_image(img_bytes: bytes, threshold: float = 0.95) -> bool:
         avg_g = sum(g_vals) / total_pixels
         avg_b = sum(b_vals) / total_pixels
         
-        # Check if all channels are very similar (grey)
+        # If RGB channels are very similar, image is grey
         channel_diff = abs(avg_r - avg_g) + abs(avg_g - avg_b) + abs(avg_r - avg_b)
         
-        # If channels are very similar (within 10-15 units), likely grey
-        if channel_diff < 30:
-            # Also check variance - grey placeholders have low variance
+        if channel_diff < 25:
+            # Check variance - grey placeholders have very low variance
             var_r = sum((x - avg_r) ** 2 for x in r_vals) / total_pixels
             var_g = sum((x - avg_g) ** 2 for x in g_vals) / total_pixels
             var_b = sum((x - avg_b) ** 2 for x in b_vals) / total_pixels
             
             avg_variance = (var_r + var_g + var_b) / 3
             
-            # Low variance means very uniform/grey image
-            # Threshold: if variance < 200, it's likely a grey placeholder
-            if avg_variance < 200:
+            # Higher threshold to catch more grey placeholders
+            if avg_variance < 300:
                 return True
         
-        # Also check if image is very small (might be a tiny placeholder)
-        if img.width < 50 or img.height < 50:
+        # Strategy 2: Check saturation (convert to HSV)
+        hsv_img = img.convert('HSV')
+        hsv_pixels = list(hsv_img.getdata())
+        s_vals = [p[1] for p in hsv_pixels]  # Saturation channel
+        avg_saturation = sum(s_vals) / total_pixels
+        
+        # Very low saturation = grey image
+        if avg_saturation < 15:
             return True
-            
+        
+        # Strategy 3: Check if most pixels are nearly identical
+        # Sample pixels and check uniformity
+        if total_pixels > 1000:
+            # Sample 1000 pixels for performance
+            step = max(1, total_pixels // 1000)
+            sampled = pixels[::step][:1000]
+        else:
+            sampled = pixels
+        
+        unique_colors = set()
+        for p in sampled:
+            # Quantize to groups of 8 to handle minor variations
+            quantized = (p[0] // 8, p[1] // 8, p[2] // 8)
+            unique_colors.add(quantized)
+        
+        # If very few unique colors, likely a placeholder
+        if len(unique_colors) < 5:
+            return True
+        
         return False
         
     except Exception as e:
         logger.warning(f"Error checking if image is grey: {e}")
+        return False
+
+
+def is_likely_tshirt_placeholder(img_bytes: bytes) -> bool:
+    """Stricter check specifically for t-shirt 000 placeholder images.
+    
+    T-shirt products often have a 000 image that's a grey t-shirt mockup.
+    This uses more aggressive detection to catch these.
+    """
+    if not HAS_PIL:
+        return False
+    
+    try:
+        img = Image.open(io.BytesIO(img_bytes))
+        img = img.convert('RGB')
+        
+        width, height = img.size
+        total_pixels = width * height
+        
+        if total_pixels == 0:
+            return True
+        
+        pixels = list(img.getdata())
+        
+        # Calculate average color
+        avg_r = sum(p[0] for p in pixels) / total_pixels
+        avg_g = sum(p[1] for p in pixels) / total_pixels
+        avg_b = sum(p[2] for p in pixels) / total_pixels
+        
+        # Grey t-shirt mockups are typically light grey (180-220 range)
+        is_grey_range = 180 <= avg_r <= 220 and 180 <= avg_g <= 220 and 180 <= avg_b <= 220
+        
+        # Check channel similarity
+        channel_diff = abs(avg_r - avg_g) + abs(avg_g - avg_b) + abs(avg_r - avg_b)
+        
+        # Calculate variance
+        var_r = sum((p[0] - avg_r) ** 2 for p in pixels) / total_pixels
+        var_g = sum((p[1] - avg_g) ** 2 for p in pixels) / total_pixels
+        var_b = sum((p[2] - avg_b) ** 2 for p in pixels) / total_pixels
+        avg_variance = (var_r + var_g + var_b) / 3
+        
+        # Grey mockup: grey color + low variance
+        if is_grey_range and channel_diff < 20 and avg_variance < 500:
+            return True
+        
+        # Also use the standard check
+        return is_grey_or_empty_image(img_bytes)
+        
+    except Exception as e:
+        logger.warning(f"Error checking t-shirt placeholder: {e}")
         return False
 
 
@@ -817,10 +896,14 @@ class ImageDownloader:
             if not img_bytes:
                 continue
                 
-            # Skip grey/empty images for t-shirts
-            if is_tshirt and is_grey_or_empty_image(img_bytes):
-                logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
-                continue
+            # Skip grey/empty images for t-shirts (use stricter check for index 0)
+            if is_tshirt:
+                if idx == 0 and is_likely_tshirt_placeholder(img_bytes):
+                    logger.info(f"Skipping t-shirt placeholder image (index 0) for product {pid}: {url}")
+                    continue
+                elif is_grey_or_empty_image(img_bytes):
+                    logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
+                    continue
             
             # Save to disk
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -914,9 +997,14 @@ class SupabaseStorageUploader:
                 continue
 
             # For t-shirts, check if image is grey/empty and skip it
-            if is_tshirt and is_grey_or_empty_image(img_bytes):
-                logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
-                continue
+            if is_tshirt:
+                # Use stricter check for index 0 (the main mockup)
+                if idx == 0 and is_likely_tshirt_placeholder(img_bytes):
+                    logger.info(f"Skipping t-shirt placeholder image (index 0) for product {pid}: {url}")
+                    continue
+                elif is_grey_or_empty_image(img_bytes):
+                    logger.info(f"Skipping grey/empty image for t-shirt product {pid} (index {idx}): {url}")
+                    continue
 
             # Determine content type
             content_type = mimetypes.guess_type(url)[0] or "image/jpeg"
@@ -994,9 +1082,55 @@ class SupabaseSync:
             return None
         rows = self._get(
             f"products?third_party_product_id=eq.{third_party_id}"
-            f"&third_party_source=eq.{source}&select=id,slug"
+            f"&third_party_source=eq.{source}&select=id,slug,third_party_synced_at,third_party_raw_data"
         )
         return rows[0] if rows else None
+
+    def product_needs_update(self, product: ScrapedProduct, existing: dict) -> bool:
+        """Check if a product needs updating by comparing raw data hashes."""
+        if not existing:
+            return True
+        
+        # Check if third_party_raw_data exists and compare
+        existing_raw = existing.get("third_party_raw_data") or {}
+        existing_hash = existing_raw.get("data_hash")
+        
+        # Calculate current hash
+        current_raw = product.third_party_raw_data or {}
+        raw_data = current_raw.get("raw", {})
+        current_hash = hashlib.md5(
+            json.dumps(raw_data, sort_keys=True).encode()
+        ).hexdigest()
+        
+        # If hashes differ, update needed
+        if existing_hash and existing_hash != current_hash:
+            return True
+        
+        # If no hash stored, check sync age (update if older than 24h)
+        synced_at = existing.get("third_party_synced_at")
+        if synced_at:
+            try:
+                sync_time = datetime.fromisoformat(synced_at.replace("Z", "+00:00"))
+                age_hours = (datetime.now(timezone.utc) - sync_time).total_seconds() / 3600
+                if age_hours > 24:
+                    return True
+            except Exception:
+                pass
+        
+        return False
+
+    def get_all_synced_products(self, source: str = "uma-penca") -> dict:
+        """Get all products from DB for incremental sync comparison."""
+        rows = self._get(
+            f"products?third_party_source=eq.{source}"
+            f"&select=id,third_party_product_id,third_party_synced_at,third_party_raw_data"
+        )
+        result = {}
+        for row in rows:
+            tp_id = row.get("third_party_product_id")
+            if tp_id:
+                result[tp_id] = row
+        return result
 
     def upsert_product(
         self,
@@ -1007,6 +1141,27 @@ class SupabaseSync:
         # Use Supabase Storage URLs if available, otherwise fall back to original URLs
         image = product.supabase_image_urls[0] if product.supabase_image_urls else product.image
         images = product.supabase_image_urls if product.supabase_image_urls else product.images
+
+        # Calculate hash of raw data for change detection
+        raw_data = (product.third_party_raw_data or {}).get("raw", {})
+        data_hash = hashlib.md5(
+            json.dumps(raw_data, sort_keys=True).encode()
+        ).hexdigest()
+        
+        # Update raw_data with hash
+        if product.third_party_raw_data:
+            product.third_party_raw_data["data_hash"] = data_hash
+
+        # Build image index metadata
+        image_index = {
+            "total_images": len(images),
+            "images": []
+        }
+        for idx, img_url in enumerate(images):
+            image_index["images"].append({
+                "index": idx,
+                "url": img_url,
+            })
 
         payload = {
             "name":               product.name,
@@ -1036,6 +1191,11 @@ class SupabaseSync:
             "third_party_source":      product.third_party_source,
             "third_party_synced_at":   datetime.now(timezone.utc).isoformat(),
             "third_party_raw_data":    product.third_party_raw_data,
+            "metadata": {
+                **(product.metadata or {}),
+                "image_index": image_index,
+                "data_hash": data_hash,
+            },
         }
 
         existing = self.existing_product(product.third_party_product_id or "", product.third_party_source)
@@ -1177,6 +1337,34 @@ def run(args) -> SyncResult:
 
     logger.info(f"Converted {len(products)} products")
 
+    # ── 2.5. Incremental sync: detect changed products ────────
+
+    products_to_sync = products
+    skipped_unchanged = 0
+    
+    if not args.full and not args.dry_run and SUPABASE_URL and SUPABASE_KEY:
+        logger.info("Incremental sync mode: checking for changed products...")
+        supabase_check = SupabaseSync(SUPABASE_URL, SUPABASE_KEY, getattr(args, 'subcollection', 'uma-penca') or 'uma-penca')
+        synced_products = supabase_check.get_all_synced_products("uma-penca")
+        
+        changed_products = []
+        for p in products:
+            tp_id = p.third_party_product_id
+            existing = synced_products.get(tp_id)
+            
+            if supabase_check.product_needs_update(p, existing):
+                changed_products.append(p)
+                if existing:
+                    logger.info(f"  Changed: {p.name} (ID: {tp_id})")
+                else:
+                    logger.info(f"  New: {p.name} (ID: {tp_id})")
+            else:
+                skipped_unchanged += 1
+                logger.debug(f"  Unchanged (skipped): {p.name} (ID: {tp_id})")
+        
+        products_to_sync = changed_products
+        logger.info(f"Incremental sync: {len(products_to_sync)} changed/new, {skipped_unchanged} unchanged")
+
     # ── 3. Save raw JSON ─────────────────────────────────────
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1201,12 +1389,13 @@ def run(args) -> SyncResult:
     image_map_storage = {}
     if args.upload_images and SUPABASE_URL and SUPABASE_KEY:
         uploader = SupabaseStorageUploader(SUPABASE_URL, SUPABASE_KEY, STORAGE_BUCKET)
-        logger.info(f"Uploading all images to Supabase Storage bucket: {STORAGE_BUCKET}")
-        image_map_storage = uploader.upload_all(products, client, workers=2)
+        logger.info(f"Uploading images to Supabase Storage bucket: {STORAGE_BUCKET}")
+        # Only upload images for products that need syncing
+        image_map_storage = uploader.upload_all(products_to_sync, client, workers=2)
         result.images_uploaded = uploader.uploaded
 
         # Update product image URLs to point to Supabase Storage
-        for p in products:
+        for p in products_to_sync:
             if p.supabase_image_urls:
                 p.image = p.supabase_image_urls[0]
                 p.images = p.supabase_image_urls
@@ -1244,7 +1433,7 @@ def run(args) -> SyncResult:
         if subcollection_id:
             logger.info(f"  subcollection_id = {subcollection_id}")
 
-        for p in products:
+        for p in products_to_sync:
             result.processed += 1
             try:
                 sr = supabase.upsert_product(p, collection_id, subcollection_id)
@@ -1289,6 +1478,9 @@ def run(args) -> SyncResult:
     print("=" * 52)
     print(f"  Discovered      : {len(raw_products)}")
     print(f"  Converted       : {len(products)}")
+    if skipped_unchanged > 0:
+        print(f"  Skipped unchanged : {skipped_unchanged}")
+        print(f"  To sync           : {len(products_to_sync)}")
     print(f"  Inserted        : {result.inserted}")
     print(f"  Updated         : {result.updated}")
     print(f"  Failed          : {result.failed}")
