@@ -55,7 +55,14 @@ const noOpClient = { auth: noOpAuth, from: noOpFrom, rpc: noOp }
 export const supabase = !isDemo && supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey, {
       global: {
-        fetch: (url, options) => withTimeout(fetch(url, options))
+        fetch: (url, options) => withTimeout(fetch(url, {
+          ...options,
+          headers: {
+            ...options?.headers,
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+          }
+        }))
       }
     })
   : noOpClient

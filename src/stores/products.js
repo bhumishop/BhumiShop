@@ -427,6 +427,10 @@ export const useProductStore = defineStore('products', () => {
     } catch (err) {
       error.value = err.message || t('stores.products.loadError')
       console.error('fetchProducts error:', err)
+      // Fall back to demo mode on error
+      products.value = mockProducts
+      totalCount.value = mockProducts.length
+      invalidateRelatedCache()
     } finally {
       loading.value = false
     }
