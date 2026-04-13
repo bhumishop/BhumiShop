@@ -27,8 +27,8 @@
       >
         <div class="product-card__image-wrap">
           <img
-            v-if="product.image && (product.image.startsWith('data:') || product.image.startsWith('http'))"
-            :src="product.image"
+            v-if="displayImage && (displayImage.startsWith('data:') || displayImage.startsWith('http'))"
+            :src="displayImage"
             :alt="product.name"
             class="product-card__image"
             loading="lazy"
@@ -98,6 +98,18 @@ const cardRef = ref(null)
 
 const isLarge = computed(() => props.size === 'large')
 const isTall = computed(() => props.size === 'tall')
+
+/**
+ * Get the correct display image. For t-shirts, product.image points to
+ * a 000 FULLCOLOR swatch. Replace 000_image with 001_image.
+ */
+const displayImage = computed(() => {
+  let img = props.product.image || ''
+  if (img && img.includes('000_image')) {
+    img = img.replace('000_image', '001_image')
+  }
+  return img
+})
 
 const cartStore = useCartStore()
 const productStore = useProductStore()

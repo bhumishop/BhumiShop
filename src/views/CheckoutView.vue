@@ -41,8 +41,8 @@
           </div>
         </div>
 
-        <!-- Uma Penca Items Group -->
-        <div v-if="cartStore.fulfillmentGroups.uma_penca?.length" class="checkout-page__group">
+        <!-- Uma Penca Items Group (only visible for Brazil users) -->
+        <div v-if="showUmaPencaItems" class="checkout-page__group">
           <div class="checkout-page__group-header checkout-page__group-header--uma-penca">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             <h3 class="checkout-page__group-title checkout-page__group-title--uma-penca">{{ $t('checkout.step1.umaPencaItems') }}</h3>
@@ -175,8 +175,8 @@
         <ShippingCalculator ref="shippingCalcRef" />
       </div>
 
-      <!-- Payment Provider Selection (if has Uma Penca items) -->
-      <div v-if="cartStore.hasUmaPencaItems && !checkoutStore.paymentProvider" class="checkout-page__section">
+      <!-- Payment Provider Selection (if has Uma Penca items and user is in Brazil) -->
+      <div v-if="showUmaPencaItems && !checkoutStore.paymentProvider" class="checkout-page__section">
         <p class="checkout-page__provider-prompt">
           {{ $t('checkout.step3.providerPrompt') }}
         </p>
@@ -189,7 +189,7 @@
       <div v-if="canShowPaymentMethods" class="checkout-page__section">
         <PaymentMethod
           v-model="checkoutStore.paymentMethod"
-          :has-uma-penca-items="cartStore.hasUmaPencaItems"
+          :has-uma-penca-items="showUmaPencaItems"
           :payment-provider="checkoutStore.paymentProvider"
         />
       </div>
@@ -315,7 +315,7 @@
     <!-- Payment Provider Popup -->
     <PaymentProviderPopup
       :show="checkoutStore.showProviderPopup"
-      :has-uma-penca-items="cartStore.hasUmaPencaItems"
+      :has-uma-penca-items="showUmaPencaItems"
       @close="checkoutStore.showProviderPopup = false"
       @select="handleProviderSelect"
     />
@@ -350,6 +350,16 @@ const checkoutStore = useCheckoutStore()
 const orderStore = useOrderStore()
 const toast = useToastStore()
 const authStore = useAuthStore()
+
+// Check if user is in Brazil based on saved location
+const isInBrazil = computed(() => {
+  return authStore.userLocation?.countryCode === 'BR'
+})
+
+// Whether cart has visible UmaPenca items (only shown for Brazil users)
+const showUmaPencaItems = computed(() => {
+  return isInBrazil.value && cartStore.hasUmaPencaItems
+})
 
 const shippingCalcRef = ref(null)
 const addressGuessRef = ref(null)
@@ -449,7 +459,7 @@ watch(customerInfo, (info) => {
 
 // Whether we can show payment methods
 const canShowPaymentMethods = computed(() => {
-  if (cartStore.hasUmaPencaItems) {
+  if (showUmaPencaItems.value) {
     return !!checkoutStore.paymentProvider
   }
   return true
@@ -507,7 +517,7 @@ function goToShippingStep() {
 
   // After step transition, auto-show provider popup if needed
   nextTick(() => {
-    if (cartStore.hasUmaPencaItems && !checkoutStore.paymentProvider) {
+    if (showUmaPencaItems.value && !checkoutStore.paymentProvider) {
       checkoutStore.showProviderPopup = true
     }
   })
@@ -565,8 +575,26 @@ async function renderPixBricks() {
 function handleUmaPencaRedirect() {
   const umaPencaItems = cartStore.items.filter(item => item.fulfillment_type === 'uma_penca')
   const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+
+  // Build cart items payload with product IDs and quantities
+  // Format: cart[items][]=product_id:quantity (common e-commerce pattern)
+  const cartItems = umaPencaItems.map(item => ({
+    id: item.id,
+    quantity: item.quantity,
+    size: item.size || null
+  }))
+
+  // Encode cart data as JSON for the external store to parse
+  const cartData = encodeURIComponent(JSON.stringify(cartItems))
   const productIds = umaPencaItems.map(item => `product=${item.id}`).join('&')
-  window.location.href = `${storeUrl}/checkout?${productIds}&ref=bhumi-shop`
+
+  // Try the cart API endpoint first, fallback to simple product IDs
+  const url = new URL(`${storeUrl}/checkout`)
+  url.searchParams.set('cart_data', cartData)
+  url.searchParams.set('ref', 'bhumi-shop')
+  url.searchParams.set('products', productIds)
+
+  window.location.href = url.toString()
 }
 
 function startPixPolling() {

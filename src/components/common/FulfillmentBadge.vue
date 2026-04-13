@@ -12,6 +12,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   type: {
@@ -33,29 +36,11 @@ const badgeClass = computed(() => {
 })
 
 const labelText = computed(() => {
-  switch (props.type) {
-    case 'uma_penca':
-      return 'UmaPenca'
-    case 'digital':
-      return 'Digital'
-    case 'uiclap':
-      return 'Uiclap'
-    default:
-      return props.type
-  }
+  return t(`fulfillment.${props.type}`, props.type)
 })
 
 const tooltipText = computed(() => {
-  switch (props.type) {
-    case 'uma_penca':
-      return 'Checkout via UmaPenca external store'
-    case 'digital':
-      return 'Digital product - instant delivery'
-    case 'uiclap':
-      return 'Print-on-demand via Uiclap'
-    default:
-      return ''
-  }
+  return t(`fulfillment.${props.type}Tooltip`, '')
 })
 </script>
 

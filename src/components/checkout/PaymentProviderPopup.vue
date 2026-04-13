@@ -13,8 +13,9 @@
         </div>
 
         <div class="provider-popup__cards">
-          <!-- Uma Penca Direct -->
+          <!-- Uma Penca Direct (only for Brazil users) -->
           <button
+            v-if="isInBrazil"
             class="provider-card"
             :class="{ 'provider-card--selected': selected === 'uma_penca' }"
             @click="select('uma_penca')"
@@ -98,10 +99,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '../../stores/auth'
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -111,6 +114,11 @@ const props = defineProps({
 const emit = defineEmits(['close', 'select'])
 
 const selected = ref('')
+
+// Check if user is in Brazil based on saved location
+const isInBrazil = computed(() => {
+  return authStore.userLocation?.countryCode === 'BR'
+})
 
 function select(provider) {
   selected.value = provider

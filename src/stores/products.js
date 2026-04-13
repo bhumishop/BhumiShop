@@ -6,6 +6,19 @@ import { i18n } from '../i18n'
 const PAGE_SIZE = 20
 const t = (key) => i18n.global.t(key)
 
+/**
+ * Normalize category matching to handle singular/plural inconsistencies.
+ * Products may have category='camiseta' while categories table has id='camisetas'.
+ */
+function normalizeCategoryMatch(productCat, categoryId) {
+  if (productCat === categoryId) return true
+  // Strip common suffixes and compare roots
+  const normalize = (s) => s.toLowerCase()
+    .replace(/s$/, '')  // remove trailing 's'
+    .replace(/es$/, 'e') // remove 'es'
+  return normalize(productCat) === normalize(categoryId)
+}
+
 // Mock data for demo mode
 const mockCategories = [
   { id: 1, name: 'Camisetas' },
@@ -126,7 +139,7 @@ export const useProductStore = defineStore('products', () => {
   const getProductsByCategory = computed(() => {
     return (category) => {
       if (category === 'todos' || !category) return products.value
-      return products.value.filter(p => p.category && p.category.toString() === category.toString())
+      return products.value.filter(p => p.category && normalizeCategoryMatch(p.category, category))
     }
   })
 
@@ -197,10 +210,10 @@ export const useProductStore = defineStore('products', () => {
   })
 
   const filteredProducts = computed(() => {
-    let result = products.value
+    let result = products.value.filter(p => p.is_active !== false && p.is_archived !== true)
 
     if (activeCategory.value && activeCategory.value !== 'todos') {
-      result = result.filter(p => p.category && p.category.toString() === activeCategory.value.toString())
+      result = result.filter(p => p.category && normalizeCategoryMatch(p.category, activeCategory.value))
     }
 
     if (searchQuery.value) {
@@ -221,6 +234,39 @@ export const useProductStore = defineStore('products', () => {
   })
 
   const totalPages = computed(() => Math.ceil(filteredProducts.value.length / PAGE_SIZE))
+
+  /** Categories that have at least one active, non-archived product, with product count */
+  const categoriesWithProducts = computed(() => {
+    const counts = {}
+    products.value
+      .filter(p => p.is_active !== false && p.is_archived !== true && p.category)
+      .forEach(p => {
+        // Normalize to match category IDs (try both singular and plural)
+        const cat = p.category
+        categories.value.forEach(c => {
+          if (normalizeCategoryMatch(cat, c.id)) {
+            counts[c.id] = (counts[c.id] || 0) + 1
+          }
+        })
+      })
+
+    return categories.value
+      .filter(c => c.is_active !== false && counts[c.id] > 0)
+      .map(c => ({ ...c, productCount: counts[c.id] || 0 }))
+      .sort((a, b) => a.sort_order - b.sort_order)
+  })
+
+  /** Get product count for a specific category ID */
+  function getCategoryProductCount(catId) {
+    return products.value
+      .filter(p => p.is_active !== false && p.is_archived !== true && p.category && normalizeCategoryMatch(p.category, catId))
+      .length
+  }
+
+  /** Total count of active, non-archived products */
+  const activeProductCount = computed(() =>
+    products.value.filter(p => p.is_active !== false && p.is_archived !== true).length
+  )
 
   const paginatedProducts = computed(() => {
     const start = (currentPage.value - 1) * PAGE_SIZE
@@ -459,6 +505,9 @@ export const useProductStore = defineStore('products', () => {
     getRelatedProducts,
     filteredProducts,
     paginatedProducts,
+    categoriesWithProducts,
+    getCategoryProductCount,
+    activeProductCount,
     fetchProducts,
     fetchCategories,
     addProduct,

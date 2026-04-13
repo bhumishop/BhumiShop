@@ -18,11 +18,12 @@
       <!-- Content overlaid on the pixel canvas (inside image area only) -->
       <div class="product-pixel-card__image-layer" @click="$router.push(`/produtos/${product.id}`)">
         <img
-          v-if="product.image && (product.image.startsWith('data:') || product.image.startsWith('http'))"
-          :src="product.image"
+          v-if="!imageError && displayImage && (displayImage.startsWith('data:') || displayImage.startsWith('http'))"
+          :src="displayImage"
           :alt="product.name"
           class="product-pixel-card__image"
           loading="lazy"
+          @error="handleImageError"
         />
         <div v-else class="product-pixel-card__placeholder">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -141,6 +142,29 @@ const categoryName = computed(() => {
 const isUmaPenca = computed(() => props.product.fulfillment_type === 'uma_penca')
 const isDigital = computed(() => props.product.fulfillment_type === 'digital')
 const isOnDemand = computed(() => props.product.stock === 'print-on-demand')
+
+/**
+ * Get the correct display image for the product.
+ * For t-shirts (Uma Penca), `product.image` points to a 000 FULLCOLOR swatch.
+ * Replace 000_image with 001_image to show the actual tshirt photo.
+ */
+const displayImage = computed(() => {
+  const p = props.product
+  let img = p.image || ''
+  if (!img) return ''
+  // For t-shirts: replace 000_image with 001_image in the URL
+  // This swaps the FULLCOLOR swatch for the actual tshirt photo
+  if (img.includes('000_image')) {
+    img = img.replace('000_image', '001_image')
+  }
+  return img
+})
+
+const imageError = ref(false)
+
+function handleImageError(event) {
+  imageError.value = true
+}
 
 function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')

@@ -1,168 +1,160 @@
 <template>
   <div class="products-page">
-    <!-- Particles background -->
-    <div class="products-page__particles">
-      <Particles
-        :particle-count="150"
-        :particle-spread="10"
-        :speed="0.1"
-        :particle-colors="['#ffffff']"
-        :move-particles-on-hover="false"
-        :particle-hover-factor="1"
-        :alpha-particles="false"
-        :particle-base-size="100"
-        :size-randomness="1"
-        :camera-distance="20"
-        :disable-rotation="false"
-        class="w-full h-full"
-      />
-    </div>
-
     <!-- Page Header -->
-    <div class="products-page__header container">
-      <h1 class="products-page__title">{{ $t('products.title') }}</h1>
-      <p class="products-page__subtitle">Discover our curated collection of handcrafted goods</p>
-    </div>
+    <div class="products-page__header">
+      <div class="products-page__header-inner container">
+        <h1 class="products-page__title">{{ $t('products.title') }}</h1>
+        <p class="products-page__subtitle">{{ $t('products.subtitle') || 'Browse our collection' }}</p>
 
-    <div class="products-page__layout container">
-      <!-- Sidebar Filters -->
-      <aside class="products-page__sidebar">
-        <div class="filter-group">
-          <div class="filter-group__header">
-            <h3 class="filter-group__title">{{ $t('products.categories') }}</h3>
-            <button
-              v-if="activeCategory"
-              class="filter-group__clear"
-              @click="setCategory('')"
-            >
-              Clear
-            </button>
-          </div>
-
+        <!-- Category pills -->
+        <div class="products-page__categories" ref="categoriesRef">
           <button
-            :class="['filter-group__item', { 'filter-group__item--active': activeCategory === '' }]"
+            :class="['products-page__pill', { 'products-page__pill--active': activeCategory === '' }]"
             @click="setCategory('')"
           >
-            <span class="filter-group__icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-              </svg>
-            </span>
-            {{ $t('products.all') }}
-            <span class="filter-group__count">{{ productStore.products.length }}</span>
+            All
+            <span class="products-page__pill-count">{{ productStore.activeProductCount }}</span>
           </button>
-
           <button
-            v-for="cat in productStore.categories"
+            v-for="cat in productStore.categoriesWithProducts"
             :key="cat.id"
-            :class="['filter-group__item', { 'filter-group__item--active': activeCategory === cat.id }]"
+            :class="['products-page__pill', { 'products-page__pill--active': activeCategory === cat.id }]"
             @click="setCategory(cat.id)"
           >
-            <span class="filter-group__icon">{{ getCategoryIcon(cat.name) }}</span>
+            <span v-if="cat.icon" class="products-page__pill-icon">{{ cat.icon }}</span>
             {{ cat.name }}
-            <span class="filter-group__count">{{ getCategoryCount(cat.id) }}</span>
+            <span class="products-page__pill-count">{{ cat.productCount }}</span>
           </button>
         </div>
-
-        <!-- Price Range Filter -->
-        <div class="filter-group filter-group--price">
-          <div class="filter-group__header">
-            <h3 class="filter-group__title">Price Range</h3>
-            <span class="filter-group__price-value">R$ {{ maxPrice }}</span>
-          </div>
-          <div class="price-slider-wrapper">
-            <ElasticSlider
-              :default-value="maxPriceLimit"
-              :starting-value="0"
-              :max-value="maxPriceLimit"
-              :is-stepped="true"
-              :step-size="5"
-              class-name="price-elastic-slider"
-              @change="onPriceChange"
-            />
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main Content -->
-      <div class="products-page__main">
-        <div class="products-page__toolbar">
-          <p class="products-page__count">
-            <span class="products-page__count-number">{{ productStore.filteredProducts.length }}</span>
-            <span class="products-page__count-label">{{ $t('products.productCount', { count: productStore.filteredProducts.length }) }}</span>
-          </p>
-        </div>
-
-        <ProductGrid
-          :products="productStore.paginatedProducts"
-          :loading="productStore.loading"
-          :current-page="productStore.currentPage"
-          :total-pages="productStore.totalPages"
-          @update:current-page="productStore.setPage"
-        />
       </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="products-page__main container">
+      <!-- Toolbar -->
+      <div class="products-page__toolbar">
+        <p class="products-page__count">
+          <span class="products-page__count-number">{{ productStore.filteredProducts.length }}</span>
+          <span class="products-page__count-label">{{ $t('products.productCount', { count: productStore.filteredProducts.length }) }}</span>
+        </p>
+
+        <!-- Sort dropdown -->
+        <div class="products-page__sort">
+          <select v-model="sortBy" class="products-page__sort-select">
+            <option value="newest">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div v-if="productStore.loading" class="products-page__skeleton">
+        <div v-for="i in 8" :key="i" class="products-page__skeleton-card">
+          <div class="products-page__skeleton-img"></div>
+          <div class="products-page__skeleton-text" style="width: 80%;"></div>
+          <div class="products-page__skeleton-text" style="width: 40%;"></div>
+        </div>
+      </div>
+
+      <div v-else-if="sortedProducts.length === 0" class="products-page__empty">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+          <line x1="9" y1="9" x2="9.01" y2="9"/>
+          <line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+        <p>No products found</p>
+      </div>
+
+      <div v-else class="products-page__grid">
+        <TransitionGroup name="product-fade" tag="div">
+          <ProductPixelCard
+            v-for="product in paginatedSortedProducts"
+            :key="product.id"
+            :product="product"
+          />
+        </TransitionGroup>
+      </div>
+
+      <!-- Pagination -->
+      <BasePagination
+        v-if="totalPages > 1"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        @update:current-page="setPage"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useProductStore } from '../stores/products'
-import ProductGrid from '../components/product/ProductGrid.vue'
-import ElasticSlider from '../components/common/ElasticSlider.vue'
-import Particles from '../components/common/Particles.vue'
+import ProductPixelCard from '../components/common/ProductPixelCard.vue'
+import BasePagination from '../components/common/BasePagination.vue'
 
 const route = useRoute()
+const router = useRouter()
 const productStore = useProductStore()
 const activeCategory = ref('')
+const sortBy = ref('newest')
+const categoriesRef = ref(null)
+const currentPage = ref(1)
 
-// Price filter - compute max from actual products
-const maxPriceLimit = computed(() => {
-  const prices = productStore.products.map(p => p.price || 0)
-  if (!prices.length) return 500
-  const max = Math.max(...prices)
-  return Math.ceil(max / 50) * 50
+// Sorted products
+const sortedProducts = computed(() => {
+  const products = [...productStore.filteredProducts]
+  switch (sortBy.value) {
+    case 'price-asc':
+      return products.sort((a, b) => (a.price || 0) - (b.price || 0))
+    case 'price-desc':
+      return products.sort((a, b) => (b.price || 0) - (a.price || 0))
+    case 'name-asc':
+      return products.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    case 'newest':
+    default:
+      return products.sort((a, b) => b.id - a.id)
+  }
 })
 
-const maxPriceValue = ref(500)
-const maxPrice = computed(() => maxPriceValue.value.toFixed(2).replace('.', ','))
+// Paginated sorted products
+const PAGE_SIZE = 20
+const totalPages = computed(() => Math.ceil(sortedProducts.value.length / PAGE_SIZE))
+const paginatedSortedProducts = computed(() => {
+  const start = (currentPage.value - 1) * PAGE_SIZE
+  return sortedProducts.value.slice(start, start + PAGE_SIZE)
+})
 
-function onPriceChange(value) {
-  maxPriceValue.value = Math.round(value)
-  productStore.setMaxPrice(maxPriceValue.value)
+function setPage(page) {
+  currentPage.value = Math.max(1, Math.min(page, totalPages.value))
 }
-
-// Precompute category counts to avoid O(n*m) in template loops
-const categoryCounts = computed(() => {
-  const counts = {}
-  productStore.categories.forEach(cat => {
-    counts[cat.id] = productStore.products.filter(p => p.category === cat.id).length
-  })
-  return counts
-})
 
 function getCategoryIcon(name) {
   const icons = {
-    'Camisetas': '👕',
-    'Acessórios': '🎒',
-    'Arte': '🎨',
-    'Canecas': '☕',
-    'Bags': '👜'
+    'Camisetas': '\U0001f455',
+    'Acess\xf3rios': '\U0001f392',
+    'Arte': '\U0001f3a8',
+    'Canecas': '\u2615',
+    'Bags': '\U0001f45c'
   }
-  return icons[name] || '📦'
-}
-
-function getCategoryCount(catId) {
-  return categoryCounts.value[catId] || 0
+  return icons[name] || '\U0001f4e6'
 }
 
 function setCategory(catId) {
   activeCategory.value = catId
   productStore.setActiveCategory(catId)
+  currentPage.value = 1
+  // Update URL
+  if (catId) {
+    router.replace({ query: { ...route.query, category: catId } })
+  } else {
+    const newQuery = { ...route.query }
+    delete newQuery.category
+    router.replace({ query: newQuery })
+  }
 }
 
 // Cleanup route watcher on unmount
@@ -173,14 +165,6 @@ onMounted(async () => {
     productStore.fetchCategories()
   ])
 
-  // Set initial max price from products
-  if (productStore.products.length) {
-    const prices = productStore.products.map(p => p.price || 0)
-    const maxP = Math.ceil(Math.max(...prices) / 50) * 50
-    maxPriceValue.value = maxP
-    productStore.setMaxPrice(maxP)
-  }
-
   if (route.query.category) {
     activeCategory.value = route.query.category
     productStore.setActiveCategory(route.query.category)
@@ -190,15 +174,11 @@ onMounted(async () => {
     if (val) {
       activeCategory.value = val
       productStore.setActiveCategory(val)
+    } else {
+      activeCategory.value = ''
+      productStore.setActiveCategory('')
     }
-  })
-
-  // Watch maxPriceLimit for reactive updates
-  watch(maxPriceLimit, (newLimit) => {
-    if (maxPriceValue.value > newLimit) {
-      maxPriceValue.value = newLimit
-      productStore.setMaxPrice(newLimit)
-    }
+    currentPage.value = 1
   })
 })
 
@@ -209,182 +189,112 @@ onUnmounted(() => {
 
 <style scoped>
 .products-page {
-  padding: clamp(2rem, 4vh, 3rem) 0 clamp(3rem, 6vh, 5rem);
-  background: var(--surface-1);
   min-height: 100vh;
-  position: relative;
-  overflow: hidden;
+  background: var(--surface-1);
 }
 
-.products-page__particles {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-
+/* ===== Header ===== */
 .products-page__header {
-  margin-bottom: clamp(2rem, 4vh, 3rem);
-  position: relative;
-  z-index: 1;
+  padding: clamp(2rem, 5vh, 3rem) 0 clamp(1.5rem, 3vh, 2rem);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
 }
 
 .products-page__title {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
-  margin-bottom: 8px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.1;
 }
 
 .products-page__subtitle {
-  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   color: var(--text-secondary);
+  margin: 0 0 1.5rem;
 }
 
-.products-page__layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 32px;
-  position: relative;
-  z-index: 1;
+/* ===== Category Pills ===== */
+.products-page__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-/* Sidebar */
-.products-page__sidebar {
-  position: sticky;
-  top: calc(var(--header-height) + 24px);
-  height: fit-content;
+.products-page__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
   background: var(--surface-0);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  border: 1px solid rgba(63, 63, 70, 0.5);
-}
-
-.filter-group__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.filter-group__title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-}
-
-.filter-group__clear {
-  font-size: 0.75rem;
-  color: var(--accent);
-  transition: opacity 0.2s ease;
-}
-
-.filter-group__clear:hover {
-  opacity: 0.8;
-}
-
-.filter-group--price {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.filter-group__price-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  transition: color 0.2s ease;
-}
-
-/* ===== Price Elastic Slider ===== */
-.price-slider-wrapper {
-  padding-top: 4px;
-}
-
-.price-slider-wrapper :deep(.elastic-slider__bar) {
-  background: var(--surface-3);
-}
-
-.price-slider-wrapper :deep(.elastic-slider__bar-fill) {
-  background: var(--accent);
-}
-
-.price-slider-wrapper :deep(.elastic-slider__value) {
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 0.7rem;
-}
-
-.filter-group__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: var(--text-secondary);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.filter-group__icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.filter-group__count {
-  margin-left: auto;
-  font-size: 0.7rem;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  background: var(--surface-2);
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.filter-group__item:hover {
+.products-page__pill:hover {
   background: var(--surface-2);
   color: var(--text-primary);
+  border-color: var(--text-muted);
 }
 
-.filter-group__item--active {
-  background: var(--accent-light);
-  color: var(--accent);
-  font-weight: 600;
+.products-page__pill--active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 
-.filter-group__item--active .filter-group__count {
-  background: rgba(139, 92, 246, 0.2);
-  color: var(--accent);
+.products-page__pill--active:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  opacity: 0.9;
 }
 
-/* Main Content */
+.products-page__pill-icon {
+  font-size: 1rem;
+}
+
+.products-page__pill-count {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 0.1rem 0.45rem;
+  border-radius: 100px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.products-page__pill--active .products-page__pill-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ===== Main Content ===== */
+.products-page__main {
+  padding: clamp(1rem, 2vh, 1.5rem) clamp(1rem, 3vw, 1.5rem) clamp(2.5rem, 6vh, 4rem);
+}
+
+/* ===== Toolbar ===== */
 .products-page__toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 16px 20px;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
   background: var(--surface-0);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(63, 63, 70, 0.5);
+  border: 1px solid var(--border);
 }
 
 .products-page__count {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .products-page__count-number {
@@ -399,49 +309,159 @@ onUnmounted(() => {
   color: var(--text-muted);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .products-page__layout {
-    grid-template-columns: 240px 1fr;
-    gap: 24px;
+.products-page__sort-select {
+  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  transition: border-color 0.2s ease;
+}
+
+.products-page__sort-select:hover {
+  border-color: var(--text-muted);
+}
+
+.products-page__sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+/* ===== Grid ===== */
+.products-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* ===== Skeleton ===== */
+.products-page__skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.products-page__skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-0);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.products-page__skeleton-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.products-page__skeleton-text {
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== Empty ===== */
+.products-page__empty {
+  text-align: center;
+  padding: clamp(3rem, 10vh, 5rem) clamp(1rem, 3vw, 1.5rem);
+  color: var(--text-muted);
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.875rem, 2vw, 1.25rem);
+}
+
+.products-page__empty svg {
+  opacity: 0.3;
+}
+
+/* ===== Transitions ===== */
+.product-fade-enter-active {
+  transition: all 0.3s ease;
+}
+
+.product-fade-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .products-page__categories {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .products-page__pill {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .products-page__toolbar {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .products-page__sort-select {
+    width: 100%;
+  }
+
+  .products-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  .products-page__skeleton {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: clamp(0.75rem, 2vw, 1rem);
   }
 }
 
-@media (max-width: 768px) {
-  .products-page__layout {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .products-page__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
-  .products-page__sidebar {
-    position: static;
-    padding: 16px;
+  .products-page__skeleton {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .products-page__skeleton-img,
+  .products-page__skeleton-text {
+    animation: none;
   }
 
-  .filter-group {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 8px;
-  }
-
-  .filter-group__header {
-    display: none;
-  }
-
-  .filter-group__title {
-    display: none;
-  }
-
-  .filter-group__item {
-    white-space: nowrap;
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    padding: 8px 16px;
-    font-size: 0.8rem;
-  }
-
-  .filter-group__count {
-    display: none;
+  .product-fade-enter-active {
+    transition: none;
   }
 }
 </style>

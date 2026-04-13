@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "สินค้า",
+    "subtitle": "ค้นพบคอลเลกชันสินค้าทำมือของเรา",
     "categories": "หมวดหมู่",
     "allCategories": "หมวดหมู่ทั้งหมด",
     "all": "ทั้งหมด",
@@ -140,7 +141,9 @@
     "remove": "ลบออก",
     "total": "รวม",
     "clearCart": "ล้างรถเข็น",
-    "cartCount": "รถเข็น ({count})"
+    "cartCount": "รถเข็น ({count})",
+    "subtotal": "ยอดรวมย่อย",
+    "umaPencaNote": "สินค้า UmaPenca จะชำระเงินในร้านแยกต่างหาก"
   },
   "checkout": {
     "title": "ชำระเงิน",
@@ -487,5 +490,13 @@
     "card": "Card",
     "upi": "UPI",
     "alipay": "Alipay"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "ดิจิทัล",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "ชำระเงินผ่านร้านค้าภายนอก UmaPenca",
+    "digitalTooltip": "ผลิตภัณฑ์ดิจิทัล - จัดส่งทันที",
+    "uiclapTooltip": "พิมพ์ตามคำสั่งซื้อผ่าน Uiclap"
   }
 }

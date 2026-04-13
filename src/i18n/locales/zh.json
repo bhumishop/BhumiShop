@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "产品",
+    "subtitle": "探索我们的手工 curated 系列",
     "categories": "分类",
     "allCategories": "所有分类",
     "all": "全部",
@@ -149,7 +150,9 @@
     "remove": "移除",
     "total": "总计",
     "clearCart": "清空购物车",
-    "cartCount": "购物车 ({count})"
+    "cartCount": "购物车 ({count})",
+    "subtotal": "小计",
+    "umaPencaNote": "UmaPenca商品在单独的商店结算"
   },
   "checkout": {
     "title": "结算",
@@ -491,5 +494,13 @@
     "card": "银行卡",
     "upi": "UPI",
     "alipay": "支付宝"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "数字",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "通过UmaPenca外部商店结算",
+    "digitalTooltip": "数字产品 - 即时交付",
+    "uiclapTooltip": "通过Uiclap按需打印"
   }
 }

@@ -56,6 +56,7 @@
   },
   "products": {
     "title": "Products",
+    "subtitle": "Discover our curated collection of handcrafted goods",
     "categories": "Categories",
     "allCategories": "All categories",
     "all": "All",
@@ -463,6 +464,14 @@
     "card": "Card",
     "upi": "UPI",
     "alipay": "Alipay"
+  },
+  "fulfillment": {
+    "uma_penca": "UmaPenca",
+    "digital": "Digital",
+    "uiclap": "Uiclap",
+    "uma_pencaTooltip": "Checkout via UmaPenca external store",
+    "digitalTooltip": "Digital product - instant delivery",
+    "uiclapTooltip": "Print-on-demand via Uiclap"
   },
   "stores": {
     "products": {

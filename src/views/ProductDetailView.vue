@@ -24,9 +24,6 @@
           <BaseBadge :variant="isUmaPenca ? 'accent' : isDigital ? 'success' : 'default'" size="sm">
             {{ categoryBadgeLabel }}
           </BaseBadge>
-          <BaseBadge v-if="isUmaPenca" variant="accent" size="xs">
-            {{ $t('productCard.badges.umaPenca') }}
-          </BaseBadge>
           <BaseBadge v-if="isDigital" variant="success" size="xs">
             {{ $t('productCard.badges.digital') }}
           </BaseBadge>
@@ -56,7 +53,7 @@
 
         <!-- Size table (camisetas) -->
         <ProductSizeTable
-          v-if="product.sizes && product.sizes.length"
+          v-if="isCamiseta"
           :product-category="product.category"
           :product-type="product.type || ''"
           :category-name="categoryName"
@@ -621,9 +618,16 @@ const relatedProducts = computed(() => {
     const variation = ((p.id * 13) % 60) - 30
     height += variation
 
+    // Get the correct display image: for t-shirts, product.image points to
+    // a 000 FULLCOLOR swatch. Replace 000_image with 001_image in the URL.
+    let displayImg = p.image || ''
+    if (displayImg && displayImg.includes('000_image')) {
+      displayImg = displayImg.replace('000_image', '001_image')
+    }
+
     return {
       id: String(p.id),
-      img: p.image || '',
+      img: displayImg,
       url: `/produtos/${p.id}`,
       name: p.name || '',
       price: p.price || 0,
