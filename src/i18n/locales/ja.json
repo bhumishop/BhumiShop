@@ -40,10 +40,17 @@
     "menu": "メニュー"
   },
   "home": {
+    "heroEyebrow": "バーチャルストア",
+    "heroTitlePre": "意味のある製品",
     "heroTitle1": "目的を持った",
     "heroTitle2": "アート",
-    "heroSubtitle": "Bhumisparsha Schoolのユニークな製品を見つけましょう -- 本、アートなど。",
+    "heroSubtitle": "歴史、芸術、目的を備えたユニークな作品。すべてのアイテムはBhumisparshaコミュニティの創造性の表現です。",
+    "heroTimestamp": "2026",
     "viewProducts": "製品を見る",
+    "explore": "探索",
+    "statProducts": "製品",
+    "statCategories": "カテゴリー",
+    "statHandcrafted": "ハンドメイド",
     "categories": "カテゴリー",
     "highlights": "おすすめ"
   },
@@ -74,7 +81,44 @@
     "selectSize": "サイズを選択してください。",
     "addedToCart": "{name} をカートに追加しました！",
     "relatedItems": "関連商品",
-    "relatedSubtitle": "お好みの類似商品を見つける"
+    "relatedSubtitle": "お好みの類似商品を見つける",
+    "productDetails": "製品の詳細",
+    "careInstructions": "Tシャツのお手入れ方法",
+    "specifications": "仕様",
+    "weight": "重量",
+    "dimensions": "寸法",
+    "fulfillment": "フルフィルメント",
+    "ownFulfillment": "自社",
+    "digitalDelivery": "デジタル配信",
+    "showSizeTable": "サイズ表",
+    "hideSizeTable": "サイズ表を閉じる",
+    "sizeTableTitle": "採寸",
+    "sizeTableSize": "サイズ",
+    "sizeTableShrink": "この製品は初めての洗濯後最大5%収縮する可能性があります",
+    "sizeTableVariation": "手作り裁断のため、採寸が最大3cm異なる場合があります。",
+    "sizeDiagram": {
+      "comprimento": "着丈",
+      "largura": "身幅",
+      "manga": "袖丈",
+      "quadril": "ヒップ",
+      "idade": "年齢"
+    },
+    "sizeTabNormal": "大人",
+    "sizeTabBaby": "ベビー",
+    "sizeTableBabyDesc": "ベビー/子供用Tシャツの概算寸法。メーカーにより異なる場合があります。",
+    "defaultCamisetaMaterial": "100%天然持続可能綿繊維で作られたTシャツ。",
+    "defaultCamisetaPrint": "デジタルプリントでプリント",
+    "defaultCamisetaVegan": "PETA Cruelty Free認証のビーガン製品",
+    "defaultCanecaMaterial": "マグカップは陶器製で、お好きな飲み物を325ml収納できます。プリントは熱転写で行われ、上記写真の色の忠実性を保証します。",
+    "defaultCanecaPrint": "熱転写プリント",
+    "defaultCanecaMicrowave": "電子レンジで使用可能",
+    "defaultCanecaDishwasher": "食器洗い機は避けてください",
+    "defaultLivroPages": "ページ数：",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "高品質の用紙に印刷",
+    "defaultCarePassInside": "裏返しでアイロン：プリントの上に直接アイロンをかけないでください。Tシャツを裏返しにして、中温または低温でアイロンをかけてください。",
+    "defaultCareProtectiveCloth": "保護布を使用：プリント側でアイロンをかける必要がある場合は、綿布を上に置いてアイロンとプリントの直接接触を避けてください。",
+    "defaultCareAvoidSteam": "直接スチームを避ける：スチームが多すぎるとプリントが傷む可能性があるため、注意して使用するか、ドライアイロンを選択してください。"
   },
   "productCard": {
     "add": "追加",
@@ -91,7 +135,8 @@
   },
   "productVariants": {
     "size": "サイズ",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "カラー"
   },
   "cart": {
     "title": "カート",

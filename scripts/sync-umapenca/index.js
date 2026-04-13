@@ -197,11 +197,107 @@ function getSampleProducts() {
 }
 
 /**
+ * Extract the image sequence number from the URL
+ * Examples:
+ * - 000_image.jpg -> 0
+ * - 001_image.jpg -> 1
+ * - 003_image.jpg -> 3
+ * - 012_image.png -> 12
+ */
+function extractImageNumber(url) {
+  if (!url) return null;
+  const match = url.match(/\/(\d+)_image\./i);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * Check if an image is a FULLCOLOR swatch based on its sequence number
+ * FULLCOLOR images are at positions: 0, 3, 6, 9, 12, 15... (every 3rd starting from 0)
+ */
+function isFullColorImage(url, index) {
+  const imgNum = extractImageNumber(url);
+  
+  // If we can extract the number, use it for accurate detection
+  if (imgNum !== null) {
+    return imgNum % 3 === 0;
+  }
+  
+  // Fallback to URL keyword detection
+  if (url && (
+    url.toLowerCase().includes('fullcolor') ||
+    url.toLowerCase().includes('full_image') ||
+    url.toLowerCase().includes('colorfull')
+  )) {
+    return true;
+  }
+  
+  // Last resort: use array index (less reliable)
+  return index % 3 === 0;
+}
+
+/**
+ * Parse image URLs from UmaPenca product and separate color swatches from tshirt images.
+ *
+ * Image naming convention in Supabase bucket:
+ * - NNN_image.jpg where NNN is sequential (000, 001, 002, ...)
+ * - FULLCOLOR images: 000, 003, 006, 009, 012... (every 3rd starting from 0) - solid color swatches
+ * - TSHIRT images: follow each FULLCOLOR - real product images (001, 002, 004, 005, 007, 008...)
+ * - BABY-LOOK images: may follow tshirt images (not always present)
+ *
+ * Example pattern:
+ * - 000 = BLACK_FULLCOLOR (swatch) - SKIP from gallery
+ * - 001 = BLACK TSHIRT NORMAL - SHOW in gallery
+ * - 002 = BLACK TSHIRT BABY-LOOK - SHOW in gallery
+ * - 003 = BLUE_FULLCOLOR (swatch) - SKIP from gallery
+ * - 004 = BLUE TSHIRT NORMAL - SHOW in gallery
+ * - 005 = BLUE TSHIRT BABY-LOOK - SHOW in gallery
+ * - 006 = YELLOW_FULLCOLOR (swatch) - SKIP from gallery
+ * - 007 = YELLOW TSHIRT NORMAL - SHOW in gallery
+ * - 008 = YELLOW TSHIRT BABY-LOOK - SHOW in gallery
+ * - 009 = RED_FULLCOLOR (swatch) - SKIP from gallery
+ * - 010 = RED TSHIRT NORMAL (NO baby look!) - SHOW in gallery
+ * - 012 = GREEN_FULLCOLOR (swatch) - SKIP from gallery
+ *
+ * This function separates them so:
+ * - color_swatches array contains the FULLCOLOR image URLs (000, 003, 006, 009, 012...)
+ * - images array contains only real tshirt images (001, 002, 004, 005, 007, 008, 010...)
+ */
+function parseProductImages(externalProduct) {
+  const rawImages = Array.isArray(externalProduct.images) ? externalProduct.images : [];
+  const colorSwatches = [];
+  const tshirtImages = [];
+
+  if (rawImages.length === 0) {
+    // Fallback to single image if available
+    if (externalProduct.image || externalProduct.thumbnail) {
+      return { colorSwatches: [], images: [externalProduct.image || externalProduct.thumbnail] };
+    }
+    return { colorSwatches: [], images: [] };
+  }
+
+  // Process each image: check if it's a FULLCOLOR swatch or a tshirt image
+  rawImages.forEach((imageUrl, index) => {
+    const isFullColor = isFullColorImage(imageUrl, index);
+    
+    if (isFullColor) {
+      colorSwatches.push(imageUrl);
+    } else {
+      tshirtImages.push(imageUrl);
+    }
+  });
+
+  return { colorSwatches, images: tshirtImages };
+}
+
+/**
  * Transform scraped product data into BhumiShop format
  */
 function transformProduct(externalProduct) {
   const name = externalProduct.name || externalProduct.title || 'Unnamed Product';
   const slug = slugify(name) || `product-${externalProduct.id}`;
+
+  // Parse and separate color swatches from tshirt images
+  const { colorSwatches, images } = parseProductImages(externalProduct);
 
   return {
     name,
@@ -219,7 +315,8 @@ function transformProduct(externalProduct) {
     weight: parseWeight(externalProduct.weight),
     dimensions: externalProduct.dimensions || null,
     image: externalProduct.image || externalProduct.thumbnail || null,
-    images: Array.isArray(externalProduct.images) ? externalProduct.images : [],
+    images: images, // Only real tshirt images (normal + baby look)
+    color_swatches: colorSwatches, // Separate array for color swatch images
     shipping_zones: Array.isArray(externalProduct.shipping_zones) ? externalProduct.shipping_zones : ['BR'],
     is_active: externalProduct.is_active !== false,
     // Third-party tracking

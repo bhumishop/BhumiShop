@@ -1,63 +1,96 @@
 <template>
-  <div class="mandala" v-if="relatedProducts.length > 0">
-    <h3 class="mandala__title">{{ $t('productDetail.relatedItems') }}</h3>
-    <p class="mandala__subtitle">{{ $t('productDetail.relatedSubtitle') }}</p>
+  <div v-if="relatedProducts.length > 0" class="flower-related" ref="flowerRoot">
+    <!-- Outer glow ring -->
+    <div class="flower-related__glow-ring"></div>
 
-    <div class="mandala__flower" ref="flowerRef">
-      <!-- Center: current product -->
-      <div class="mandala__center">
-        <div class="mandala__center-inner">
-          <img
-            v-if="currentProductImage"
-            :src="currentProductImage"
-            :alt="productName"
-            class="mandala__center-img"
-          />
-          <span v-else class="mandala__center-placeholder">{{ productName?.charAt(0) || '?' }}</span>
-        </div>
-        <div class="mandala__center-label">{{ productName }}</div>
-      </div>
-
-      <!-- Petals: related products -->
+    <!-- Decorative background petals - subtle layer -->
+    <div class="flower-related__bg-petals">
       <div
-        v-for="(product, index) in displayedProducts"
-        :key="product.id"
-        class="mandala__petal-wrapper"
-        :style="getPetalPosition(index, displayedProducts.length)"
-      >
-        <router-link
-          :to="`/produtos/${product.id}`"
-          class="mandala__petal"
-          :title="product.name"
-        >
-          <img
-            v-if="product.image && (product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('/'))"
-            :src="product.image"
-            :alt="product.name"
-            class="mandala__petal-img"
-          />
-          <span v-else class="mandala__petal-placeholder">{{ product.name?.charAt(0) || '?' }}</span>
-          <div class="mandala__petal-overlay">
-            <span class="mandala__petal-name">{{ product.name }}</span>
-            <span class="mandala__petal-price">R$ {{ formatPrice(product.price) }}</span>
-          </div>
-        </router-link>
+        v-for="i in 16"
+        :key="'bg-' + i"
+        class="flower-related__bg-petal"
+        :style="`--petal-idx: ${i}`"
+      ></div>
+    </div>
+
+    <!-- Spinning dust particles -->
+    <div class="flower-related__particles">
+      <div
+        v-for="i in 6"
+        :key="'particle-' + i"
+        class="flower-related__particle"
+        :style="`--particle-idx: ${i}`"
+      ></div>
+    </div>
+
+    <!-- Inner ring decoration -->
+    <div class="flower-related__inner-ring"></div>
+
+    <!-- Center: current product -->
+    <div class="flower-related__center">
+      <div class="flower-related__center-pulse"></div>
+      <div class="flower-related__center-ring"></div>
+      <div class="flower-related__center-inner">
+        <img
+          v-if="currentProductImage"
+          :src="currentProductImage"
+          :alt="productName"
+          class="flower-related__center-img"
+          loading="lazy"
+        />
+        <span v-else class="flower-related__center-placeholder">{{ productName?.charAt(0) || '?' }}</span>
       </div>
     </div>
+
+    <!-- Petals: related products in layered flower arrangement -->
+    <div
+      v-for="(prod, index) in displayedProducts"
+      :key="prod.id"
+      class="flower-related__petal"
+      :style="getPetalStyle(index, displayedProducts.length)"
+      :class="{ 'flower-related__petal--outer': index >= 6 }"
+    >
+      <router-link
+        :to="`/produtos/${prod.id}`"
+        class="flower-related__petal-link"
+        :title="prod.name"
+      >
+        <div class="flower-related__petal-shape">
+          <!-- Petal shape overlay for depth -->
+          <div class="flower-related__petal-highlight"></div>
+          <img
+            v-if="prod.image && (prod.image.startsWith('data:') || prod.image.startsWith('http') || prod.image.startsWith('/'))"
+            :src="prod.image"
+            :alt="prod.name"
+            class="flower-related__petal-img"
+            loading="lazy"
+          />
+          <span v-else class="flower-related__petal-placeholder">{{ prod.name?.charAt(0) || '?' }}</span>
+          <div class="flower-related__petal-overlay"></div>
+        </div>
+        <!-- Tooltip on hover -->
+        <div class="flower-related__petal-tooltip">
+          <span class="flower-related__petal-name">{{ prod.name }}</span>
+          <span class="flower-related__petal-price">R$ {{ formatPrice(prod.price) }}</span>
+        </div>
+      </router-link>
+    </div>
+
+    <!-- Decorative stem line -->
+    <div class="flower-related__stem"></div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   currentProduct: { type: Object, required: true },
   relatedProducts: { type: Array, default: () => [] }
 })
 
-const { t } = useI18n()
-const flowerRef = ref(null)
+const flowerRoot = ref(null)
+const isBloomed = ref(false)
 
 const displayedProducts = computed(() => props.relatedProducts.slice(0, 8))
 
@@ -71,16 +104,33 @@ const currentProductImage = computed(() => {
 
 const productName = computed(() => props.currentProduct?.name || '')
 
-function getPetalPosition(index, total) {
-  const angle = (360 / total) * index - 90
-  const radius = window.innerWidth < 768 ? 120 : 150
+// Calculate petal positions with 2-layer flower arrangement
+function getPetalStyle(index, total) {
+  // Inner layer: 6 petals in hexagonal arrangement
+  // Outer layer: remaining petals (if any)
+  const isOuterLayer = index >= 6
+  const layerIndex = isOuterLayer ? index - 6 : index
+  const layerTotal = isOuterLayer ? Math.max(total - 6, 0) : Math.min(total, 6)
+
+  // Different radius for each layer
+  const baseRadius = isOuterLayer ? 1.35 : 1
+  const angleOffset = isOuterLayer ? (360 / layerTotal) / 2 : 0 // Offset outer layer by half
+  const angle = (360 / layerTotal) * layerIndex + angleOffset
   const radian = (angle * Math.PI) / 180
-  const x = Math.cos(radian) * radius
-  const y = Math.sin(radian) * radius
+
+  // Add slight random-looking offset based on index for organic feel
+  const organicOffsetX = Math.sin(index * 2.5) * 4
+  const organicOffsetY = Math.cos(index * 3.2) * 4
 
   return {
-    transform: `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`,
-    '--petal-angle': `${angle}deg`
+    '--flower-angle': `${angle}deg`,
+    '--flower-x': `${Math.cos(radian) * baseRadius}px`,
+    '--flower-y': `${Math.sin(radian) * baseRadius}px`,
+    '--flower-index': index,
+    '--flower-layer': isOuterLayer ? '1' : '0',
+    '--organic-x': `${organicOffsetX}px`,
+    '--organic-y': `${organicOffsetY}px`,
+    '--bloom-delay': `${index * 0.08}s`
   }
 }
 
@@ -88,238 +138,612 @@ function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')
 }
 
+// Trigger bloom animation on mount
 onMounted(() => {
-  // Recalculate positions on resize
-  window.addEventListener('resize', () => {
-    if (flowerRef.value) {
-      flowerRef.value.querySelectorAll('.mandala__petal-wrapper').forEach((el, index) => {
-        Object.assign(el.style, getPetalPosition(index, displayedProducts.value.length))
-      })
+  setTimeout(() => {
+    isBloomed.value = true
+    if (flowerRoot.value) {
+      flowerRoot.value.classList.add('flower-related--bloomed')
     }
-  })
+  }, 100)
 })
 </script>
 
 <style scoped>
-.mandala {
-  margin-top: clamp(2rem, 5vh, 3rem);
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  background: var(--surface-1);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  text-align: center;
-}
+.flower-related {
+  --flower-radius: 105px;
+  --flower-radius-outer: 142px;
+  --flower-petal-size: 48px;
+  --flower-petal-size-outer: 42px;
+  --flower-center-size: 62px;
+  --petal-bloom-scale: 0;
 
-.mandala__title {
-  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
-  font-weight: 700;
-  margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
-  letter-spacing: -0.01em;
-}
-
-.mandala__subtitle {
-  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
-  color: var(--text-muted);
-  margin-bottom: clamp(1.5rem, 3vh, 2rem);
-}
-
-.mandala__flower {
   position: relative;
-  width: clamp(280px, 50vw, 380px);
-  height: clamp(280px, 50vw, 380px);
-  margin: 0 auto;
+  width: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 20px);
+  height: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 40px);
+  margin: 2rem auto;
+  opacity: 0;
+  animation: flower-fade-in 0.6s ease forwards;
+}
+
+@keyframes flower-fade-in {
+  to { opacity: 1; }
+}
+
+/* ========== OUTER GLOW RING ========== */
+.flower-related__glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--flower-radius-outer) * 1.8);
+  height: calc(var(--flower-radius-outer) * 1.8);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--accent-subtle) 0%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  opacity: 0.4;
+  animation: glow-ring-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glow-ring-pulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* ========== BACKGROUND DECORATIVE PETALS ========== */
+.flower-related__bg-petals {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
-/* Decorative ring */
-.mandala__flower::before {
+.flower-related__bg-petal {
+  position: absolute;
+  width: 12px;
+  height: 24px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: linear-gradient(
+    to bottom,
+    var(--accent-subtle) 0%,
+    rgba(139, 92, 246, 0.02) 100%
+  );
+  border: 1px solid rgba(139, 92, 246, 0.04);
+  top: 50%;
+  left: 50%;
+  margin-left: -6px;
+  margin-top: -12px;
+  transform:
+    rotate(calc(22.5deg * var(--petal-idx)))
+    translateY(calc(-1 * var(--flower-radius) - 8px));
+  opacity: 0.25;
+  animation: bg-petal-sway 10s ease-in-out infinite;
+  animation-delay: calc(var(--petal-idx) * 0.4s);
+}
+
+@keyframes bg-petal-sway {
+  0%, 100% {
+    transform: rotate(calc(22.5deg * var(--petal-idx))) translateY(calc(-1 * var(--flower-radius) - 8px)) scaleY(1) rotate(0deg);
+  }
+  25% {
+    transform: rotate(calc(22.5deg * var(--petal-idx) + 2deg)) translateY(calc(-1 * var(--flower-radius) - 10px)) scaleY(1.08) rotate(1deg);
+  }
+  75% {
+    transform: rotate(calc(22.5deg * var(--petal-idx) - 2deg)) translateY(calc(-1 * var(--flower-radius) - 6px)) scaleY(0.95) rotate(-1deg);
+  }
+}
+
+/* ========== PARTICLES ========== */
+.flower-related__particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flower-related__particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.3;
+  top: 50%;
+  left: 50%;
+  animation: particle-orbit 12s linear infinite;
+  animation-delay: calc(var(--particle-idx) * -2s);
+}
+
+@keyframes particle-orbit {
+  from {
+    transform: rotate(calc(60deg * var(--particle-idx))) translateX(var(--flower-radius)) scale(1);
+    opacity: 0;
+  }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  to {
+    transform: rotate(calc(60deg * var(--particle-idx) + 360deg)) translateX(var(--flower-radius)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* ========== INNER RING ========== */
+.flower-related__inner-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--flower-radius) * 1.6);
+  height: calc(var(--flower-radius) * 1.6);
+  border-radius: 50%;
+  border: 1px dashed rgba(139, 92, 246, 0.1);
+  animation: inner-ring-rotate 60s linear infinite;
+}
+
+@keyframes inner-ring-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ========== CENTER ========== */
+.flower-related__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.flower-related__center-pulse {
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 70%);
+  animation: center-pulse 3s ease-out infinite;
+}
+
+@keyframes center-pulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.2; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+.flower-related__center-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 12px var(--accent-subtle);
+  animation: center-ring-pulse 3s ease-in-out infinite;
+}
+
+@keyframes center-ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.06); opacity: 0.5; }
+}
+
+.flower-related__center-inner {
+  width: var(--flower-center-size);
+  height: var(--flower-center-size);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 2px solid var(--accent);
+  box-shadow:
+    0 0 20px var(--accent-subtle),
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 2px 8px rgba(255, 255, 255, 0.05);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  position: relative;
+}
+
+.flower-related__center-inner::after {
   content: '';
   position: absolute;
-  width: 85%;
-  height: 85%;
-  border-radius: 50%;
-  border: 2px dashed var(--border);
-  opacity: 0.5;
-  animation: mandala-spin 30s linear infinite;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
 }
 
-@keyframes mandala-spin {
+.flower-related__center-inner:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 28px var(--accent-subtle),
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    inset 0 2px 8px rgba(255, 255, 255, 0.08);
+}
+
+.flower-related__center-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flower-related__center-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+}
+
+/* ========== PETALS ========== */
+.flower-related__petal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--flower-petal-size);
+  height: var(--flower-petal-size);
+  margin-left: calc(var(--flower-petal-size) / -2);
+  margin-top: calc(var(--flower-petal-size) / -2);
+  z-index: 5;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+  animation: petal-bloom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(0.2s + var(--bloom-delay));
+}
+
+@keyframes petal-bloom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x)),
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y))
+    ) scale(1) rotate(0deg);
+  }
+}
+
+.flower-related__petal--outer {
+  width: var(--flower-petal-size-outer);
+  height: var(--flower-petal-size-outer);
+  margin-left: calc(var(--flower-petal-size-outer) / -2);
+  margin-top: calc(var(--flower-petal-size-outer) / -2);
+  z-index: 4;
+}
+
+.flower-related__petal--outer .flower-related__petal-shape {
+  width: var(--flower-petal-size-outer);
+  height: var(--flower-petal-size-outer);
+}
+
+/* Continuous floating animation after bloom */
+.flower-related--bloomed .flower-related__petal {
+  animation: petal-float 6s ease-in-out infinite;
+  animation-delay: calc(var(--bloom-delay));
+}
+
+@keyframes petal-float {
+  0%, 100% {
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x)),
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y))
+    ) scale(1);
+  }
+  33% {
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x)),
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) - 4px)
+    ) scale(1.03) rotate(1deg);
+  }
+  66% {
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x) + 2px),
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) + 3px)
+    ) scale(0.98) rotate(-1deg);
+  }
+}
+
+.flower-related--bloomed .flower-related__petal--outer {
+  animation: petal-float-outer 7s ease-in-out infinite;
+  animation-delay: calc(var(--bloom-delay));
+}
+
+@keyframes petal-float-outer {
+  0%, 100% {
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius-outer) + var(--organic-x)),
+      calc(var(--flower-y) * var(--flower-radius-outer) + var(--organic-y))
+    ) scale(1);
+  }
+  50% {
+    transform: translate(
+      calc(var(--flower-x) * var(--flower-radius-outer) + var(--organic-x) - 3px),
+      calc(var(--flower-y) * var(--flower-radius-outer) + var(--organic-y) - 5px)
+    ) scale(1.04) rotate(-1.5deg);
+  }
+}
+
+.flower-related__petal-link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Organic petal shape - flower petal, not circle */
+.flower-related__petal-shape {
+  position: relative;
+  width: var(--flower-petal-size);
+  height: calc(var(--flower-petal-size) * 1.15);
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.05);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-smooth),
+    filter var(--transition-fast);
+  transform: rotate(var(--flower-angle));
+}
+
+/* 3D highlight on petal */
+.flower-related__petal-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at 30% 25%,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.flower-related__petal-shape::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    var(--accent-subtle),
+    transparent,
+    var(--accent-subtle),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
+  z-index: -1;
+  animation: highlight-rotate 8s linear infinite;
+}
+
+@keyframes highlight-rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-/* Center product */
-.mandala__center {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.flower-related__petal:hover .flower-related__petal-shape {
+  border-color: var(--accent);
+  box-shadow:
+    0 6px 20px var(--accent-subtle),
+    0 3px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 3px rgba(139, 92, 246, 0.1);
+  transform: rotate(var(--flower-angle)) scale(1.22);
+  z-index: 20;
+  filter: brightness(1.1);
 }
 
-.mandala__center-inner {
-  width: clamp(72px, 12vw, 96px);
-  height: clamp(72px, 12vw, 96px);
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--surface-2);
-  border: 3px solid var(--accent);
-  box-shadow: 0 0 20px var(--accent-subtle), 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+.flower-related__petal:hover .flower-related__petal-shape::before {
+  opacity: 0.6;
 }
 
-.mandala__center-inner:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 28px var(--accent-subtle), 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-.mandala__center-img {
+.flower-related__petal-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--transition-smooth), filter var(--transition-fast);
 }
 
-.mandala__center-placeholder {
+.flower-related__petal:hover .flower-related__petal-img {
+  transform: scale(1.08);
+}
+
+.flower-related__petal-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-muted);
+  background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
 }
 
-.mandala__center-label {
-  margin-top: clamp(0.375rem, 0.75vh, 0.5rem);
-  font-size: clamp(0.65rem, 1.1vw, 0.75rem);
-  color: var(--text-secondary);
+/* Hover overlay */
+.flower-related__petal-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.2) 0%,
+    transparent 50%,
+    rgba(34, 197, 94, 0.1) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.flower-related__petal:hover .flower-related__petal-overlay {
+  opacity: 1;
+}
+
+/* Tooltip */
+.flower-related__petal-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+.flower-related__petal-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--surface-2);
+}
+
+.flower-related__petal:hover .flower-related__petal-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.flower-related__petal-name {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-primary);
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.3;
 }
 
-/* Petals */
-.mandala__petal-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -32px;
-  margin-top: -32px;
-  transition: transform var(--transition-smooth);
-  z-index: 1;
-}
-
-.mandala__petal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  position: relative;
-}
-
-.mandala__petal:hover {
-  transform: scale(1.15);
-  z-index: 10;
-}
-
-.mandala__petal-img,
-.mandala__petal-placeholder {
-  width: clamp(52px, 9vw, 64px);
-  height: clamp(52px, 9vw, 64px);
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--surface-2);
-  border: 2px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.mandala__petal:hover .mandala__petal-img,
-.mandala__petal:hover .mandala__petal-placeholder {
-  border-color: var(--accent);
-  box-shadow: 0 4px 16px var(--accent-subtle), 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.mandala__petal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mandala__petal-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-/* Hover overlay with product info */
-.mandala__petal-overlay {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) scale(0.9);
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
-  box-shadow: var(--shadow-md);
-  z-index: 20;
-}
-
-.mandala__petal:hover .mandala__petal-overlay {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
-}
-
-.mandala__petal-name {
+.flower-related__petal-price {
   display: block;
-  font-size: clamp(0.65rem, 1.1vw, 0.75rem);
-  font-weight: 600;
-  color: var(--text-primary);
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mandala__petal-price {
-  display: block;
-  font-size: clamp(0.6rem, 1vw, 0.7rem);
+  font-size: 0.6rem;
+  font-weight: 500;
   color: var(--green-adorn);
   font-family: var(--font-mono);
   margin-top: 2px;
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .mandala__flower::before {
-    animation: none;
-  }
+/* ========== STEM ========== */
+.flower-related__stem {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--accent-subtle), transparent);
+  border-radius: 1px;
+  opacity: 0.4;
 }
 
-/* Mobile adjustments */
+/* ========== SECTION TITLE ========== */
+.flower-related::before {
+  content: 'Produtos Relacionados';
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* ========== MOBILE ========== */
 @media (max-width: 768px) {
-  .mandala__flower {
-    width: clamp(260px, 85vw, 320px);
-    height: clamp(260px, 85vw, 320px);
+  .flower-related {
+    --flower-radius: 85px;
+    --flower-radius-outer: 115px;
+    --flower-petal-size: 42px;
+    --flower-petal-size-outer: 36px;
+    --flower-center-size: 52px;
+    margin: 1.5rem auto;
+  }
+
+  .flower-related__petal-tooltip {
+    display: none;
+  }
+
+  .flower-related__bg-petal {
+    width: 10px;
+    height: 20px;
+  }
+
+  .flower-related::before {
+    font-size: 0.65rem;
+    bottom: -28px;
   }
 }
 
 @media (max-width: 480px) {
-  .mandala__flower {
-    width: clamp(240px, 90vw, 280px);
-    height: clamp(240px, 90vw, 280px);
+  .flower-related {
+    --flower-radius: 72px;
+    --flower-radius-outer: 98px;
+    --flower-petal-size: 38px;
+    --flower-petal-size-outer: 32px;
+    --flower-center-size: 46px;
+    margin: 1rem auto;
+  }
+
+  .flower-related__particle {
+    display: none;
+  }
+
+  .flower-related__inner-ring {
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .flower-related__bg-petal,
+  .flower-related__center-ring,
+  .flower-related__center-pulse,
+  .flower-related__particle,
+  .flower-related__inner-ring,
+  .flower-related__glow-ring {
+    animation: none;
+  }
+
+  .flower-related__petal {
+    animation: petal-bloom 0.4s ease forwards;
+  }
+
+  .flower-related--bloomed .flower-related__petal {
+    animation: none;
   }
 }
 </style>

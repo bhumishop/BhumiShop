@@ -40,10 +40,17 @@
     "menu": "Menu"
   },
   "home": {
+    "heroEyebrow": "TIENDA VIRTUAL",
+    "heroTitlePre": "PRODUCTOS CON SIGNIFICADO",
     "heroTitle1": "Arte con",
     "heroTitle2": "Proposito",
-    "heroSubtitle": "Descubre productos unicos de Bhumisparsha School -- libros, arte y mucho mas.",
+    "heroSubtitle": "Piezas unicas que llevan historia, arte y proposito. Cada articulo es una expresion de la creatividad de la comunidad Bhumisparsha.",
+    "heroTimestamp": "2026",
     "viewProducts": "Ver Productos",
+    "explore": "Explorar",
+    "statProducts": "Productos",
+    "statCategories": "Categorias",
+    "statHandcrafted": "Artesanal",
     "categories": "Categorias",
     "highlights": "Destacados"
   },
@@ -74,7 +81,44 @@
     "selectSize": "Por favor, seleccione una talla.",
     "addedToCart": "¡{name} anadido al carrito!",
     "relatedItems": "Productos Relacionados",
-    "relatedSubtitle": "Descubre productos similares que te pueden gustar"
+    "relatedSubtitle": "Descubre productos similares que te pueden gustar",
+    "productDetails": "Detalles del producto",
+    "careInstructions": "Cuidados de la camiseta",
+    "specifications": "Especificaciones",
+    "weight": "Peso",
+    "dimensions": "Dimensiones",
+    "fulfillment": "Realizacion",
+    "ownFulfillment": "Propio",
+    "digitalDelivery": "Entrega digital",
+    "showSizeTable": "Tabla de Tallas",
+    "hideSizeTable": "Cerrar Tabla de Tallas",
+    "sizeTableTitle": "Medidas",
+    "sizeTableSize": "Talla",
+    "sizeTableShrink": "Este producto puede encoger hasta un 5% despues del primer lavado",
+    "sizeTableVariation": "Debido al corte artesanal, las medidas pueden variar hasta 3 cm.",
+    "sizeDiagram": {
+      "comprimento": "Largo",
+      "largura": "Ancho",
+      "manga": "Manga",
+      "quadril": "Cadera",
+      "idade": "Edad"
+    },
+    "sizeTabNormal": "Adulto",
+    "sizeTabBaby": "Bebe",
+    "sizeTableBabyDesc": "Medidas aproximadas para camisetas infantiles. Pueden variar segun el fabricante.",
+    "defaultCamisetaMaterial": "Camiseta confeccionada con 100% fibra de algodon sostenible.",
+    "defaultCamisetaPrint": "Estampada con impresion digital",
+    "defaultCamisetaVegan": "Producto vegano certificado por PETA Cruelty Free",
+    "defaultCanecaMaterial": "Nuestra taza es de ceramica y tiene capacidad para 325ml de tu bebida favorita. La impresion se realiza por termotransferencia, garantizando fidelidad a los colores mostrados en la foto.",
+    "defaultCanecaPrint": "Impresion por termotransferencia",
+    "defaultCanecaMicrowave": "Puede usarla en el microondas",
+    "defaultCanecaDishwasher": "Evite colocar en el lavavajillas",
+    "defaultLivroPages": "Numero de paginas:",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "Impreso en papel de alta calidad",
+    "defaultCarePassInside": "Planchar del reves: Nunca planche directamente sobre el estampado. De vuelta a la camiseta y use la plancha a temperatura media o baja.",
+    "defaultCareProtectiveCloth": "Use un pano protector: Si necesita planchar la camiseta del lado del estampado, coloque un pano de algodon encima para evitar el contacto directo entre la plancha y el estampado.",
+    "defaultCareAvoidSteam": "Evitar vapor directo: El vapor en exceso puede danar el estampado, use con precaucion o prefiera planchado en seco."
   },
   "productCard": {
     "add": "Anadir",
@@ -91,7 +135,8 @@
   },
   "productVariants": {
     "size": "Talla",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "Color"
   },
   "cart": {
     "title": "Carrito",

@@ -1,18 +1,22 @@
 <template>
   <Teleport to="body">
     <div
-      v-if="cartStore.isOpen"
+      ref="overlayRef"
       class="drawer-overlay"
-      :class="{ 'drawer-overlay--visible': overlayVisible }"
+      :style="{ display: shouldShowOverlay ? 'block' : 'none' }"
       @click="handleOverlayClick"
     ></div>
-    <div class="drawer" :class="{ 'drawer--open': cartStore.isOpen }" :aria-hidden="!cartStore.isOpen">
+    <div
+      ref="drawerRef"
+      class="drawer"
+      style="display: none;"
+    >
       <div class="drawer__header">
         <h2 class="drawer__title">{{ $t('cart.cartCount', { count: cartStore.totalItems }) }}</h2>
         <button
           type="button"
           class="drawer__close"
-          @click.stop="handleClose"
+          @click="handleClose"
           :aria-label="$t('common.close')"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -60,7 +64,7 @@
             <button
               type="button"
               class="drawer__item-remove"
-              @click.stop="cartStore.removeItem(item.id, item.size)"
+              @click="cartStore.removeItem(item.id, item.size)"
               :aria-label="$t('cart.remove')"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -117,43 +121,44 @@ import FulfillmentBadge from '../common/FulfillmentBadge.vue'
 
 const cartStore = useCartStore()
 const router = useRouter()
-const overlayVisible = ref(false)
+const drawerRef = ref(null)
+const overlayRef = ref(null)
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const isClosing = ref(false)
-let drawerTween = null
-let overlayTween = null
-let itemsTween = null
-let footerTween = null
+const shouldShowOverlay = ref(false)
+
+let activeTweens = []
 
 function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')
 }
 
-// Close handler that bypasses animation blocking
+function killAllTweens() {
+  for (const tween of activeTweens) {
+    if (tween && tween.kill) tween.kill()
+  }
+  activeTweens = []
+}
+
 function handleClose() {
-  if (isClosing.value) return
-  isClosing.value = true
   cartStore.closeDrawer()
-  // Reset closing state after animation completes
-  setTimeout(() => { isClosing.value = false }, 400)
 }
 
 function handleOverlayClick() {
-  if (isClosing.value) return
   handleClose()
 }
 
 function handleCloseAndNavigate() {
   handleClose()
-  router.push('/produtos')
+  setTimeout(() => router.push('/produtos'), 400)
 }
 
 function handleCheckout() {
-  handleClose()
-  router.push('/checkout')
+  cartStore.closeDrawer()
+  setTimeout(() => router.push('/checkout'), 400)
 }
 
 function handleClearCart() {
+  if (cartStore.items.length === 0) return
   cartStore.clearCart()
 }
 
@@ -171,86 +176,133 @@ function shouldShowBadge(item) {
 watch(() => cartStore.isOpen, async (isOpen) => {
   await nextTick()
 
+  killAllTweens()
+
   if (isOpen) {
-    overlayVisible.value = true
-    isClosing.value = false
-    animateDrawerOpen()
+    shouldShowOverlay.value = true
+    if (drawerRef.value) drawerRef.value.style.display = 'flex'
+    animateDrawerIn()
   } else {
-    animateDrawerClose()
+    animateDrawerOut()
   }
 })
 
-function animateDrawerOpen() {
-  if (prefersReducedMotion) return
+function animateDrawerIn() {
+  if (!drawerRef.value || !overlayRef.value) return
 
-  const overlay = document.querySelector('.drawer-overlay')
-  const drawer = document.querySelector('.drawer')
-  if (!overlay || !drawer) return
+  // Reset initial state
+  gsap.set(overlayRef.value, { opacity: 0, pointerEvents: 'none' })
+  gsap.set(drawerRef.value, { xPercent: 100, pointerEvents: 'none' })
 
-  if (overlayTween) overlayTween.kill()
-  if (drawerTween) drawerTween.kill()
-  if (itemsTween) itemsTween.kill()
-  if (footerTween) footerTween.kill()
+  // Animate overlay
+  const overlayTween = gsap.to(overlayRef.value, {
+    opacity: 1,
+    duration: 0.3,
+    ease: 'power2.out',
+    onStart: () => { gsap.set(overlayRef.value, { pointerEvents: 'auto' }) },
+    overwrite: true,
+  })
+  activeTweens.push(overlayTween)
 
-  overlayTween = gsap.fromTo(overlay,
-    { opacity: 0 },
-    { opacity: 1, duration: 0.3, ease: 'power2.out', force3D: true, overwrite: true }
-  )
+  // Animate drawer
+  const drawerTween = gsap.to(drawerRef.value, {
+    xPercent: 0,
+    duration: 0.45,
+    ease: 'power3.out',
+    onStart: () => { gsap.set(drawerRef.value, { pointerEvents: 'auto' }) },
+    overwrite: true,
+  })
+  activeTweens.push(drawerTween)
 
-  drawerTween = gsap.fromTo(drawer,
-    { x: '100%' },
-    { x: '0%', duration: 0.45, ease: 'power3.out', force3D: true, overwrite: true }
-  )
+  // Animate items
+  const items = document.querySelectorAll('.drawer__item')
+  if (items.length > 0 && !prefersReducedMotion) {
+    const itemsTween = gsap.fromTo(items,
+      { opacity: 0, x: 30 },
+      { opacity: 1, x: 0, duration: 0.4, stagger: 0.06, ease: 'power3.out', delay: 0.1, overwrite: 'auto' }
+    )
+    activeTweens.push(itemsTween)
+  }
 
-  itemsTween = gsap.fromTo('.drawer__item',
-    { opacity: 0, x: 30 },
-    {
-      opacity: 1, x: 0, duration: 0.4, stagger: 0.06, ease: 'power3.out',
-      force3D: true, delay: 0.1, overwrite: 'auto',
-    }
-  )
-
-  footerTween = gsap.fromTo('.drawer__footer',
-    { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out', force3D: true, delay: 0.15, overwrite: true }
-  )
+  // Animate footer
+  const footer = document.querySelector('.drawer__footer')
+  if (footer && !prefersReducedMotion) {
+    const footerTween = gsap.fromTo(footer,
+      { opacity: 0, y: 15 },
+      { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out', delay: 0.15, overwrite: true }
+    )
+    activeTweens.push(footerTween)
+  }
 }
 
-function animateDrawerClose() {
+function animateDrawerOut() {
+  if (!drawerRef.value) return
+
+  // Ensure pointer-events are auto before animating out
+  gsap.set(drawerRef.value, { pointerEvents: 'auto' })
+  if (overlayRef.value) {
+    gsap.set(overlayRef.value, { pointerEvents: 'auto' })
+  }
+
   if (prefersReducedMotion) {
-    overlayVisible.value = false
+    gsap.set(drawerRef.value, { xPercent: 100, pointerEvents: 'none' })
+    if (overlayRef.value) gsap.set(overlayRef.value, { opacity: 0, pointerEvents: 'none' })
+    shouldShowOverlay.value = false
+    drawerRef.value.style.display = 'none'
     return
   }
 
-  const overlay = document.querySelector('.drawer-overlay')
-  const drawer = document.querySelector('.drawer')
-  if (!overlay || !drawer) return
+  // Fade out items first
+  const items = document.querySelectorAll('.drawer__item')
+  if (items.length > 0) {
+    const itemsTween = gsap.to(items, {
+      opacity: 0, x: 15, duration: 0.15, stagger: 0.02,
+      ease: 'power2.in', overwrite: 'auto',
+    })
+    activeTweens.push(itemsTween)
+  }
 
-  if (overlayTween) overlayTween.kill()
-  if (drawerTween) drawerTween.kill()
-  if (itemsTween) itemsTween.kill()
-  if (footerTween) footerTween.kill()
+  // Animate footer out
+  const footer = document.querySelector('.drawer__footer')
+  if (footer) {
+    const footerTween = gsap.to(footer, {
+      opacity: 0, y: 10, duration: 0.2,
+      ease: 'power2.in', overwrite: true,
+    })
+    activeTweens.push(footerTween)
+  }
 
-  itemsTween = gsap.to('.drawer__item', {
-    opacity: 0, x: 15, duration: 0.15, stagger: 0.02,
-    ease: 'power2.in', force3D: true, overwrite: 'auto',
+  // Animate overlay out
+  if (overlayRef.value) {
+    const overlayTween = gsap.to(overlayRef.value, {
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power2.in',
+      overwrite: true,
+      onComplete: () => {
+        gsap.set(overlayRef.value, { pointerEvents: 'none' })
+        shouldShowOverlay.value = false
+      },
+    })
+    activeTweens.push(overlayTween)
+  }
+
+  // Animate drawer out
+  const drawerTween = gsap.to(drawerRef.value, {
+    xPercent: 100,
+    duration: 0.35,
+    ease: 'power3.in',
+    overwrite: true,
+    onComplete: () => {
+      gsap.set(drawerRef.value, { pointerEvents: 'none' })
+      if (drawerRef.value) drawerRef.value.style.display = 'none'
+    },
   })
-
-  overlayTween = gsap.to(overlay, {
-    opacity: 0, duration: 0.25, ease: 'power2.in', force3D: true, overwrite: true,
-    onComplete: () => { overlayVisible.value = false }
-  })
-
-  drawerTween = gsap.to(drawer, {
-    x: '100%', duration: 0.35, ease: 'power3.in', force3D: true, overwrite: true,
-  })
+  activeTweens.push(drawerTween)
 }
 
 onUnmounted(() => {
-  if (overlayTween) overlayTween.kill()
-  if (drawerTween) drawerTween.kill()
-  if (itemsTween) itemsTween.kill()
-  if (footerTween) footerTween.kill()
+  killAllTweens()
 })
 </script>
 
@@ -267,10 +319,6 @@ onUnmounted(() => {
   will-change: opacity;
 }
 
-.drawer-overlay--visible {
-  pointer-events: auto;
-}
-
 .drawer {
   position: fixed;
   top: 0;
@@ -283,17 +331,8 @@ onUnmounted(() => {
   z-index: 201;
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  transition: none;
   box-shadow: var(--shadow-xl), var(--glow-accent);
   border-left: 1px solid var(--border);
-  contain: layout style paint;
-  pointer-events: none;
-}
-
-.drawer--open {
-  transform: translateX(0);
-  pointer-events: auto;
 }
 
 .drawer__header {

@@ -40,10 +40,17 @@
     "menu": "Menu"
   },
   "home": {
+    "heroEyebrow": "VIRTUAL STORE",
+    "heroTitlePre": "PRODUCTS WITH MEANING",
     "heroTitle1": "Art with",
     "heroTitle2": "Purpose",
-    "heroSubtitle": "Discover unique products from Bhumisparsha School -- books, art and much more.",
+    "heroSubtitle": "Unique pieces that carry history, art and purpose. Every item is an expression of the Bhumisparsha community's creativity.",
+    "heroTimestamp": "2026",
     "viewProducts": "View Products",
+    "explore": "Explore",
+    "statProducts": "Products",
+    "statCategories": "Categories",
+    "statHandcrafted": "Handcrafted",
     "categories": "Categories",
     "highlights": "Highlights"
   },
@@ -74,7 +81,44 @@
     "selectSize": "Please select a size.",
     "addedToCart": "{name} added to cart!",
     "relatedItems": "Related Items",
-    "relatedSubtitle": "Discover similar items you might like"
+    "relatedSubtitle": "Discover similar items you might like",
+    "productDetails": "Product Details",
+    "careInstructions": "T-shirt Care Instructions",
+    "specifications": "Specifications",
+    "weight": "Weight",
+    "dimensions": "Dimensions",
+    "fulfillment": "Fulfillment",
+    "ownFulfillment": "Own",
+    "digitalDelivery": "Digital delivery",
+    "showSizeTable": "Size Chart",
+    "hideSizeTable": "Hide Size Chart",
+    "sizeTableTitle": "Measurements",
+    "sizeTableSize": "Size",
+    "sizeTableShrink": "This product may shrink up to 5% after the first wash",
+    "sizeTableVariation": "Due to artisanal cutting, measurements may vary up to 3 cm.",
+    "sizeDiagram": {
+      "comprimento": "Length",
+      "largura": "Width",
+      "manga": "Sleeve",
+      "quadril": "Hip",
+      "idade": "Age"
+    },
+    "sizeTabNormal": "Adult",
+    "sizeTabBaby": "Baby",
+    "sizeTableBabyDesc": "Approximate measurements for baby/children t-shirts. May vary by manufacturer.",
+    "defaultCamisetaMaterial": "T-shirt made with 100% natural sustainable cotton fiber.",
+    "defaultCamisetaPrint": "Printed with digital printing",
+    "defaultCamisetaVegan": "Vegan product certified by PETA Cruelty Free",
+    "defaultCanecaMaterial": "Our mug is made of ceramic and holds 325ml of your favorite beverage. The print is done by thermal transfer, ensuring color fidelity as shown in the photo above.",
+    "defaultCanecaPrint": "Thermal transfer printing",
+    "defaultCanecaMicrowave": "Feel free to use it in the microwave oven",
+    "defaultCanecaDishwasher": "Avoid placing in the dishwasher",
+    "defaultLivroPages": "Number of pages:",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "Printed on high-quality paper",
+    "defaultCarePassInside": "Iron inside out: Never iron directly over the print. Turn the t-shirt inside out and use the iron on medium or low temperature.",
+    "defaultCareProtectiveCloth": "Use a protective cloth: If you need to iron the t-shirt on the print side, place a cotton cloth over it to avoid direct contact between the iron and the print.",
+    "defaultCareAvoidSteam": "Avoid direct steam: Excessive steam can damage the print, so use with caution or opt for dry ironing."
   },
   "productCard": {
     "add": "Add",
@@ -91,7 +135,8 @@
   },
   "productVariants": {
     "size": "Size",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "Color"
   },
   "cart": {
     "title": "Cart",
