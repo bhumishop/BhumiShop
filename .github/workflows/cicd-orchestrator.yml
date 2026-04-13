@@ -325,16 +325,10 @@ jobs:
       - name: Build
         id: build
         env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || '' }}
-          VITE_SUPABASE_KEY: ${{ vars.VITE_SUPABASE_KEY || '' }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           VITE_BASE_URL: /bhumi-shop/
-        run: |
-          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_KEY" ]; then
-            echo "Supabase not configured - running in demo mode"
-            export VITE_SUPABASE_URL="https://placeholder.supabase.co"
-            export VITE_SUPABASE_KEY="placeholder-key"
-          fi
-          pnpm build
+        run: pnpm build
 
       - name: Configure Pages
         uses: actions/configure-pages@v4
