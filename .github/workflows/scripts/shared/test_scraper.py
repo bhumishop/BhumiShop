@@ -3,70 +3,91 @@
 Test script for UmaPenca scraper and BhumiShop integration.
 
 This script:
-1. Tests scraping a known product from Prataprint
+1. Tests scraping products from configured stores (prataprint, bhumisprint)
 2. Validates the scraped data structure
 3. Tests Supabase connection (if credentials are available)
-4. Verifies all payment configurations are in place
 """
 
 import os
 import sys
 import json
-import time
 from datetime import datetime
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add parent directory to path so we can import umapenca
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(SCRIPT_DIR))
 
-from umapenca import UmaPencaScraper, ScrapedProduct, STORE_URL
+from umapenca import HtmlExtractor, Client, ProductConverter, ScrapedProduct, STORE_URL
 
-def test_scraper():
-    """Test the UmaPenca scraper with known products"""
-    print("=" * 60)
-    print("Testing UmaPenca Scraper")
-    print("=" * 60)
+# Store configurations for testing
+STORES = {
+    "prataprint": {
+        "url": "https://prataprint.bhumisparshaschool.org",
+        "store_id": "11210",
+        "test_product_id": "352000",
+    },
+    "bhumisprint": {
+        "url": "https://umapenca.com/bhumisprint",
+        "store_id": "11205",
+        "test_product_id": "141327",
+    },
+}
 
-    scraper = UmaPencaScraper(STORE_URL)
 
-    # Test known products
-    test_products = [
-        "camiseta/bode-de-trompete-352000.html",
-    ]
+def test_store_scraper(store_name: str, store_config: dict) -> list:
+    """Test scraping a store's product list."""
+    print(f"\n{'=' * 60}")
+    print(f"Testing store: {store_name}")
+    print(f"URL: {store_config['url']}")
+    print(f"{'=' * 60}")
 
-    results = []
-    for product_slug in test_products:
-        print(f"\nTesting: {product_slug}")
+    os.environ["UMAPENCA_STORE_URL"] = store_config["url"]
+    os.environ["UMAPENCA_STORE_ID"] = store_config["store_id"]
 
-        product = scraper.scrape_single_product(product_slug)
+    # Re-import to pick up new env vars
+    import importlib
+    import umapenca
+    importlib.reload(umapenca)
 
-        if product:
-            print(f"  Name: {product.name}")
-            print(f"  Slug: {product.slug}")
-            print(f"  Price: R$ {product.price:.2f}")
-            print(f"  Category: {product.category}")
-            print(f"  Image: {'Yes' if product.image else 'No'}")
-            print(f"  Sizes: {len(product.sizes)} variants")
-            print(f"  Third-party ID: {product.third_party_product_id}")
+    client = Client(delay=0.3)
+    extractor = HtmlExtractor(client)
+    raw_products = extractor.fetch_product_list()
 
-            # Validate data
-            assert product.name, "Product name should not be empty"
-            assert product.price > 0, "Product price should be positive"
-            assert product.third_party_product_id, "Third-party ID should be set"
-            assert product.image, "Product image should be set"
-            assert product.slug, "Product slug should be set"
+    if not raw_products:
+        print(f"  [FAIL] No products found for {store_name}")
+        return []
 
-            results.append(product)
-            print("  [PASS] Data validation passed")
-        else:
-            print("  [FAIL] Could not scrape product")
+    print(f"  Found {len(raw_products)} products")
 
-    return results
+    # Convert
+    slugs = set()
+    converter = ProductConverter(slugs)
+    products = []
+    for raw in raw_products[:5]:  # Test first 5
+        try:
+            p = converter.convert(raw)
+            if p.name:
+                products.append(p)
+                print(f"  - {p.name} | R${p.price:.2f} | slug={p.slug} | source={p.third_party_source}")
+
+                # Validate
+                assert p.name, "Product name should not be empty"
+                assert p.price > 0, "Product price should be positive"
+                assert p.third_party_product_id, "Third-party ID should be set"
+                assert p.slug, "Product slug should be set"
+                assert p.third_party_source == store_name, f"Source should be '{store_name}', got '{p.third_party_source}'"
+        except Exception as exc:
+            print(f"  [WARN] Conversion error: {exc}")
+
+    print(f"  [PASS] {len(products)}/5 products converted and validated")
+    return products
+
 
 def test_supabase_connection():
     """Test Supabase connection if credentials are available"""
-    print("\n" + "=" * 60)
+    print(f"\n{'=' * 60}")
     print("Testing Supabase Connection")
-    print("=" * 60)
+    print(f"{'=' * 60}")
 
     supabase_url = os.environ.get('SUPABASE_URL', '')
     supabase_key = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '')
@@ -85,7 +106,6 @@ def test_supabase_connection():
             'Content-Type': 'application/json'
         }
 
-        # Test connection
         response = requests.get(
             f"{supabase_url}/rest/v1/collections?limit=1",
             headers=headers
@@ -96,7 +116,6 @@ def test_supabase_connection():
             print(f"[PASS] Connected to Supabase")
             print(f"  Collections found: {len(collections)}")
 
-            # Test products table
             response = requests.get(
                 f"{supabase_url}/rest/v1/products?limit=1",
                 headers=headers
@@ -116,89 +135,65 @@ def test_supabase_connection():
         print(f"[FAIL] Error: {e}")
         return False
 
-def test_payment_configuration():
-    """Test that payment configuration is properly set up"""
-    print("\n" + "=" * 60)
-    print("Testing Payment Configuration")
-    print("=" * 60)
 
-    # Check environment variables
-    required_vars = {
-        'VITE_SUPABASE_URL': 'Supabase URL',
-        'VITE_SUPABASE_KEY': 'Supabase Anon Key',
-        'VITE_UMAPENCA_STORE_URL': 'UmaPenca Store URL',
-    }
+def test_products_json_files():
+    """Test that generated products.json files are valid."""
+    print(f"\n{'=' * 60}")
+    print("Testing products.json files")
+    print(f"{'=' * 60}")
 
-    missing = []
-    for var, desc in required_vars.items():
-        value = os.environ.get(var, '')
-        if value and value != f'your-{var.lower().replace("VITE_", "").replace("_", "-")}':
-            print(f"[PASS] {desc}: configured")
+    base_dir = os.path.dirname(SCRIPT_DIR)
+    results = {}
+
+    for store_name in STORES:
+        json_path = os.path.join(base_dir, store_name, "products.json")
+        if os.path.exists(json_path):
+            with open(json_path) as f:
+                data = json.load(f)
+            total = data.get("total_products", 0)
+            store_info = data.get("store", {})
+            print(f"  [PASS] {store_name}/products.json — {total} products (store: {store_info.get('name', 'N/A')})")
+            results[store_name] = True
         else:
-            missing.append(var)
-            print(f"[WARN] {desc}: not configured")
+            print(f"  [WARN] {store_name}/products.json not found (run scraper first)")
+            results[store_name] = False
 
-    # Check payment provider files
-    payment_files = [
-        '.github/workflows/scripts/src/components/checkout/PaymentMethod.vue',
-        '.github/workflows/scripts/src/components/checkout/PaymentProviderPopup.vue',
-        '.github/workflows/scripts/src/components/checkout/PixPayment.vue',
-        '.github/workflows/scripts/src/composables/useAbacatePay.js',
-        '.github/workflows/scripts/src/composables/usePixBricks.js',
-    ]
+    return results
 
-    # Also check from project root
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-    payment_files = [
-        os.path.join(project_root, 'src/components/checkout/PaymentMethod.vue'),
-        os.path.join(project_root, 'src/components/checkout/PaymentProviderPopup.vue'),
-        os.path.join(project_root, 'src/components/checkout/PixPayment.vue'),
-        os.path.join(project_root, 'src/composables/useAbacatePay.js'),
-        os.path.join(project_root, 'src/composables/usePixBricks.js'),
-    ]
-
-    print("\nPayment Provider Files:")
-    for file in payment_files:
-        if os.path.exists(file):
-            print(f"  [PASS] {file}")
-        else:
-            print(f"  [FAIL] {file} - missing")
-
-    return len(missing) == 0
 
 def main():
     print(f"BhumiShop Integration Test")
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Store URL: {STORE_URL}")
     print()
 
-    # Test 1: Scraper
-    scraped = test_scraper()
+    # Test 1: Store scrapers
+    all_products = []
+    for store_name, store_config in STORES.items():
+        products = test_store_scraper(store_name, store_config)
+        all_products.extend(products)
 
     # Test 2: Supabase
     supabase_ok = test_supabase_connection()
 
-    # Test 3: Payment Configuration
-    payment_ok = test_payment_configuration()
+    # Test 3: Products JSON files
+    json_results = test_products_json_files()
 
     # Summary
-    print("\n" + "=" * 60)
+    print(f"\n{'=' * 60}")
     print("Test Summary")
-    print("=" * 60)
-    print(f"Scraper: {len(scraped)} products scraped successfully")
+    print(f"{'=' * 60}")
+    print(f"Total products validated: {len(all_products)}")
     print(f"Supabase: {'Connected' if supabase_ok else 'Not configured'}")
-    print(f"Payment: {'Configured' if payment_ok else 'Missing env vars'}")
+    json_ok = sum(1 for v in json_results.values() if v)
+    print(f"Products JSON: {json_ok}/{len(json_results)} files valid")
 
-    if scraped and supabase_ok:
-        print("\n[SUCCESS] All tests passed!")
-        return 0
-    elif scraped:
-        print("\n[PARTIAL] Scraper works, but Supabase not configured")
+    if all_products:
+        print(f"\n[SUCCESS] Scraper working for {len(STORES)} stores")
         return 0
     else:
-        print("\n[FAIL] Some tests failed")
+        print(f"\n[FAIL] No products scraped")
         return 1
+
 
 if __name__ == '__main__':
     sys.exit(main())

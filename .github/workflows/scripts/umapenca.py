@@ -357,19 +357,22 @@ class HtmlExtractor:
 
     def fetch_product_list(self) -> list[dict]:
         """Fetch the store page and extract all product hits."""
-        # Try multiple entry points
-        pfx = self.path_prefix
-        paths = [f"{pfx}/loja", f"{pfx}/", pfx or "/"]
+        # Try multiple entry points relative to the store root
+        # STORE_URL already contains the full path e.g. https://umapenca.com/bhumisprint
+        pfx = self.path_prefix  # e.g. /bhumisprint or ""
+        paths = [f"{pfx}/loja", f"{pfx}/", "/loja", "/"]
         seen = set()
         for path in paths:
-            if not path:
-                path = "/"
             if path in seen:
                 continue
             seen.add(path)
-            url = f"{STORE_URL}{path}" if path.startswith("/") else f"{STORE_URL}/{path}"
-            # Normalize double slashes
-            url = url.replace("//", "/").replace(":/", "://")
+            # Build full URL: STORE_URL is the base, path is relative to store root
+            if path.startswith("/"):
+                # Replace the prefix in the base URL with the target path
+                base = f"{urlparse(STORE_URL).scheme}://{urlparse(STORE_URL).netloc}"
+                url = f"{base}{path}"
+            else:
+                url = f"{STORE_URL}/{path}"
             logger.info(f"Fetching {url}")
             resp = self.client.get(url)
             if not resp:
