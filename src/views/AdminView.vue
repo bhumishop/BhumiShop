@@ -121,14 +121,17 @@
           </div>
         </div>
         <div class="admin-form__row">
-        <div class="admin-form__field">
-          <label class="admin-form__label">{{ $t('admin.modal.description') }}</label>
-          <textarea v-model="productForm.description" rows="3" class="admin-textarea"></textarea>
+          <div class="admin-form__field">
+            <label class="admin-form__label">{{ $t('admin.modal.description') }}</label>
+            <textarea v-model="productForm.description" rows="3" class="admin-textarea"></textarea>
+          </div>
         </div>
-        <div class="admin-form__field">
-          <label class="admin-form__label">{{ $t('admin.modal.image') }}</label>
-          <input type="file" accept="image/*" @change="handleImageUpload" class="admin-file" />
-          <input v-model="productForm.image" :placeholder="$t('admin.modal.imagePlaceholder')" class="admin-input" />
+        <div class="admin-form__row">
+          <div class="admin-form__field">
+            <label class="admin-form__label">{{ $t('admin.modal.image') }}</label>
+            <input type="file" accept="image/*" @change="handleImageUpload" class="admin-file" />
+            <input v-model="productForm.image" :placeholder="$t('admin.modal.imagePlaceholder')" class="admin-input" />
+          </div>
         </div>
         <BaseInput v-model="productForm.artist" :label="$t('admin.modal.artist')" :placeholder="$t('admin.modal.artistPlaceholder')" />
         <BaseInput v-model="productForm.info" :label="$t('admin.modal.additionalInfo')" />
