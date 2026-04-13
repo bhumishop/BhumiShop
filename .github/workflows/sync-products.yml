@@ -130,7 +130,22 @@ jobs:
         if: success()
         run: |
           OUTPUT=".github/workflows/scripts/${{ matrix.store }}/output/products.json"
-          python3 -c "import json; data=json.load(open('$OUTPUT')); print(f\"Store: {data.get('store',{}).get('name','?')}\"); print(f\"Products: {data.get('total_products',0)}\"); cats={}; [cats.__setitem__(p.get('category','?'), cats.get(p.get('category','?'),0)+1) for p in data.get('products',[])]; print('Categories:', dict(cats))"
+          python3 << 'EOF'
+          import json, os
+          output = os.environ.get('OUTPUT_FILE', 'OUTPUT_PLACEHOLDER')
+          with open(output) as f:
+              data = json.load(f)
+          store_name = data.get('store', {}).get('name', '?')
+          total = data.get('total_products', 0)
+          print(f"Store: {store_name}")
+          print(f"Products: {total}")
+          cats = {}
+          for p in data.get('products', []):
+              c = p.get('category', '?')
+              cats[c] = cats.get(c, 0) + 1
+          print('Categories:', dict(cats))
+        env:
+          OUTPUT_FILE: ".github/workflows/scripts/${{ matrix.store }}/output/products.json"
 
       - name: Upload products.json artifact
         if: always()
@@ -201,8 +216,20 @@ jobs:
       - name: Verify products.json
         if: success()
         run: |
-          OUTPUT=".github/workflows/scripts/uiclap/output/products.json"
-          python3 -c "import json; data=json.load(open('$OUTPUT')); print(f\"Source: {data.get('source','?')}\"); print(f\"Books: {data.get('total_products',0)}\"); [print(f\"  - {b.get('name','?')} | R${b.get('price',0):.2f} | variants: {len(b.get('variants',[]))}\") for b in data.get('products',[])[:3]]"
+          python3 << 'EOF'
+          import json, os
+          output = os.environ.get('OUTPUT_FILE')
+          with open(output) as f:
+              data = json.load(f)
+          print(f"Source: {data.get('source','?')}")
+          print(f"Books: {data.get('total_products',0)}")
+          for b in data.get('products', [])[:3]:
+              name = b.get('name', '?')
+              price = b.get('price', 0)
+              variants = len(b.get('variants', []))
+              print(f"  - {name} | R${price:.2f} | variants: {variants}")
+        env:
+          OUTPUT_FILE: ".github/workflows/scripts/uiclap/output/products.json"
 
       - name: Upload products.json artifact
         if: always()
