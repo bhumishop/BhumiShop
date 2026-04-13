@@ -72,11 +72,22 @@
     "viewProducts": "View Products",
     "notFound": "Product not found",
     "selectSize": "Please select a size.",
-    "addedToCart": "{name} added to cart!"
+    "addedToCart": "{name} added to cart!",
+    "relatedItems": "Related Items",
+    "relatedSubtitle": "Discover similar items you might like"
   },
   "productCard": {
     "add": "Add",
-    "addedToCart": "{name} added to cart"
+    "addedToCart": "{name} added to cart",
+    "quickAdd": "Quick Add",
+    "addToCart": "Add to cart",
+    "badges": {
+      "umaPenca": "Uma Penca",
+      "digital": "Digital",
+      "printOnDemand": "Print-on-Demand",
+      "bundle": "Bundle",
+      "madeToOrder": "Made to order"
+    }
   },
   "productVariants": {
     "size": "Size",
@@ -92,8 +103,10 @@
     "size": "Size:",
     "remove": "Remove",
     "total": "Total",
+    "subtotal": "Subtotal",
     "clearCart": "Clear cart",
-    "cartCount": "Cart ({count})"
+    "cartCount": "Cart ({count})",
+    "umaPencaNote": "UmaPenca items are checked out in a separate store"
   },
   "checkout": {
     "title": "Checkout",

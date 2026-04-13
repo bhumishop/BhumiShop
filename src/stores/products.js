@@ -130,6 +130,72 @@ export const useProductStore = defineStore('products', () => {
     }
   })
 
+  const getRelatedProducts = computed(() => {
+    return (productId, limit = 8) => {
+      const product = products.value.find(p => p.id === parseInt(productId))
+      if (!product) return []
+
+      const otherProducts = products.value.filter(p => p.id !== parseInt(productId))
+
+      // Score each product based on matching criteria
+      const scored = otherProducts.map(p => {
+        let score = 0
+
+        // Tags match (highest priority)
+        if (product.tags && p.tags && Array.isArray(product.tags) && Array.isArray(p.tags)) {
+          const commonTags = product.tags.filter(tag => p.tags.includes(tag))
+          score += commonTags.length * 10
+        }
+
+        // Same collection
+        if (product.collection_id && p.collection_id && product.collection_id === p.collection_id) {
+          score += 15
+        }
+
+        // Same subcollection
+        if (product.subcollection_id && p.subcollection_id && product.subcollection_id === p.subcollection_id) {
+          score += 20
+        }
+
+        // Same category (legacy)
+        if (product.category && p.category && product.category === p.category) {
+          score += 5
+        }
+
+        // Similar name (word overlap)
+        if (product.name && p.name) {
+          const productWords = new Set(product.name.toLowerCase().split(/\s+/).filter(w => w.length > 2))
+          const otherWords = p.name.toLowerCase().split(/\s+/).filter(w => productWords.has(w))
+          score += otherWords.length * 3
+        }
+
+        // Similar price range (within 30%)
+        if (product.price && p.price) {
+          const priceDiff = Math.abs(product.price - p.price) / product.price
+          if (priceDiff <= 0.3) {
+            score += 4
+          } else if (priceDiff <= 0.5) {
+            score += 2
+          }
+        }
+
+        // Same artist
+        if (product.artist && p.artist && product.artist === p.artist) {
+          score += 6
+        }
+
+        return { product: p, score }
+      })
+
+      // Sort by score descending and return top N
+      return scored
+        .sort((a, b) => b.score - a.score)
+        .filter(item => item.score > 0)
+        .slice(0, limit)
+        .map(item => item.product)
+    }
+  })
+
   const filteredProducts = computed(() => {
     let result = products.value
 
@@ -386,6 +452,7 @@ export const useProductStore = defineStore('products', () => {
     totalPages,
     getProductById,
     getProductsByCategory,
+    getRelatedProducts,
     filteredProducts,
     paginatedProducts,
     fetchProducts,

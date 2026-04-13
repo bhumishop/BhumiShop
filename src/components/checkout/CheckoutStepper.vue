@@ -1,47 +1,74 @@
 <template>
-  <div class="stepper">
+  <div class="checkout-stepper">
     <div
       v-for="(step, index) in steps"
       :key="index"
       :class="[
-        'stepper__step',
-        { 'stepper__step--active': index === current, 'stepper__step--done': index < current }
+        'checkout-stepper__step',
+        { 'checkout-stepper__step--active': index === current, 'checkout-stepper__step--done': index < current }
       ]"
     >
-      <div class="stepper__circle">
+      <div class="checkout-stepper__circle">
         <svg v-if="index < current" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
         <span v-else>{{ index + 1 }}</span>
       </div>
-      <span class="stepper__label">{{ step }}</span>
-      <div v-if="index < steps.length - 1" class="stepper__line" :class="{ 'stepper__line--done': index < current }"></div>
+      <span class="checkout-stepper__label">{{ step }}</span>
+      <div v-if="index < steps.length - 1" class="checkout-stepper__line" :class="{ 'checkout-stepper__line--done': index < current }"></div>
+    </div>
+
+    <!-- External provider indicator -->
+    <div v-if="hasExternalProviders" class="checkout-stepper__provider-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      <span>{{ providerLabel }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useCartStore } from '../../stores/cart'
+
 defineProps({
   steps: { type: Array, required: true },
   current: { type: Number, default: 0 }
 })
+
+const cartStore = useCartStore()
+
+const hasExternalProviders = computed(() => {
+  return cartStore.hasUmaPencaItems
+})
+
+const providerLabel = computed(() => {
+  const providers = []
+  if (cartStore.hasUmaPencaItems) providers.push('UmaPenca')
+  return providers.join(' + ')
+})
 </script>
 
 <style scoped>
-.stepper {
+.checkout-stepper {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
   padding: clamp(1rem, 2.5vh, 1.5rem) 0;
+  position: relative;
+  flex-wrap: wrap;
 }
 
-.stepper__step {
+.checkout-stepper__step {
   display: flex;
   align-items: center;
   gap: clamp(0.375rem, 0.75vw, 0.5rem);
   position: relative;
 }
 
-.stepper__circle {
+.checkout-stepper__circle {
   width: clamp(2rem, 4.5vw, 2.25rem);
   height: clamp(2rem, 4.5vw, 2.25rem);
   border-radius: 50%;
@@ -57,37 +84,37 @@ defineProps({
   flex-shrink: 0;
 }
 
-.stepper__step--active .stepper__circle {
+.checkout-stepper__step--active .checkout-stepper__circle {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
   box-shadow: var(--glow-accent);
 }
 
-.stepper__step--done .stepper__circle {
+.checkout-stepper__step--done .checkout-stepper__circle {
   border-color: var(--success);
   background: var(--success);
   color: white;
   box-shadow: 0 0 clamp(0.5rem, 1.5vw, 0.75rem) var(--success-light);
 }
 
-.stepper__label {
+.checkout-stepper__label {
   font-size: clamp(0.7rem, 1.2vw, 0.8rem);
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.stepper__step--active .stepper__label {
+.checkout-stepper__step--active .checkout-stepper__label {
   color: var(--accent);
   font-weight: 600;
 }
 
-.stepper__step--done .stepper__label {
+.checkout-stepper__step--done .checkout-stepper__label {
   color: var(--success);
 }
 
-.stepper__line {
+.checkout-stepper__line {
   width: clamp(1.5rem, 4vw, 2.5rem);
   height: 2px;
   background: var(--border);
@@ -96,17 +123,42 @@ defineProps({
   border-radius: var(--radius-full);
 }
 
-.stepper__line--done {
+.checkout-stepper__line--done {
   background: var(--success);
 }
 
+/* External provider badge */
+.checkout-stepper__provider-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-sm, 0.25rem);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #7c3aed;
+  margin-top: 0.5rem;
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
-  .stepper__label {
+  .checkout-stepper__label {
     display: none;
   }
 
-  .stepper__line {
+  .checkout-stepper__line {
     width: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .checkout-stepper__provider-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
   }
 }
 </style>

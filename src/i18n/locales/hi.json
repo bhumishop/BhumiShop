@@ -72,7 +72,9 @@
     "viewProducts": "उत्पाद देखें",
     "notFound": "उत्पाद नहीं मिला",
     "selectSize": "कृपया एक आकार चुनें।",
-    "addedToCart": "{name} कार्ट में जोड़ा गया!"
+    "addedToCart": "{name} कार्ट में जोड़ा गया!",
+    "relatedItems": "संबंधित आइटम",
+    "relatedSubtitle": "समान आइटम खोजें जो आपको पसंद आ सकते हैं"
   },
   "productCard": {
     "add": "जोड़ें",

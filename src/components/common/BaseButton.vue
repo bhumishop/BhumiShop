@@ -5,7 +5,7 @@
       'btn',
       `btn--${variant}`,
       `btn--${size}`,
-      { 'btn--full': full, 'btn--loading': loading }
+      { 'btn--full': full, 'btn--loading': loading, 'btn--rainbow': rainbow }
     ]"
     :disabled="disabled || loading"
     @click="handleClick"
@@ -33,7 +33,8 @@ const props = defineProps({
   },
   full: Boolean,
   loading: Boolean,
-  disabled: Boolean
+  disabled: Boolean,
+  rainbow: Boolean
 })
 
 const emit = defineEmits(['click'])
@@ -284,5 +285,94 @@ onMounted(() => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ===== Rainbow border animation (matching ProductPixelCard hover) ===== */
+.btn--rainbow {
+  --rainbow-radius: 12px;
+  --rainbow-border-width: 2px;
+
+  position: relative;
+  border-radius: var(--rainbow-radius);
+  background: #0a0a0a;
+  color: #ffffff;
+  z-index: 0;
+  overflow: visible;
+  border: none;
+}
+
+.btn--rainbow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--rainbow-radius);
+  padding: var(--rainbow-border-width);
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    #8b5cf6,
+    #ec4899,
+    #f59e0b,
+    #22c55e,
+    #06b6d4,
+    #3b82f6,
+    #8b5cf6
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.btn--rainbow:hover::before {
+  opacity: 0.8;
+  animation: btn-border-rotate 3s linear infinite;
+}
+
+.btn--rainbow::after {
+  content: '';
+  position: absolute;
+  inset: var(--rainbow-border-width);
+  border-radius: calc(var(--rainbow-radius) - var(--rainbow-border-width));
+  background: #0a0a0a;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.btn--rainbow .btn__texture {
+  z-index: 1;
+}
+
+.btn--rainbow .btn__spinner,
+.btn--rainbow > *:not(::before):not(::after) {
+  position: relative;
+  z-index: 2;
+}
+
+.btn--rainbow:hover {
+  background: transparent;
+  box-shadow:
+    0 4px 20px rgba(139, 92, 246, 0.2),
+    0 0 30px rgba(139, 92, 246, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn--rainbow:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+@keyframes btn-border-rotate {
+  to { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
 </style>
