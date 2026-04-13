@@ -39,6 +39,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -335,9 +336,9 @@ jobs:
           pnpm build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@v5
         with:
-          static_site_generator: AUTO
+          static_site_generator: automatic
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
