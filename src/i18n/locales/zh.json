@@ -40,10 +40,17 @@
     "menu": "菜单"
   },
   "home": {
+    "heroEyebrow": "虚拟商店",
+    "heroTitlePre": "有意义的产品",
     "heroTitle1": "有",
     "heroTitle2": "目的的艺术",
-    "heroSubtitle": "发现Bhumisparsha School的独特产品——书籍、艺术等等。",
+    "heroSubtitle": "承载历史、艺术与目的的独特作品。每一件物品都是Bhumisparsha社区创造力的表达。",
+    "heroTimestamp": "2026",
     "viewProducts": "查看产品",
+    "explore": "探索",
+    "statProducts": "产品",
+    "statCategories": "分类",
+    "statHandcrafted": "手工制作",
     "categories": "分类",
     "highlights": "精选"
   },
@@ -74,7 +81,44 @@
     "selectSize": "请选择尺寸。",
     "addedToCart": "{name} 已加入购物车！",
     "relatedItems": "相关推荐",
-    "relatedSubtitle": "发现您可能喜欢的类似商品"
+    "relatedSubtitle": "发现您可能喜欢的类似商品",
+    "productDetails": "产品详情",
+    "careInstructions": "T恤护理说明",
+    "specifications": "规格",
+    "weight": "重量",
+    "dimensions": "尺寸",
+    "fulfillment": "配送方式",
+    "ownFulfillment": "自营",
+    "digitalDelivery": "数字交付",
+    "showSizeTable": "尺码表",
+    "hideSizeTable": "关闭尺码表",
+    "sizeTableTitle": "尺寸测量",
+    "sizeTableSize": "尺码",
+    "sizeTableShrink": "本产品首次洗涤后可能收缩最多5%",
+    "sizeTableVariation": "由于手工裁剪，本产品尺寸可能相差最多3厘米。",
+    "sizeDiagram": {
+      "comprimento": "衣长",
+      "largura": "胸宽",
+      "manga": "袖长",
+      "quadril": "臀围",
+      "idade": "年龄"
+    },
+    "sizeTabNormal": "成人",
+    "sizeTabBaby": "婴儿",
+    "sizeTableBabyDesc": "婴儿/儿童T恤的近似尺寸。可能因制造商而异。",
+    "defaultCamisetaMaterial": "采用100%天然可持续棉纤维制成的T恤。",
+    "defaultCamisetaPrint": "采用数码印花",
+    "defaultCamisetaVegan": "经PETA Cruelty Free认证的纯素产品",
+    "defaultCanecaMaterial": "我们的马克杯由陶瓷制成，可容纳325毫升您最喜欢的饮料。印花采用热转印技术，确保与上图所示颜色一致。",
+    "defaultCanecaPrint": "热转印印花",
+    "defaultCanecaMicrowave": "可用于微波炉",
+    "defaultCanecaDishwasher": "避免放入洗碗机",
+    "defaultLivroPages": "页数：",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "采用高品质纸张印刷",
+    "defaultCarePassInside": "反面熨烫：切勿直接在印花上熨烫。将T恤翻到反面，使用中低温熨烫。",
+    "defaultCareProtectiveCloth": "使用保护布：如果需要在印花侧熨烫T恤，请在上面放一块棉布，避免熨斗与印花直接接触。",
+    "defaultCareAvoidSteam": "避免直接蒸汽：过多蒸汽会损坏印花，请谨慎使用或选择干熨。"
   },
   "productCard": {
     "add": "添加",
@@ -91,7 +135,8 @@
   },
   "productVariants": {
     "size": "尺寸",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "颜色"
   },
   "cart": {
     "title": "购物车",

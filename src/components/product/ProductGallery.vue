@@ -30,7 +30,9 @@ import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   images: { type: Array, default: () => [] },
-  productName: { type: String, default: '' }
+  productName: { type: String, default: '' },
+  // When a color is selected, jump to that color's first image
+  selectedColorImageIndex: { type: Number, default: null }
 })
 
 const activeIndex = ref(0)
@@ -40,23 +42,49 @@ const currentImage = computed(() => props.images[activeIndex.value] || '')
 watch(() => props.images, () => {
   activeIndex.value = 0
 })
+
+watch(() => props.selectedColorImageIndex, (newIndex) => {
+  if (newIndex !== null && newIndex >= 0 && newIndex < props.images.length) {
+    activeIndex.value = newIndex
+  }
+})
+
+// Expose method to set active image
+function setActiveImage(index) {
+  if (index >= 0 && index < props.images.length) {
+    activeIndex.value = index
+  }
+}
+
+defineExpose({ setActiveImage })
 </script>
 
 <style scoped>
+.gallery {
+  display: flex;
+  flex-direction: column;
+}
+
 .gallery__main {
-  aspect-ratio: 1;
+  width: 100%;
+  height: clamp(320px, 50vw, 520px);
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .gallery__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 .gallery__placeholder {
@@ -82,6 +110,7 @@ watch(() => props.images, () => {
   transition: border-color var(--transition-fast);
   flex-shrink: 0;
   background: var(--surface-2);
+  padding: 0;
 }
 
 .gallery__thumb--active {

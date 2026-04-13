@@ -40,10 +40,17 @@
     "menu": "मेनू"
   },
   "home": {
+    "heroEyebrow": "वर्चुअल स्टोर",
+    "heroTitlePre": "अर्थपूर्ण उत्पाद",
     "heroTitle1": "उद्देश्य के साथ",
     "heroTitle2": "कला",
-    "heroSubtitle": "Bhumisparsha School के अद्वितीय उत्पाद खोजें -- किताबें, कला और बहुत कुछ।",
+    "heroSubtitle": "अद्वितीय टुकड़े जो इतिहास, कला और उद्देश्य को दर्शाते हैं। प्रत्येक वस्तु भूमिस्पर्श समुदाय की रचनात्मकता की अभिव्यक्ति है।",
+    "heroTimestamp": "2026",
     "viewProducts": "उत्पाद देखें",
+    "explore": "अन्वेषण करें",
+    "statProducts": "उत्पाद",
+    "statCategories": "श्रेणियाँ",
+    "statHandcrafted": "हस्तनिर्मित",
     "categories": "श्रेणियाँ",
     "highlights": "विशेष"
   },
@@ -74,7 +81,44 @@
     "selectSize": "कृपया एक आकार चुनें।",
     "addedToCart": "{name} कार्ट में जोड़ा गया!",
     "relatedItems": "संबंधित आइटम",
-    "relatedSubtitle": "समान आइटम खोजें जो आपको पसंद आ सकते हैं"
+    "relatedSubtitle": "समान आइटम खोजें जो आपको पसंद आ सकते हैं",
+    "productDetails": "उत्पाद विवरण",
+    "careInstructions": "टी-शर्ट देखभाल निर्देश",
+    "specifications": "विशेषताएं",
+    "weight": "वजन",
+    "dimensions": "आयाम",
+    "fulfillment": "पूर्ति",
+    "ownFulfillment": "स्वयं",
+    "digitalDelivery": "डिजिटल वितरण",
+    "showSizeTable": "आकार तालिका",
+    "hideSizeTable": "आकार तालिका बंद करें",
+    "sizeTableTitle": "माप",
+    "sizeTableSize": "आकार",
+    "sizeTableShrink": "यह उत्पाद पहली धुलाई के बाद 5% तक सिकड़ सकता है",
+    "sizeTableVariation": "हस्तशिल्प कटाई के कारण, माप 3 सेमी तक भिन्न हो सकते हैं।",
+    "sizeDiagram": {
+      "comprimento": "लंबाई",
+      "largura": "चौड़ाई",
+      "manga": "आस्तीन",
+      "quadril": "कूल्हे",
+      "idade": "आयु"
+    },
+    "sizeTabNormal": "वयस्क",
+    "sizeTabBaby": "शिशु",
+    "sizeTableBabyDesc": "शिशु/बच्चों की टी-शर्ट के अनुमानित माप। निर्माता के अनुसार भिन्न हो सकते हैं।",
+    "defaultCamisetaMaterial": "100% प्राकृतिक टिकाऊ कपास फाइबर से बना टी-शर्ट।",
+    "defaultCamisetaPrint": "डिजिटल प्रिंटिंग से मुद्रित",
+    "defaultCamisetaVegan": "PETA Cruelty Free द्वारा प्रमाणित वेगन उत्पाद",
+    "defaultCanecaMaterial": "हमारा मग सिरेमिक से बना है और आपके पेय 325ml धारण कर सकता है। प्रिंट थर्मल ट्रांसफर द्वारा किया जाता है, ऊपर दी गई तस्वीर में प्रदर्शित रंगों की निष्ठा सुनिश्चित करता है।",
+    "defaultCanecaPrint": "थर्मल ट्रांसफर प्रिंटिंग",
+    "defaultCanecaMicrowave": "माइक्रोवेव ओवन में उपयोग करने के लिए स्वतंत्र",
+    "defaultCanecaDishwasher": "डिशवाशर में रखने से बचें",
+    "defaultLivroPages": "पृष्ठों की संख्या:",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "उच्च गुणवत्ता वाले कागज पर मुद्रित",
+    "defaultCarePassInside": "अंदर से इस्त्री करें: प्रिंट पर सीधे इस्त्री न करें। टी-शर्ट को उल्टा करें और मध्यम या कम तापमान पर इस्त्री का उपयोग करें।",
+    "defaultCareProtectiveCloth": "सुरक्षात्मक कपड़ा उपयोग करें: यदि प्रिंट की तरफ इस्त्री करनी हो, तो इस्त्री और प्रिंट के बीच सीधे संपर्क से बचने के लिए ऊपर सूती कपड़ा रखें।",
+    "defaultCareAvoidSteam": "प्रत्यक्ष भाप से बचें: अत्यधिक भाप प्रिंट को नुकसान पहुंचा सकती है, इसलिए सावधानी से उपयोग करें या सूखी इस्त्री चुनें।"
   },
   "productCard": {
     "add": "जोड़ें",
@@ -82,7 +126,8 @@
   },
   "productVariants": {
     "size": "आकार",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "रंग"
   },
   "cart": {
     "title": "कार्ट",

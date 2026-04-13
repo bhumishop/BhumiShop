@@ -47,6 +47,7 @@ import { useRoute } from 'vue-router'
 import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
+import { useCartStore } from './stores/cart'
 import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
@@ -58,6 +59,7 @@ import Noise from './components/common/Noise.vue'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+const cartStore = useCartStore()
 const route = useRoute()
 const { updateMetaTags } = useSEO()
 const isCartRoute = computed(() => route.name === 'cart')
@@ -90,6 +92,9 @@ function updateRouteSEO() {
 
 // Refresh ScrollTrigger and update SEO on every route change
 watch(() => route.path, () => {
+  // Close cart drawer on navigation
+  cartStore.closeDrawer()
+
   // Wait for DOM to update, then refresh
   requestAnimationFrame(() => {
     refreshScrollTriggers()

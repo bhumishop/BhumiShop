@@ -35,17 +35,27 @@
           <div class="hero__text">
             <div class="hero__eyebrow">
               <span class="hero__eyebrow-line"></span>
-              <span class="hero__eyebrow-text">{{ $t('home.heroEyebrow') || 'Virtual Store' }}</span>
+              <span class="hero__eyebrow-text">{{ $t('home.heroEyebrow') || 'VIRTUAL STORE' }}</span>
+              <span class="hero__eyebrow-line"></span>
             </div>
 
             <h1 class="hero__title">
-              <span class="hero__title-line">Bhumisparsha</span>
-              <span class="hero__title-line hero__title-line--accent">School</span>
+              <span class="hero__title-line hero__title-main">
+                <span class="hero__title-glitch" data-text="Bhumisparsha">Bhumisparsha</span>
+              </span>
+              <span class="hero__title-line hero__title-line--accent hero__title-main">
+                <span class="hero__title-glitch" data-text="School">School</span>
+              </span>
             </h1>
 
             <p class="hero__subtitle">
               {{ $t('home.heroSubtitle') }}
             </p>
+
+            <div class="hero__vhs-indicator">
+              <span class="hero__vhs-rec">REC</span>
+              <span class="hero__vhs-timestamp">{{ $t('home.heroTimestamp') || '2026' }}</span>
+            </div>
 
             <div class="hero__actions">
               <button class="hero__btn-primary" @click="$router.push('/produtos')">
@@ -62,15 +72,15 @@
             <div class="hero__stats">
               <div class="hero__stat">
                 <span class="hero__stat-value">{{ productStore.products.length }}</span>
-                <span class="hero__stat-label">Products</span>
+                <span class="hero__stat-label">{{ $t('home.statProducts') || 'Products' }}</span>
               </div>
               <div class="hero__stat">
                 <span class="hero__stat-value">{{ productStore.categories.length }}</span>
-                <span class="hero__stat-label">Categories</span>
+                <span class="hero__stat-label">{{ $t('home.statCategories') || 'Categories' }}</span>
               </div>
               <div class="hero__stat">
                 <span class="hero__stat-value">100%</span>
-                <span class="hero__stat-label">Handcrafted</span>
+                <span class="hero__stat-label">{{ $t('home.statHandcrafted') || 'Handcrafted' }}</span>
               </div>
             </div>
           </div>
@@ -345,27 +355,68 @@ const galleryItems = computed(() => {
   width: clamp(1.5rem, 3vw, 2rem);
   height: 0.0625rem;
   background: var(--accent);
+  animation: vhs-line-flicker 3s ease-in-out infinite;
 }
 
 .hero__eyebrow-text {
   font-size: clamp(0.6rem, 1.2vw, 0.75rem);
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--accent);
+  font-family: var(--font-mono);
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
 }
 
 .hero__title {
   font-size: clamp(2rem, 6vw + 1rem, 5.5rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: clamp(0.75rem, 2vh, 1.25rem);
+  position: relative;
+  font-family: 'Space Grotesk', var(--font-sans);
 }
 
 .hero__title-line {
   display: block;
+}
+
+.hero__title-main {
+  position: relative;
+  display: inline-block;
+}
+
+.hero__title-glitch {
+  position: relative;
+  display: inline-block;
+  animation: vhs-text-glitch 5s ease-in-out infinite;
+}
+
+.hero__title-glitch::before,
+.hero__title-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: vhs-glitch-layers 4s ease-in-out infinite;
+  font-family: 'Space Grotesk', var(--font-sans);
+}
+
+.hero__title-glitch::before {
+  color: #22c55e;
+  z-index: -1;
+  animation-delay: 0.1s;
+}
+
+.hero__title-glitch::after {
+  color: #8b5cf6;
+  z-index: -1;
+  animation-delay: 0.2s;
 }
 
 .hero__title-line--accent {
@@ -378,6 +429,46 @@ const galleryItems = computed(() => {
   line-height: clamp(1.4, 2vw, 1.6);
   max-width: clamp(280px, 50vw, 540px);
   margin-bottom: clamp(1rem, 3vh, 1.75rem);
+}
+
+/* VHS Timestamp Indicator */
+.hero__vhs-indicator {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(0.75rem, 2vh, 1.25rem);
+  font-family: var(--font-mono);
+  opacity: 0.6;
+}
+
+.hero__vhs-rec {
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #ef4444;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  animation: vhs-rec-blink 1.5s ease-in-out infinite;
+  position: relative;
+}
+
+.hero__vhs-rec::before {
+  content: '';
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #ef4444;
+  border-radius: 50%;
+  margin-right: 0.375rem;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  animation: vhs-rec-blink 1.5s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+.hero__vhs-timestamp {
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
 }
 
 .hero__actions {
@@ -485,6 +576,58 @@ const galleryItems = computed(() => {
   50% { opacity: 1; }
 }
 
+/* ===== VHS ANIMATIONS ===== */
+
+/* VHS line flicker */
+@keyframes vhs-line-flicker {
+  0%, 100% { opacity: 1; }
+  5% { opacity: 0.4; }
+  10% { opacity: 1; }
+  48% { opacity: 1; }
+  50% { opacity: 0.6; }
+  52% { opacity: 1; }
+}
+
+/* VHS text glitch */
+@keyframes vhs-text-glitch {
+  0%, 100% { transform: translate(0); }
+  2% { transform: translate(2px, -1px); }
+  4% { transform: translate(-2px, 1px); }
+  6% { transform: translate(0); }
+  48% { transform: translate(0); }
+  50% { transform: translate(-1px, 0); }
+  52% { transform: translate(1px, 0); }
+  54% { transform: translate(0); }
+}
+
+/* VHS glitch layers */
+@keyframes vhs-glitch-layers {
+  0%, 100% { opacity: 0; transform: translate(0); }
+  2% { opacity: 0.8; transform: translate(-2px, 1px); }
+  4% { opacity: 0; transform: translate(0); }
+  48% { opacity: 0; transform: translate(0); }
+  50% { opacity: 0.6; transform: translate(2px, -1px); }
+  52% { opacity: 0; transform: translate(0); }
+}
+
+/* VHS REC indicator blink */
+@keyframes vhs-rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* VHS scanlines overlay effect for text */
+@keyframes vhs-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* VHS noise/static subtle effect */
+@keyframes vhs-static {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.04; }
+}
+
 /* Featured Section */
 .featured {
   padding: clamp(2rem, 6vh, 3.125rem) 0;
@@ -544,6 +687,10 @@ const galleryItems = computed(() => {
     margin-right: auto;
   }
 
+  .hero__vhs-indicator {
+    justify-content: center;
+  }
+
   .hero__actions {
     justify-content: center;
   }
@@ -573,6 +720,10 @@ const galleryItems = computed(() => {
     font-size: clamp(0.8rem, 2.5vw + 0.25rem, 0.95rem);
     margin-bottom: clamp(0.75rem, 2.5vh, 1.5rem);
     line-height: 1.5;
+  }
+
+  .hero__vhs-indicator {
+    margin-bottom: clamp(0.5rem, 2vh, 1rem);
   }
 
   .hero__actions {

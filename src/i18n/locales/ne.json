@@ -40,10 +40,17 @@
     "menu": "मेनु"
   },
   "home": {
+    "heroEyebrow": "भर्चुअल पसल",
+    "heroTitlePre": "अर्थपूर्ण उत्पादनहरू",
     "heroTitle1": "उद्देश्य सहितको",
     "heroTitle2": "कला",
-    "heroSubtitle": "Bhumisparsha School बाट अद्वितीय उत्पादनहरू पत्ता लगाउनुहोस् -- किताबहरू, कला र धेरै थप।",
+    "heroSubtitle": "इतिहास, कला र उद्देश्य बोक्ने अद्वितीय टुक्राहरू। प्रत्येक वस्तु भूमिस्पर्श समुदायको सिर्जनशीलताको अभिव्यक्ति हो।",
+    "heroTimestamp": "2026",
     "viewProducts": "उत्पादनहरू हेर्नुहोस्",
+    "explore": "अन्वेषण गर्नुहोस्",
+    "statProducts": "उत्पादनहरू",
+    "statCategories": "श्रेणीहरू",
+    "statHandcrafted": "हस्तनिर्मित",
     "categories": "श्रेणीहरू",
     "highlights": "मुख्य उत्पादनहरू"
   },
@@ -74,7 +81,44 @@
     "selectSize": "कृपया आकार छनौट गर्नुहोस्।",
     "addedToCart": "{name} कार्टमा थपियो!",
     "relatedItems": "सम्बन्धित वस्तुहरू",
-    "relatedSubtitle": "तपाईंले मन पराउन सक्ने उस्तै वस्तुहरू पत्ता लगाउनुहोस्"
+    "relatedSubtitle": "तपाईंले मन पराउन सक्ने उस्तै वस्तुहरू पत्ता लगाउनुहोस्",
+    "productDetails": "उत्पादन विवरण",
+    "careInstructions": "टी-सर्ट हेरचाह निर्देशन",
+    "specifications": "विशिष्टताहरू",
+    "weight": "तौल",
+    "dimensions": "आयामहरू",
+    "fulfillment": "पूर्ति",
+    "ownFulfillment": "आफ्नै",
+    "digitalDelivery": "डिजिटल डेलिभरी",
+    "showSizeTable": "आकार तालिका",
+    "hideSizeTable": "आकार तालिका बन्द गर्नुहोस्",
+    "sizeTableTitle": "मापन",
+    "sizeTableSize": "आकार",
+    "sizeTableShrink": "यो उत्पादन पहिलो पटक धुएपछि ५% सम्म खुम्चिन सक्छ",
+    "sizeTableVariation": "हस्त निर्मित कटाइको कारण, मापन ३ सेमी सम्म फरक पर्न सक्छ।",
+    "sizeDiagram": {
+      "comprimento": "लम्बाइ",
+      "largura": "चौडाइ",
+      "manga": "बाहुला",
+      "quadril": "नितम्ब",
+      "idade": "उमेर"
+    },
+    "sizeTabNormal": "वयस्क",
+    "sizeTabBaby": "शिशु",
+    "sizeTableBabyDesc": "शिशु/बच्चाहरूको टी-सर्टको अनुमानित मापन। निर्माता अनुसार फरक पर्न सक्छ।",
+    "defaultCamisetaMaterial": "१००% प्राकृतिक दिगो कपास फाइबरबाट बनेको टी-सर्ट।",
+    "defaultCamisetaPrint": "डिजिटल प्रिन्टिङद्वारा छपाइ",
+    "defaultCamisetaVegan": "PETA Cruelty Free द्वारा प्रमाणित भेगन उत्पादन",
+    "defaultCanecaMaterial": "हाम्रो मग सेरामिकबाट बनेको छ र तपाईंको मनपर्ने पेय ३२५ मलिसम्म अट्छ। प्रिन्ट थर्मल ट्रान्सफरद्वारा गरिन्छ, माथिको तस्बिरमा देखाइएको रंगको निष्ठा सुनिश्चित गर्दछ।",
+    "defaultCanecaPrint": "थर्मल ट्रान्सफर प्रिन्टिङ",
+    "defaultCanecaMicrowave": "माइक्रोवेभ ओभनमा प्रयोग गर्न सकिन्छ",
+    "defaultCanecaDishwasher": "डिसवासरमा नराख्नुहोस्",
+    "defaultLivroPages": "पृष्ठ सङ्ख्या:",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "उच्च गुणस्तरको कागजमा प्रिन्ट गरिएको",
+    "defaultCarePassInside": "भित्रबाट इस्त्री गर्नुहोस्: प्रिन्टमाथि सिधै इस्त्री नगर्नुहोस्। टी-सर्ट उल्ट्याउनुहोस् र मध्यम वा न्यून तापक्रममा इस्त्री प्रयोग गर्नुहोस्।",
+    "defaultCareProtectiveCloth": "सुरक्षात्मक कपडा प्रयोग गर्नुहोस्: यदि प्रिन्ट पट्टि इस्त्री गर्नुपर्छ भने, इस्त्री र प्रिन्टबीचको सिधै सम्पर्कबाट बच्न माथि कपासको कपडा राख्नुहोस्।",
+    "defaultCareAvoidSteam": "प्रत्यक्ष वाफबाट बच्नुहोस्: अत्यधिक वाफले प्रिन्टलाई क्षति पुर्याउन सक्छ, सावधानीपूर्वक प्रयोग गर्नुहोस् वा सुख्खा इस्त्री छनौट गर्नुहोस्।"
   },
   "productCard": {
     "add": "थप्नुहोस्",
@@ -82,7 +126,8 @@
   },
   "productVariants": {
     "size": "आकार",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "रङ"
   },
   "cart": {
     "title": "कार्ट",

@@ -40,10 +40,17 @@
     "menu": "เมนู"
   },
   "home": {
+    "heroEyebrow": "ร้านค้าออนไลน์",
+    "heroTitlePre": "สินค้าที่มีความหมาย",
     "heroTitle1": "ศิลปะที่มี",
     "heroTitle2": "วัตถุประสงค์",
-    "heroSubtitle": "ค้นพบสินค้าเฉพาะจาก Bhumisparsha School -- หนังสือ ศิลปะ และอีกมากมาย",
+    "heroSubtitle": "ชิ้นงานพิเศษที่แฝงไปด้วยประวัติศาสตร์ ศิลปะ และวัตถุประสงค์ ทุกสินค้าเป็นการแสดงออกถึงความสร้างสรรค์ของชุมชน Bhumisparsha",
+    "heroTimestamp": "2026",
     "viewProducts": "ดูสินค้า",
+    "explore": "สำรวจ",
+    "statProducts": "สินค้า",
+    "statCategories": "หมวดหมู่",
+    "statHandcrafted": "ทำมือ",
     "categories": "หมวดหมู่",
     "highlights": "สินค้าแนะนำ"
   },
@@ -74,7 +81,44 @@
     "selectSize": "กรุณาเลือกขนาด",
     "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว!",
     "relatedItems": "สินค้าที่เกี่ยวข้อง",
-    "relatedSubtitle": "ค้นพบสินค้าที่คล้ายกันที่คุณอาจชอบ"
+    "relatedSubtitle": "ค้นพบสินค้าที่คล้ายกันที่คุณอาจชอบ",
+    "productDetails": "รายละเอียดสินค้า",
+    "careInstructions": "คำแนะนำการดูแลเสื้อยืด",
+    "specifications": "คุณสมบัติ",
+    "weight": "น้ำหนัก",
+    "dimensions": "ขนาด",
+    "fulfillment": "การจัดส่ง",
+    "ownFulfillment": "ของเราเอง",
+    "digitalDelivery": "จัดส่งดิจิทัล",
+    "showSizeTable": "ตารางขนาด",
+    "hideSizeTable": "ปิดตารางขนาด",
+    "sizeTableTitle": "การวัดขนาด",
+    "sizeTableSize": "ขนาด",
+    "sizeTableShrink": "สินค้านี้อาจหดได้ถึง 5% หลังจากซักครั้งแรก",
+    "sizeTableVariation": "เนื่องจากการตัดแบบทำมือ ขนาดอาจแตกต่างกันได้สูงสุด 3 ซม.",
+    "sizeDiagram": {
+      "comprimento": "ความยาว",
+      "largura": "ความกว้าง",
+      "manga": "แขนเสื้อ",
+      "quadril": "สะโพก",
+      "idade": "อายุ"
+    },
+    "sizeTabNormal": "ผู้ใหญ่",
+    "sizeTabBaby": "เด็กอ่อน",
+    "sizeTableBabyDesc": "ขนาดโดยประมาณสำหรับเสื้อยืดเด็ก/เด็กอ่อน อาจแตกต่างกันไปตามผู้ผลิต",
+    "defaultCamisetaMaterial": "เสื้อยืดทำจากเส้นใยฝ้ายธรรมชาติ 100% แบบยั่งยืน",
+    "defaultCamisetaPrint": "พิมพ์ด้วยการพิมพ์ดิจิทัล",
+    "defaultCamisetaVegan": "ผลิตภัณฑ์มังสวิรัติที่ได้รับการรับรองจาก PETA Cruelty Free",
+    "defaultCanecaMaterial": "แก้วของเราทำจากเซรามิก จุได้ 325 มล. สำหรับเครื่องดื่มที่คุณชื่นชอบ การพิมพ์ทำโดยการโอนความร้อน เพื่อให้ตรงกับสีที่แสดงในภาพด้านบน",
+    "defaultCanecaPrint": "การพิมพ์แบบโอนความร้อน",
+    "defaultCanecaMicrowave": "สามารถใช้ในเตาไมโครเวฟได้",
+    "defaultCanecaDishwasher": "หลีกเลี่ยงการใส่ในเครื่องล้างจาน",
+    "defaultLivroPages": "จำนวนหน้า:",
+    "defaultLivroIsbn": "ISBN",
+    "defaultLivroPrint": "พิมพ์บนกระดาษคุณภาพสูง",
+    "defaultCarePassInside": "รีด้านใน: อย่ารีดโดยตรงบนลวดลาย กลับเสื้อยืดและใช้เตารีดที่อุณหภูมิปานกลางหรือต่ำ",
+    "defaultCareProtectiveCloth": "ใช้ผ้าป้องกัน: หากต้องการรีดด้านลวดลาย ให้วางผ้าฝ้ายด้านบนเพื่อหลีกเลี่ยงการสัมผัสโดยตรงระหว่างเตารีดและลวดลาย",
+    "defaultCareAvoidSteam": "หลีกเลี่ยงไอน้ำโดยตรง: ไอน้ำมากเกินไปอาจทำลายลวดลาย ใช้ด้วยความระมัดระวังหรือเลือกการรีดแบบแห้ง"
   },
   "productCard": {
     "add": "เพิ่ม",
@@ -82,7 +126,8 @@
   },
   "productVariants": {
     "size": "ขนาด",
-    "sizePlaceholder": "S, M, L, XL"
+    "sizePlaceholder": "S, M, L, XL",
+    "color": "สี"
   },
   "cart": {
     "title": "รถเข็น",
