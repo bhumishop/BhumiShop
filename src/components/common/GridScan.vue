@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, useTemplateRef, type CSSProperties } from 'vue';
+import { onMounted, onUnmounted, watch, useTemplateRef, type CSSProperties } from 'vue';
 import { EffectComposer, RenderPass, EffectPass, BloomEffect, ChromaticAberrationEffect } from 'postprocessing';
 import * as THREE from 'three';
 import { useGridScanStore } from '../../stores/gridscan';

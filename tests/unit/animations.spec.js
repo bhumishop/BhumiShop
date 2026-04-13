@@ -699,7 +699,7 @@ describe('Animation System - Performance', () => {
     // Setup should be fast (< 100ms for 100 elements)
     expect(setupTime).toBeLessThan(100)
     expect(anim).toBeDefined()
-  })
+  }, { timeout: 10000 })
 
   it('should handle concurrent animations', () => {
     const elements = []

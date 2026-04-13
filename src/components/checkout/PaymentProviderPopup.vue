@@ -103,10 +103,10 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../stores/auth'
 
-const { t } = useI18n()
+const _t = useI18n()
 const authStore = useAuthStore()
 
-const props = defineProps({
+const _props = defineProps({
   show: { type: Boolean, default: false },
   hasUmaPencaItems: { type: Boolean, default: false }
 })

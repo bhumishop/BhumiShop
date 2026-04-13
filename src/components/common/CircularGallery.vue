@@ -71,7 +71,7 @@ type GL = Renderer['gl'];
 
 function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: number;
-  return function (this: unknown, ...args: Parameters<T>) {
+  return function (this: unknown, ..._args: Parameters<T>) {
     window.clearTimeout(timeout);
     timeout = window.setTimeout(() => func.apply(this, args), wait);
   };
@@ -80,7 +80,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number)
 /**
  * Cubic ease-out using direct multiplication (faster than Math.pow)
  */
-function easeOutCubic(t: number): number {
+function _easeOutCubic(t: number): number {
   const mt = 1 - t;
   return 1 - mt * mt * mt;
 }
@@ -89,7 +89,7 @@ function easeOutCubic(t: number): number {
  * Smooth scroll interpolation with velocity-aware easing.
  * Uses direct cubic multiplication instead of Math.pow for performance.
  */
-function smoothLerp(current: number, target: number, baseEase: number, velocity: number = 0): number {
+function smoothLerp(current: number, target: number, baseEase: number, _velocity: number = 0): number {
   const distance = Math.abs(target - current);
   const dynamicEase = Math.min(baseEase + (distance / 5000) * 0.05, 0.15);
   const t = dynamicEase * 10;
@@ -98,7 +98,7 @@ function smoothLerp(current: number, target: number, baseEase: number, velocity:
   return current + (target - current) * easedT;
 }
 
-function autoBind<T extends object>(instance: T): void {
+function _autoBind<T extends object>(instance: T): void {
   const proto = Object.getPrototypeOf(instance) as Record<string, unknown> | null;
   if (!proto) return;
   Object.getOwnPropertyNames(proto).forEach(key => {

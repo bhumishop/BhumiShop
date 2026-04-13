@@ -59,7 +59,7 @@ interface AnimateOpts {
   end?: number;
   duration?: number;
   delay?: number;
-  ease?: (t: number) => number;
+  ease?: (_t: number) => number;
   onUpdate: (v: number) => void;
   onEnd?: () => void;
 }

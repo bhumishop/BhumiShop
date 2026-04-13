@@ -99,12 +99,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCartStore } from '../../stores/cart'
-import { calculateShipping, getStateFromCEP, getFreeShippingProgress, FREE_SHIPPING_ABOVE } from '../../stores/shipping'
+import { calculateShipping, FREE_SHIPPING_ABOVE } from '../../stores/shipping'
 
-const { t } = useI18n()
+const _t = useI18n()
 const cartStore = useCartStore()
 
 const cep = ref('')

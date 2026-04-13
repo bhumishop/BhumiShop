@@ -58,7 +58,7 @@ function createWrapper(locale = 'en') {
 describe('LanguageSwitcher Component', () => {
   it('should render the language button with current locale', () => {
     const wrapper = createWrapper('en')
-    expect(wrapper.find('.language-button').exists()).toBe(true)
+    expect(wrapper.find('.lang-btn').exists()).toBe(true)
     expect(wrapper.find('.code').text()).toBe('EN')
   })
 
@@ -77,7 +77,7 @@ describe('LanguageSwitcher Component', () => {
     const wrapper = createWrapper('en')
     // With <script setup>, vm doesn't exposes refs directly
     // We verify the component renders correctly and button exists
-    expect(wrapper.find('.language-button').exists()).toBe(true)
+    expect(wrapper.find('.lang-btn').exists()).toBe(true)
     expect(wrapper.find('.code').text()).toBe('EN')
   })
 
@@ -92,7 +92,7 @@ describe('LanguageSwitcher Component', () => {
 
   it('should highlight the active locale option', async () => {
     const wrapper = createWrapper('en')
-    await wrapper.find('.language-button').trigger('click')
+    await wrapper.find('.lang-btn').trigger('click')
 
     const activeOption = supportedLocales.find(l => l.code === 'en')
     expect(activeOption).toBeDefined()
@@ -114,19 +114,31 @@ describe('Translated Components Render', () => {
   it('should render BaseModal with translated aria-label', async () => {
     const BaseModal = (await import('@/components/common/BaseModal.vue')).default
     const i18n = createI18nPlugin('en')
+    
+    // Create a div to act as the teleport target
+    const teleportTarget = document.createElement('div')
+    teleportTarget.id = 'teleport-target'
+    document.body.appendChild(teleportTarget)
+    
     const wrapper = mount(BaseModal, {
       props: { modelValue: true, title: 'Test' },
       global: { 
         plugins: [i18n],
         stubs: { Teleport: false }
-      }
+      },
+      attachTo: teleportTarget
     })
+    
+    await flushPromises()
 
-    // Modal is rendered via Teleport
-    const modal = wrapper.find('.modal')
-    expect(modal.exists()).toBe(true)
-    const title = wrapper.find('.modal__title')
-    expect(title.text()).toBe('Test')
+    // Modal is rendered via Teleport to body
+    const modal = document.querySelector('.modal')
+    expect(modal).toBeTruthy()
+    const title = document.querySelector('.modal__title')
+    expect(title.textContent).toBe('Test')
+    
+    wrapper.unmount()
+    document.body.removeChild(teleportTarget)
   })
 
   it('should render BasePagination with translated labels', async () => {
