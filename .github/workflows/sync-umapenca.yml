@@ -145,29 +145,28 @@ jobs:
       - name: Verify products.json
         if: success()
         run: |
-          OUTPUT=".github/workflows/scripts/${{ matrix.store }}/output/products.json"
-          if [ -f "$OUTPUT" ]; then
-            echo "${{ matrix.store }} products.json generated successfully"
-            python3 << 'EOF'
-            import json, os
-            output = os.environ.get('OUTPUT_FILE')
-            with open(output) as f:
-                data = json.load(f)
-            print(f"Store: {data.get('store', {}).get('name', 'N/A')}")
-            print(f"Total products: {data.get('total_products', 0)}")
-            print(f"Generated at: {data.get('generated_at', 'N/A')}")
-            cats = {}
-            for p in data.get('products', []):
-                cat = p.get('category', 'unknown')
-                cats[cat] = cats.get(cat, 0) + 1
-            print('Categories:', dict(cats))
-            EOF
-          else
-            echo "ERROR: products.json was not generated for ${{ matrix.store }}"
-            exit 1
-          fi
+          python3 << 'EOF'
+          import json, os, sys
+          output = os.environ.get('OUTPUT_FILE')
+          store = os.environ.get('STORE_NAME', 'unknown')
+          if not os.path.isfile(output):
+              print(f"ERROR: products.json was not generated for {store}")
+              sys.exit(1)
+          print(f"{store} products.json generated successfully")
+          with open(output) as f:
+              data = json.load(f)
+          print(f"Store: {data.get('store', {}).get('name', 'N/A')}")
+          print(f"Total products: {data.get('total_products', 0)}")
+          print(f"Generated at: {data.get('generated_at', 'N/A')}")
+          cats = {}
+          for p in data.get('products', []):
+              cat = p.get('category', 'unknown')
+              cats[cat] = cats.get(cat, 0) + 1
+          print('Categories:', dict(cats))
+          EOF
         env:
           OUTPUT_FILE: ".github/workflows/scripts/${{ matrix.store }}/output/products.json"
+          STORE_NAME: "${{ matrix.store }}"
 
       - name: Upload products.json artifact
         if: always()
