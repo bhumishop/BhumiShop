@@ -139,7 +139,9 @@ jobs:
         run: |
           SCRIPT=".github/workflows/scripts/umapenca.py"
           OUTPUT=".github/workflows/scripts/${{ matrix.store }}/output/products.json"
-          CMD="python3 $SCRIPT --full --output $OUTPUT"
+          # Incremental by default — only changed products get image upload + DB upsert
+          # Use --full only when you need to force re-sync everything
+          CMD="python3 $SCRIPT --output $OUTPUT"
           CMD="$CMD --url ${{ steps.store-config.outputs.url }}"
           CMD="$CMD --store-id ${{ steps.store-config.outputs.store_id }}"
           CMD="$CMD --collection ${{ steps.store-config.outputs.collection }}"

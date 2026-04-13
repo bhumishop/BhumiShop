@@ -1087,43 +1087,46 @@ class SupabaseSync:
         return rows[0] if rows else None
 
     def product_needs_update(self, product: ScrapedProduct, existing: dict) -> bool:
-        """Check if a product needs updating by comparing raw data hashes."""
+        """Check if a product needs updating by comparing raw data hashes.
+        
+        Hash is stored in metadata.data_hash (set during upsert_product).
+        Fallback: check third_party_raw_data.data_hash for legacy records.
+        """
         if not existing:
             return True
         
-        # Check if third_party_raw_data exists and compare
-        existing_raw = existing.get("third_party_raw_data") or {}
-        existing_hash = existing_raw.get("data_hash")
-        
-        # Calculate current hash
+        # Calculate current hash from raw product data
         current_raw = product.third_party_raw_data or {}
         raw_data = current_raw.get("raw", {})
         current_hash = hashlib.md5(
             json.dumps(raw_data, sort_keys=True).encode()
         ).hexdigest()
         
-        # If hashes differ, update needed
-        if existing_hash and existing_hash != current_hash:
-            return True
+        # Look for existing hash — check metadata first (canonical), then legacy location
+        existing_hash = None
+        metadata = existing.get("metadata") or {}
+        if isinstance(metadata, dict):
+            existing_hash = metadata.get("data_hash")
+        if not existing_hash:
+            existing_raw = existing.get("third_party_raw_data") or {}
+            if isinstance(existing_raw, dict):
+                existing_hash = existing_raw.get("data_hash")
         
-        # If no hash stored, check sync age (update if older than 24h)
-        synced_at = existing.get("third_party_synced_at")
-        if synced_at:
-            try:
-                sync_time = datetime.fromisoformat(synced_at.replace("Z", "+00:00"))
-                age_hours = (datetime.now(timezone.utc) - sync_time).total_seconds() / 3600
-                if age_hours > 24:
-                    return True
-            except Exception:
-                pass
+        # If hashes match, product is unchanged
+        if existing_hash and existing_hash == current_hash:
+            return False
         
-        return False
+        # If hashes differ (or no hash stored yet), update needed
+        return True
 
     def get_all_synced_products(self, source: str = "uma-penca") -> dict:
-        """Get all products from DB for incremental sync comparison."""
+        """Get all products from DB for incremental sync comparison.
+        Returns {third_party_product_id: {id, slug, images, metadata, ...}}
+        """
         rows = self._get(
             f"products?third_party_source=eq.{source}"
-            f"&select=id,third_party_product_id,third_party_synced_at,third_party_raw_data"
+            f"&select=id,slug,third_party_product_id,third_party_synced_at,"
+            f"third_party_raw_data,metadata,image,images"
         )
         result = {}
         for row in rows:
@@ -1137,7 +1140,14 @@ class SupabaseSync:
         product: ScrapedProduct,
         collection_id: Optional[str],
         subcollection_id: Optional[str],
+        existing_cache: dict = None,
     ) -> dict:
+        """Upsert a single product. Uses existing_cache to avoid N+1 queries.
+        
+        Args:
+            existing_cache: dict mapping third_party_product_id -> existing DB row.
+                            If provided, skips the individual lookup query.
+        """
         # Use Supabase Storage URLs if available, otherwise fall back to original URLs
         image = product.supabase_image_urls[0] if product.supabase_image_urls else product.image
         images = product.supabase_image_urls if product.supabase_image_urls else product.images
@@ -1198,7 +1208,15 @@ class SupabaseSync:
             },
         }
 
-        existing = self.existing_product(product.third_party_product_id or "", product.third_party_source)
+        # Use cache if available, otherwise fall back to individual query
+        tp_id = product.third_party_product_id or ""
+        source = product.third_party_source
+        existing = None
+        if existing_cache and tp_id:
+            existing = existing_cache.get(tp_id)
+        if not existing:
+            existing = self.existing_product(tp_id, source)
+
         if existing:
             resp = self._patch(f"products?id=eq.{existing['id']}", payload)
             action = "updated"
@@ -1341,20 +1359,27 @@ def run(args) -> SyncResult:
 
     products_to_sync = products
     skipped_unchanged = 0
+    synced_products_cache = {}  # Cache for N+1 avoidance in upsert_product
     
     if not args.full and not args.dry_run and SUPABASE_URL and SUPABASE_KEY:
         logger.info("Incremental sync mode: checking for changed products...")
         supabase_check = SupabaseSync(SUPABASE_URL, SUPABASE_KEY, getattr(args, 'subcollection', 'uma-penca') or 'uma-penca')
-        synced_products = supabase_check.get_all_synced_products("uma-penca")
+        synced_products_cache = supabase_check.get_all_synced_products("uma-penca")
         
         changed_products = []
         for p in products:
             tp_id = p.third_party_product_id
-            existing = synced_products.get(tp_id)
+            existing = synced_products_cache.get(tp_id)
             
             if supabase_check.product_needs_update(p, existing):
                 changed_products.append(p)
                 if existing:
+                    # For changed products with existing images, reuse existing Storage URLs
+                    # to avoid re-downloading and re-uploading identical images
+                    existing_images = existing.get("images") or []
+                    if existing_images:
+                        p.supabase_image_urls = existing_images
+                        p.image = existing_images[0] if existing_images else p.image
                     logger.info(f"  Changed: {p.name} (ID: {tp_id})")
                 else:
                     logger.info(f"  New: {p.name} (ID: {tp_id})")
@@ -1364,6 +1389,26 @@ def run(args) -> SyncResult:
         
         products_to_sync = changed_products
         logger.info(f"Incremental sync: {len(products_to_sync)} changed/new, {skipped_unchanged} unchanged")
+
+    # ── 2.6. Early exit if nothing to sync ─────────────────────
+
+    if not products_to_sync and not args.full:
+        logger.info("No changed or new products detected — skipping image upload + DB sync")
+        result.duration_seconds = time.time() - start
+        # Still generate products.json for the record
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = args.output or f"scraped_products_{ts}.json"
+        generate_products_json(products, output_file, {})
+        print("\n" + "=" * 52)
+        print("Sync summary (no changes)")
+        print("=" * 52)
+        print(f"  Discovered      : {len(raw_products)}")
+        print(f"  Converted       : {len(products)}")
+        print(f"  Skipped unchanged : {skipped_unchanged}")
+        print(f"  Images uploaded : 0 (skipped)")
+        print(f"  DB upserts      : 0 (skipped)")
+        print(f"  Duration        : {result.duration_seconds:.1f}s")
+        return result
 
     # ── 3. Save raw JSON ─────────────────────────────────────
 
@@ -1388,12 +1433,22 @@ def run(args) -> SyncResult:
 
     image_map_storage = {}
     if args.upload_images and SUPABASE_URL and SUPABASE_KEY:
-        uploader = SupabaseStorageUploader(SUPABASE_URL, SUPABASE_KEY, STORAGE_BUCKET)
-        logger.info(f"Uploading images to Supabase Storage bucket: {STORAGE_BUCKET}")
-        # Only upload images for products that need syncing
-        image_map_storage = uploader.upload_all(products_to_sync, client, workers=2)
-        result.images_uploaded = uploader.uploaded
-
+        # Only upload images for products that DON'T already have Supabase Storage URLs
+        products_needing_image_upload = [
+            p for p in products_to_sync
+            if not p.supabase_image_urls  # Skip if already has Storage URLs (from cache)
+        ]
+        
+        if products_needing_image_upload:
+            uploader = SupabaseStorageUploader(SUPABASE_URL, SUPABASE_KEY, STORAGE_BUCKET)
+            logger.info(f"Uploading images to Supabase Storage bucket: {STORAGE_BUCKET}")
+            logger.info(f"  Products needing image upload: {len(products_needing_image_upload)}/{len(products_to_sync)} "
+                        f"({len(products_to_sync) - len(products_needing_image_upload)} reuse existing)")
+            image_map_storage = uploader.upload_all(products_needing_image_upload, client, workers=2)
+            result.images_uploaded = uploader.uploaded
+        else:
+            logger.info(f"All {len(products_to_sync)} products already have Storage URLs — skipping image upload")
+        
         # Update product image URLs to point to Supabase Storage
         for p in products_to_sync:
             if p.supabase_image_urls:
@@ -1436,7 +1491,8 @@ def run(args) -> SyncResult:
         for p in products_to_sync:
             result.processed += 1
             try:
-                sr = supabase.upsert_product(p, collection_id, subcollection_id)
+                sr = supabase.upsert_product(p, collection_id, subcollection_id,
+                                             existing_cache=synced_products_cache)
                 if sr["success"]:
                     if sr["action"] == "inserted":
                         result.inserted += 1
