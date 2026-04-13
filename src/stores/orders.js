@@ -30,15 +30,21 @@ export const useOrderStore = defineStore('orders', () => {
     }
   }
 
-  async function fetchOrderByNumber(orderNumber) {
+  async function fetchOrderByNumber(orderNumber, userId = null, isAdmin = false) {
     loading.value = true
     error.value = null
     try {
-      const { data, error: err } = await supabase
+      let query = supabase
         .from('orders')
         .select('*, order_items(*), order_status_history(*)')
         .eq('order_number', orderNumber)
-        .single()
+
+      // If not admin, verify ownership via user_id
+      if (!isAdmin && userId) {
+        query = query.eq('user_id', userId)
+      }
+
+      const { data, error: err } = await query.single()
 
       if (err) throw err
       currentOrder.value = data
@@ -56,11 +62,27 @@ export const useOrderStore = defineStore('orders', () => {
     loading.value = true
     error.value = null
     try {
+      // Check for idempotency key to prevent duplicate orders
+      if (orderData.idempotencyKey) {
+        const { data: existingOrder } = await supabase
+          .from('orders')
+          .select('id, order_number')
+          .eq('idempotency_key', orderData.idempotencyKey)
+          .single()
+        
+        if (existingOrder) {
+          console.warn('Duplicate order detected via idempotency key:', orderData.idempotencyKey)
+          currentOrder.value = existingOrder
+          return existingOrder
+        }
+      }
+
       const { data: orderNumber, error: numError } = await supabase.rpc('generate_order_number')
       if (numError) throw numError
 
       const orderPayload = {
         order_number: orderNumber,
+        idempotency_key: orderData.idempotencyKey || null,
         status: 'pending',
         total: orderData.total,
         payment_method: orderData.paymentMethod,

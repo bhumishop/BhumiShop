@@ -256,7 +256,7 @@
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           <h3 class="checkout-page__redirect-title">{{ $t('checkout.step4.finalizePayment') }}</h3>
           <p class="checkout-page__redirect-desc">{{ $t('checkout.step4.redirectDesc') }}</p>
-          <BaseButton variant="primary" @click="checkoutStore.redirectToBillingCheckout()">
+          <BaseButton variant="primary" @click="handleBillingRedirect">
             {{ $t('checkout.step4.goToPayment') }}
           </BaseButton>
         </div>
@@ -596,48 +596,57 @@ function handleUmaPencaRedirect() {
   const umaPencaItems = cartStore.items.filter(item => item.fulfillment_type === 'uma_penca')
   const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
 
-  // Build cart items payload with product IDs and quantities
-  // Format: cart[items][]=product_id:quantity (common e-commerce pattern)
-  const cartItems = umaPencaItems.map(item => ({
-    id: item.id,
-    quantity: item.quantity,
+  const cartPayload = umaPencaItems.map(item => ({
+    id: parseInt(item.id, 10) || item.id,
+    qty: Math.min(Math.max(item.quantity, 1), 99),
     size: item.size || null
   }))
 
-  // Encode cart data as JSON for the external store to parse
-  const cartData = encodeURIComponent(JSON.stringify(cartItems))
-  const productIds = umaPencaItems.map(item => `product=${item.id}`).join('&')
-
-  // Try the cart API endpoint first, fallback to simple product IDs
+  const encodedCart = btoa(JSON.stringify(cartPayload))
   const url = new URL(`${storeUrl}/checkout`)
-  url.searchParams.set('cart_data', cartData)
+  url.searchParams.set('cart', encodedCart)
   url.searchParams.set('ref', 'bhumi-shop')
-  url.searchParams.set('products', productIds)
 
+  cartStore.clearCart()
   window.location.href = url.toString()
 }
 
 function startPixPolling() {
   if (pixPollingTimer) clearInterval(pixPollingTimer)
   pixPollingTimer = setInterval(async () => {
-    await checkPixPayment()
+    const result = await checkPixPayment()
+    // Stop polling immediately if payment is confirmed
+    if (result?.confirmed) {
+      clearInterval(pixPollingTimer)
+      pixPollingTimer = null
+    }
   }, 10000)
 }
 
 async function checkPixPayment() {
   checkingPix.value = true
   try {
-    const status = await checkoutStore.checkPixStatus()
-    if (status === 'paid') {
+    const { status, confirmed } = await checkoutStore.checkPixStatus()
+    if (confirmed || status === 'paid') {
       pixPaid.value = true
       clearInterval(pixPollingTimer)
+      pixPollingTimer = null
       toast.success(t('checkout.step4.pixConfirmed'))
+      return { confirmed: true, status }
     }
+    return { confirmed: false, status }
   } catch {
     // Silent polling failure
+    return { confirmed: false, status: null }
   } finally {
     checkingPix.value = false
   }
+}
+
+function handleBillingRedirect() {
+  // Clear cart when redirecting to external payment
+  cartStore.clearCart()
+  checkoutStore.redirectToBillingCheckout()
 }
 
 onUnmounted(() => {

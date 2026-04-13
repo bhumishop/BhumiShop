@@ -21,9 +21,9 @@ function corsHeaders(origin?: string) {
 function verifyWebhookSignature(payload: string, signature: string): boolean {
   const webhookSecret = Deno.env.get('ABACATEPAY_WEBHOOK_SECRET')
   if (!webhookSecret) {
-    // If no secret configured, log warning but allow (for development)
-    console.warn('ABACATEPAY_WEBHOOK_SECRET not configured - signature verification skipped')
-    return true
+    // In production, signature verification MUST be enforced
+    console.error('ABACATEPAY_WEBHOOK_SECRET not configured - rejecting webhook')
+    return false
   }
 
   const expectedSignature = createHmac('sha256', webhookSecret)
@@ -99,16 +99,22 @@ serve(async (req) => {
     const rawBody = await req.text()
     const signature = req.headers.get('x-webhook-signature') || req.headers.get('X-Webhook-Signature')
 
-    // Verify signature if present
-    if (signature) {
-      const isValid = verifyWebhookSignature(rawBody, signature)
-      if (!isValid) {
-        console.error('Invalid webhook signature')
-        return new Response(
-          JSON.stringify({ error: 'Invalid signature' }),
-          { status: 401, headers: { ...corsHeaders(), 'Content-Type': 'application/json' } }
-        )
-      }
+    // Verify signature - required for all webhook calls
+    if (!signature) {
+      console.error('Missing webhook signature')
+      return new Response(
+        JSON.stringify({ error: 'Missing signature' }),
+        { status: 401, headers: { ...corsHeaders(), 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const isValid = verifyWebhookSignature(rawBody, signature)
+    if (!isValid) {
+      console.error('Invalid webhook signature')
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { status: 401, headers: { ...corsHeaders(), 'Content-Type': 'application/json' } }
+      )
     }
 
     const payload = JSON.parse(rawBody)

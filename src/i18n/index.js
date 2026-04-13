@@ -56,7 +56,6 @@ export const i18n = createI18n({
   fallbackLocale: defaultLocale,
   fallbackWarn: false,
   missingWarn: false,
-  silentTranslationWarn: true,
   globalInjection: true, // Inject $t globally
   datetimeFormats: {
     'en': { short: { year: 'numeric', month: 'short', day: 'numeric' } },
