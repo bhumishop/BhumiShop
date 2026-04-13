@@ -61,11 +61,12 @@ sync_store() {
   echo "  Store ID: ${store_id}"
   echo "  Output: ${OUTPUT_DIR}/products.json"
 
+  # Incremental by default — only changed products get synced
+  # Add --full flag manually if you need to force re-sync everything
   python3 "${SCRIPT_DIR}/umapenca.py" \
     --url "$url" \
     --store-id "$store_id" \
     --subcollection "$subcollection" \
-    --full \
     --output "${OUTPUT_DIR}/products.json" \
     ${DRY_RUN} ${SYNC_TO_DB} ${UPLOAD_IMAGES}
 
