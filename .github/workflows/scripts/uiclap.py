@@ -954,13 +954,84 @@ class SupabaseSync:
     def existing_product(self, third_party_id: str) -> Optional[dict]:
         rows = self._get(
             f"products?third_party_product_id=eq.{third_party_id}"
-            f"&third_party_source=eq.uiclap&select=id,slug"
+            f"&third_party_source=eq.uiclap&select=id,slug,third_party_synced_at,third_party_raw_data"
         )
         return rows[0] if rows else None
 
+    def product_needs_update(self, book: ScrapedBook, existing: dict) -> bool:
+        """Check if a book needs updating by comparing raw data hashes."""
+        import hashlib as _hashlib
+        
+        if not existing:
+            return True
+        
+        # Check if third_party_raw_data exists and compare
+        existing_raw = existing.get("third_party_raw_data") or {}
+        existing_hash = existing_raw.get("data_hash")
+        
+        # Calculate current hash from product_ld
+        current_raw = book.third_party_raw_data or {}
+        raw_data = current_raw.get("product_ld", {})
+        current_hash = _hashlib.md5(
+            json.dumps(raw_data, sort_keys=True).encode()
+        ).hexdigest()
+        
+        # If hashes differ, update needed
+        if existing_hash and existing_hash != current_hash:
+            return True
+        
+        # If no hash stored, check sync age (update if older than 24h)
+        synced_at = existing.get("third_party_synced_at")
+        if synced_at:
+            try:
+                sync_time = datetime.fromisoformat(synced_at.replace("Z", "+00:00"))
+                age_hours = (datetime.now(timezone.utc) - sync_time).total_seconds() / 3600
+                if age_hours > 24:
+                    return True
+            except Exception:
+                pass
+        
+        return False
+
+    def get_all_synced_products(self) -> dict:
+        """Get all products from DB for incremental sync comparison."""
+        rows = self._get(
+            f"products?third_party_source=eq.uiclap"
+            f"&select=id,third_party_product_id,third_party_synced_at,third_party_raw_data"
+        )
+        result = {}
+        for row in rows:
+            tp_id = row.get("third_party_product_id")
+            if tp_id:
+                result[tp_id] = row
+        return result
+
     def upsert_product(self, book: ScrapedBook, collection_id, subcollection_id) -> dict:
+        import hashlib as _hashlib
+        
         image  = book.supabase_image_urls[0] if book.supabase_image_urls else book.image
         images = book.supabase_image_urls    if book.supabase_image_urls else book.images
+
+        # Calculate hash of raw data for change detection
+        raw_data = (book.third_party_raw_data or {}).get("product_ld", {})
+        data_hash = _hashlib.md5(
+            json.dumps(raw_data, sort_keys=True).encode()
+        ).hexdigest()
+        
+        # Update raw_data with hash
+        if book.third_party_raw_data:
+            book.third_party_raw_data["data_hash"] = data_hash
+
+        # Build image index metadata
+        image_index = {
+            "total_images": len(images),
+            "images": []
+        }
+        for idx, img_url in enumerate(images):
+            image_index["images"].append({
+                "index": idx,
+                "url": img_url,
+            })
 
         payload = {
             "name":               book.name,
@@ -990,6 +1061,11 @@ class SupabaseSync:
             "third_party_source":      "uiclap",
             "third_party_synced_at":   datetime.now(timezone.utc).isoformat(),
             "third_party_raw_data":    book.third_party_raw_data,
+            "metadata": {
+                **(book.metadata or {}),
+                "image_index": image_index,
+                "data_hash": data_hash,
+            },
         }
 
         existing = self.existing_product(book.third_party_product_id or "")
@@ -1123,15 +1199,44 @@ def run(args) -> SyncResult:
 
     logger.info(f"Converted {len(books)} book(s)")
 
+    # ── 1.5. Incremental sync: detect changed books ───────────
+
+    books_to_sync = books
+    skipped_unchanged = 0
+    
+    if not args.full and not args.dry_run and SUPABASE_URL and SUPABASE_KEY and args.sync_to_db:
+        logger.info("Incremental sync mode: checking for changed books...")
+        supabase_check = SupabaseSync(SUPABASE_URL, SUPABASE_KEY, getattr(args, "subcollection", "uiclap") or "uiclap")
+        synced_books = supabase_check.get_all_synced_products()
+        
+        changed_books = []
+        for b in books:
+            tp_id = b.third_party_product_id
+            existing = synced_books.get(tp_id)
+            
+            if supabase_check.product_needs_update(b, existing):
+                changed_books.append(b)
+                if existing:
+                    logger.info(f"  Changed: {b.name} (SKU: {tp_id})")
+                else:
+                    logger.info(f"  New: {b.name} (SKU: {tp_id})")
+            else:
+                skipped_unchanged += 1
+                logger.debug(f"  Unchanged (skipped): {b.name} (SKU: {tp_id})")
+        
+        books_to_sync = changed_books
+        logger.info(f"Incremental sync: {len(books_to_sync)} changed/new, {skipped_unchanged} unchanged")
+
     # ── 2. Upload images ──────────────────────────────────────
 
     if args.upload_images and SUPABASE_URL and SUPABASE_KEY:
         uploader = SupabaseStorageUploader(SUPABASE_URL, SUPABASE_KEY, STORAGE_BUCKET)
         logger.info(f"Uploading images to Supabase Storage bucket: {STORAGE_BUCKET}")
-        uploader.upload_all(books, client, workers=2)
+        # Only upload images for books that need syncing
+        uploader.upload_all(books_to_sync, client, workers=2)
         result.images_uploaded = uploader.uploaded
 
-        for b in books:
+        for b in books_to_sync:
             if b.supabase_image_urls:
                 b.image  = b.supabase_image_urls[0]
                 b.images = b.supabase_image_urls
@@ -1155,7 +1260,7 @@ def run(args) -> SyncResult:
         subcollection_id = supabase.get_subcollection_id()
         logger.info(f"DB sync: collection='{collection_slug}' subcollection='{subcollection_slug}'")
 
-        for b in books:
+        for b in books_to_sync:
             result.processed += 1
             try:
                 sr = supabase.upsert_product(b, collection_id, subcollection_id)
@@ -1197,6 +1302,9 @@ def run(args) -> SyncResult:
     if author_info:
         print(f"  Author          : {author_info.get('name', '?')}")
     print(f"  Books found     : {len(books)}")
+    if skipped_unchanged > 0:
+        print(f"  Skipped unchanged : {skipped_unchanged}")
+        print(f"  To sync           : {len(books_to_sync)}")
     print(f"  Inserted        : {result.inserted}")
     print(f"  Updated         : {result.updated}")
     print(f"  Failed          : {result.failed}")

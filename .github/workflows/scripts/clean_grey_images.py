@@ -174,17 +174,24 @@ class SupabaseStorageCleaner:
             return None
 
     def is_grey_image(self, img_bytes: bytes) -> bool:
-        """Check if an image is grey/empty."""
+        """Check if an image is grey/empty using improved detection."""
         try:
             img = Image.open(io.BytesIO(img_bytes))
             img = img.convert('RGB')
             
-            pixels = list(img.getdata())
-            total_pixels = len(pixels)
+            width, height = img.size
+            total_pixels = width * height
             
             if total_pixels == 0:
                 return True
             
+            # Small images are likely placeholders
+            if width < 100 or height < 100:
+                return True
+            
+            pixels = list(img.getdata())
+            
+            # Strategy 1: Check channel similarity (grey detection)
             r_vals = [p[0] for p in pixels]
             g_vals = [p[1] for p in pixels]
             b_vals = [p[2] for p in pixels]
@@ -193,21 +200,46 @@ class SupabaseStorageCleaner:
             avg_g = sum(g_vals) / total_pixels
             avg_b = sum(b_vals) / total_pixels
             
+            # If RGB channels are very similar, image is grey
             channel_diff = abs(avg_r - avg_g) + abs(avg_g - avg_b) + abs(avg_r - avg_b)
             
-            if channel_diff < 30:
+            if channel_diff < 25:
+                # Check variance - grey placeholders have very low variance
                 var_r = sum((x - avg_r) ** 2 for x in r_vals) / total_pixels
                 var_g = sum((x - avg_g) ** 2 for x in g_vals) / total_pixels
                 var_b = sum((x - avg_b) ** 2 for x in b_vals) / total_pixels
                 
                 avg_variance = (var_r + var_g + var_b) / 3
                 
-                if avg_variance < 200:
+                if avg_variance < 300:
                     return True
             
-            if img.width < 50 or img.height < 50:
+            # Strategy 2: Check saturation (convert to HSV)
+            hsv_img = img.convert('HSV')
+            hsv_pixels = list(hsv_img.getdata())
+            s_vals = [p[1] for p in hsv_pixels]  # Saturation channel
+            avg_saturation = sum(s_vals) / total_pixels
+            
+            # Very low saturation = grey image
+            if avg_saturation < 15:
                 return True
-                
+            
+            # Strategy 3: Check if most pixels are nearly identical
+            if total_pixels > 1000:
+                step = max(1, total_pixels // 1000)
+                sampled = pixels[::step][:1000]
+            else:
+                sampled = pixels
+            
+            unique_colors = set()
+            for p in sampled:
+                quantized = (p[0] // 8, p[1] // 8, p[2] // 8)
+                unique_colors.add(quantized)
+            
+            # If very few unique colors, likely a placeholder
+            if len(unique_colors) < 5:
+                return True
+            
             return False
             
         except Exception as e:
