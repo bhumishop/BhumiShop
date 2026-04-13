@@ -40,6 +40,7 @@ permissions:
   pages: write
   id-token: write
   issues: write
+  actions: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -335,20 +336,20 @@ jobs:
           fi
           pnpm build
 
-      - name: Setup Pages
-        uses: actions/setup-pages@v5
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          enablement: false
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
           name: github-pages
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
 
   # ── Notify on failure ───────────────────────────────────
   notify-failure:
