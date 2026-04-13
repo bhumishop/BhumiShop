@@ -542,7 +542,9 @@ const setupAnimation = () => {
     ) {
       try {
         await (DeviceOrientationEvent as any).requestPermission();
-      } catch {}
+      } catch (e) {
+        // Ignore permission errors
+      }
     }
   };
 

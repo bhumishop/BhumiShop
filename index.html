@@ -137,13 +137,14 @@
         var redirectPath = sessionStorage.getItem('spa-redirect-path');
         if (redirectPath) {
           sessionStorage.removeItem('spa-redirect-path');
-          // Use history.replaceState to update URL without reload
-          // Vite injects __VITE_BASE_URL__ at build time, fallback to detecting from script src
-          var base = typeof __VITE_BASE_URL__ !== 'undefined' ? __VITE_BASE_URL__ : '/';
-
-          // If base is not set, try to detect from current URL
-          if (base === '/' && window.location.pathname.includes('/bhumi-shop/')) {
-            base = '/bhumi-shop/';
+          // Detect base path from current URL or use Vite-injected BASE_URL
+          var base = window.location.pathname;
+          // Extract base: if path is /bhumi-shop/index.html, base is /bhumi-shop/
+          var idx = base.lastIndexOf('/index.html');
+          if (idx !== -1) {
+            base = base.substring(0, idx + 1);
+          } else {
+            base = '/';
           }
 
           var fullPath = base === '/' ? redirectPath : base + redirectPath.slice(1);

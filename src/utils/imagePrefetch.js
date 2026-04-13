@@ -8,8 +8,9 @@
 const MAX_CACHE_SIZE = 50
 const imageCache = new Map()
 const prefetchQueue = new Set()
-let pendingPrefetches = 0
+export let pendingPrefetches = 0
 const MAX_CONCURRENT_PREFETCHES = 3
+const activeImageLoads = new Set()
 
 /**
  * Prefetch an image URL by loading it into memory

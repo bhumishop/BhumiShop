@@ -9,22 +9,26 @@
     (function() {
       var path = window.location.pathname;
 
-      // Detect the base path (e.g., /bhumi-shop/ for GitHub Pages, / for localhost)
+      // Detect the base path (e.g., /bhumi-shop/ for GitHub Pages, / for custom domain)
       var pathParts = path.split('/').filter(Boolean);
       var base = '/';
 
-      // If first segment looks like a repo name (not a route), use it as base
-      var routes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin'];
-      if (pathParts.length > 0 && !routes.includes(pathParts[0]) && !pathParts[0].match(/^[\d]/)) {
+      // Known app routes - if the first segment is one of these, we're at root
+      var appRoutes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin'];
+      if (pathParts.length > 0 && !appRoutes.includes(pathParts[0])) {
+        // First segment is not an app route - likely the repo name for GitHub Pages
         base = '/' + pathParts[0] + '/';
       }
 
       // Only redirect if we're not already at index.html
       if (!path.endsWith('/index.html') && path !== base) {
         // Store the path (relative to base) so index.html can use it
-        var relativePath = path.replace(base, '/') || '/';
+        var relativePath = path.replace(base, '/');
+        if (!relativePath.startsWith('/')) {
+          relativePath = '/' + relativePath;
+        }
         sessionStorage.setItem('spa-redirect-path', relativePath + window.location.search + window.location.hash);
-        // Redirect to index.html
+        // Redirect to index.html at the detected base
         window.location.href = base + 'index.html';
       }
     })();

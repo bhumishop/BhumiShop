@@ -465,15 +465,15 @@ const isLivro = computed(() => {
 const categoryBadgeLabel = computed(() => {
   if (isUmaPenca.value) return 'Uma Penca'
   if (isDigital.value) return 'Digital'
-  if (isOnDemand.value) return $t('productCard.badges.printOnDemand')
+  if (isOnDemand.value) return t('productCard.badges.printOnDemand')
   return categoryName.value
 })
 
 // Fulfillment label
 const fulfillmentLabel = computed(() => {
   if (product.value?.fulfillment_type === 'uma_penca') return 'Uma Penca'
-  if (product.value?.fulfillment_type === 'digital') return $t('productDetail.digitalDelivery')
-  if (product.value?.fulfillment_type === 'own') return $t('productDetail.ownFulfillment')
+  if (product.value?.fulfillment_type === 'digital') return t('productDetail.digitalDelivery')
+  if (product.value?.fulfillment_type === 'own') return t('productDetail.ownFulfillment')
   return product.value?.fulfillment_type || ''
 })
 
