@@ -916,7 +916,7 @@ onMounted(() => {
   margin-bottom: clamp(0.5rem, 1vw, 0.75rem);
 }
 
-@media (max-width: 560px) {
+@media (max-width: var(--bp-mobile)) {
   .checkout-page__form-grid {
     grid-template-columns: 1fr;
   }

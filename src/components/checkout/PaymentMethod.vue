@@ -260,7 +260,7 @@ function select(method) {
   color: white;
 }
 
-@media (max-width: 560px) {
+@media (max-width: var(--bp-mobile)) {
   .payment-method__options {
     grid-template-columns: 1fr;
   }

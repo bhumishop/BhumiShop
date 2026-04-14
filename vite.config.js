@@ -33,7 +33,11 @@ export default defineConfig(({ mode }) => {
             'vue-vendor': ['vue', 'vue-router', 'pinia'],
             'i18n-vendor': ['vue-i18n'],
             'animation-vendor': ['gsap', 'motion-v'],
-            '3d-vendor': ['three', 'ogl', 'postprocessing']
+            // Split heavy 3D libraries - only load what's needed
+            'ogl-vendor': ['ogl'],
+            'postprocessing-vendor': ['postprocessing'],
+            // Three.js is only loaded when GridScan is lazy-loaded
+            'three-vendor': ['three']
           }
         }
       },

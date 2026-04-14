@@ -529,9 +529,27 @@ export function staggerGrid(targets, config = {}) {
  * Uses a subtle overshoot easing for a more dynamic entrance
  */
 export function pageEnter(el, done) {
+  // Guard against null/undefined element
+  if (!el) {
+    done()
+    return
+  }
+
+  const safeDone = () => {
+    try {
+      refreshScrollTriggers()
+      done()
+    } catch (e) {
+      // Ignore parentNode errors during transition cleanup
+      if (!e.message?.includes('parentNode')) {
+        throw e
+      }
+    }
+  }
+
   if (isReducedMotion) {
     gsap.set(el, { opacity: 1, y: 0 });
-    done();
+    safeDone();
     return;
   }
 
@@ -546,12 +564,11 @@ export function pageEnter(el, done) {
     ease: 'power3.out',
     force3D: true,
     onComplete: () => {
-      refreshScrollTriggers();
-      done();
+      safeDone()
     },
     onInterrupt: () => {
       gsap.set(el, { opacity: 1, y: 0, scale: 1 });
-      done();
+      safeDone();
     }
   });
 }
@@ -560,9 +577,26 @@ export function pageEnter(el, done) {
  * Page leave animation with faster exit for perceived performance
  */
 export function pageLeave(el, done) {
+  // Guard against null/undefined element
+  if (!el) {
+    done()
+    return
+  }
+
   if (isReducedMotion) {
-    done();
-    return;
+    done()
+    return
+  }
+
+  const safeDone = () => {
+    try {
+      done()
+    } catch (e) {
+      // Ignore parentNode errors during transition cleanup
+      if (!e.message?.includes('parentNode')) {
+        throw e
+      }
+    }
   }
 
   gsap.to(el, {
@@ -572,9 +606,9 @@ export function pageLeave(el, done) {
     duration: 0.25,
     ease: 'power3.in',
     force3D: true,
-    onComplete: done,
-    onInterrupt: done,
-  });
+    onComplete: safeDone,
+    onInterrupt: safeDone,
+  })
 }
 
 // ===== MICRO-INTERACTIONS =====

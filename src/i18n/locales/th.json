@@ -64,8 +64,26 @@
     "searchPlaceholder": "ค้นหาสินค้า...",
     "clearSearch": "ล้างการค้นหา",
     "notFound": "ไม่พบสินค้า",
+    "noImage": "ไม่มีภาพสำหรับ {name}",
     "previous": "ก่อนหน้า",
-    "next": "ถัดไป"
+    "next": "ถัดไป",
+    "filters": "ตัวกรอง",
+    "clearAll": "ล้างทั้งหมด",
+    "sort": "เรียงลำดับ",
+    "price": "ราคา",
+    "productCountLabel": "สินค้า",
+    "categoryCountLabel": "หมวดหมู่",
+    "sortNewest": "ใหม่ล่าสุด",
+    "sortPriceAsc": "ราคา: ต่ำไปสูง",
+    "sortPriceDesc": "ราคา: สูงไปต่ำ",
+    "sortNameAsc": "ชื่อ A-Z",
+    "noProductsFound": "ไม่พบสินค้า",
+    "clearFilters": "ล้างตัวกรอง",
+    "loadingMore": "กำลังโหลดสินค้าเพิ่มเติม...",
+    "allLoaded": "โหลดสินค้าทั้งหมดแล้ว",
+    "maxPriceLabel": "สูงสุด",
+    "minPriceLabel": "ต่ำสุด",
+    "sortNewestFirst": "ใหม่ล่าสุดก่อน"
   },
   "productDetail": {
     "breadcrumbHome": "หน้าแรก",
@@ -124,7 +142,18 @@
   },
   "productCard": {
     "add": "เพิ่ม",
-    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว"
+    "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว",
+    "quickAdd": "เพิ่มด่วน",
+    "addToCart": "เพิ่มลงในรถเข็น",
+    "addToCartError": "เพิ่ม {name} ลงในรถเข็นไม่สำเร็จ",
+    "addAriaLabel": "เพิ่มลงในรถเข็น",
+    "badges": {
+      "umaPenca": "อูมา เพนก้า",
+      "digital": "ดิจิทัล",
+      "printOnDemand": "พิมพ์ตามคำสั่งซื้อ",
+      "bundle": "ชุด",
+      "madeToOrder": "ทำตามสั่ง"
+    }
   },
   "productVariants": {
     "size": "ขนาด",

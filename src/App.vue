@@ -27,7 +27,7 @@
         <AppHeader />
         <main class="app-main">
           <router-view v-slot="{ Component }">
-            <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
+            <transition name="page" @enter="onPageEnter" @leave="onPageLeave">
               <component :is="Component" />
             </transition>
           </router-view>
@@ -52,30 +52,33 @@ import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 
 // Lazy load heavy visual effect components with error handling
+// Use proper empty components instead of { template: null } which causes warnings
+const emptyComponent = { render: () => null }
+
 const CartDrawer = defineAsyncComponent({
   loader: () => import('./components/layout/CartDrawer.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: emptyComponent,
+  loadingComponent: emptyComponent
 })
 const ToastContainer = defineAsyncComponent({
   loader: () => import('./components/common/BaseToast.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: emptyComponent,
+  loadingComponent: emptyComponent
 })
 const ClickSpark = defineAsyncComponent({
   loader: () => import('./components/common/ClickSpark.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: emptyComponent,
+  loadingComponent: emptyComponent
 })
 const Preloader = defineAsyncComponent({
   loader: () => import('./components/common/Preloader.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: emptyComponent,
+  loadingComponent: emptyComponent
 })
 const Noise = defineAsyncComponent({
   loader: () => import('./components/common/Noise.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: emptyComponent,
+  loadingComponent: emptyComponent
 })
 
 const authStore = useAuthStore()

@@ -60,14 +60,25 @@ const easeFunc = computed(() => {
 const handleClick = (e: MouseEvent) => {
   const canvas = canvasRef.value;
   if (!canvas) return;
+  
+  // Ensure canvas dimensions are up to date
+  resizeCanvas();
+  
+  // Calculate click position relative to the canvas
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
+  // Account for canvas scale (if canvas resolution differs from display size)
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const adjustedX = x * scaleX;
+  const adjustedY = y * scaleY;
+
   const now = performance.now();
   const newSparks: Spark[] = Array.from({ length: props.sparkCount }, (_, i) => ({
-    x,
-    y,
+    x: adjustedX,
+    y: adjustedY,
     angle: (2 * Math.PI * i) / props.sparkCount,
     startTime: now
   }));
@@ -145,40 +156,32 @@ const resizeCanvas = () => {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  const parent = canvas.parentElement;
-  if (!parent) return;
-
-  const { width, height } = parent.getBoundingClientRect();
-  if (width === 0 || height === 0) return;
-  const w = Math.round(width);
-  const h = Math.round(height);
+  // Use viewport dimensions for fixed full-screen canvas
+  const w = Math.round(window.innerWidth * window.devicePixelRatio);
+  const h = Math.round(window.innerHeight * window.devicePixelRatio);
+  
   if (canvas.width !== w || canvas.height !== h) {
     canvas.width = w;
     canvas.height = h;
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
   }
 };
-
-let resizeObserver: ResizeObserver | null = null;
 
 onMounted(() => {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  const parent = canvas.parentElement;
-  if (!parent) return;
-
   resizeCanvas();
-  resizeObserver = new ResizeObserver(() => resizeCanvas());
-  resizeObserver.observe(parent);
+  
+  // Listen for window resize instead of parent resize
+  window.addEventListener('resize', resizeCanvas);
 
   animationId.value = requestAnimationFrame(draw);
 });
 
 onUnmounted(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-    resizeObserver = null;
-  }
+  window.removeEventListener('resize', resizeCanvas);
   if (animationId.value) {
     cancelAnimationFrame(animationId.value);
   }
@@ -203,14 +206,15 @@ watch(
 .click-spark-container {
   position: relative;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
 }
 
 .click-spark-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 9999;
 }

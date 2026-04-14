@@ -620,4 +620,223 @@ onUnmounted(() => {
 .drawer__clear:hover {
   color: var(--danger);
 }
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: var(--bp-mobile-lg)) {
+  .drawer {
+    width: clamp(18rem, 90vw, 22rem);
+    max-width: 95vw;
+  }
+
+  .drawer__header {
+    padding: clamp(0.875rem, 1.75vw, 1rem) clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .drawer__title {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+  }
+
+  .drawer__close {
+    width: clamp(1.75rem, 3.5vw, 2rem);
+    height: clamp(1.75rem, 3.5vw, 2rem);
+  }
+
+  .drawer__close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .drawer__items {
+    padding: clamp(0.625rem, 1.25vw, 0.875rem) clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .drawer__item {
+    gap: clamp(0.5rem, 1vw, 0.625rem);
+    padding: clamp(0.625rem, 1.25vh, 0.875rem) 0;
+  }
+
+  .drawer__item-img {
+    width: clamp(3rem, 7vw, 3.5rem);
+    height: clamp(3rem, 7vw, 3.5rem);
+  }
+
+  .drawer__item-name {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+  }
+
+  .drawer__item-size {
+    font-size: clamp(0.625rem, 1.5vw, 0.7rem);
+  }
+
+  .drawer__item-price {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+  }
+
+  .drawer__item-qty button {
+    width: clamp(1.375rem, 2.75vw, 1.5rem);
+    height: clamp(1.375rem, 2.75vw, 1.5rem);
+    font-size: clamp(0.75rem, 1.75vw, 0.825rem);
+  }
+
+  .drawer__item-qty span {
+    width: clamp(1.5rem, 3vw, 1.75rem);
+    font-size: clamp(0.675rem, 1.5vw, 0.75rem);
+    line-height: clamp(1.375rem, 2.75vw, 1.5rem);
+  }
+
+  .drawer__uma-penca-banner {
+    padding: clamp(0.5rem, 1vw, 0.625rem) clamp(1rem, 2vw, 1.25rem);
+    font-size: clamp(0.65rem, 1.5vw, 0.725rem);
+  }
+
+  .drawer__footer {
+    padding: clamp(0.875rem, 1.75vw, 1rem) clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .drawer__totals {
+    margin-bottom: clamp(0.625rem, 1.25vh, 0.875rem);
+  }
+
+  .drawer__total-line {
+    padding: clamp(0.2rem, 0.4vh, 0.3rem) 0;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+  }
+
+  .drawer__total-price {
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+}
+
+@media (max-width: var(--bp-mobile)) {
+  .drawer {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .drawer__item {
+    gap: 0.5rem;
+  }
+
+  .drawer__item-img {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .drawer__item-name {
+    font-size: 0.775rem;
+  }
+
+  .drawer__item-size {
+    font-size: 0.625rem;
+  }
+
+  .drawer__item-price {
+    font-size: 0.775rem;
+  }
+
+  .drawer__item-qty button {
+    width: 1.375rem;
+    height: 1.375rem;
+    font-size: 0.75rem;
+  }
+
+  .drawer__item-qty span {
+    width: 1.5rem;
+    font-size: 0.675rem;
+    line-height: 1.375rem;
+  }
+
+  .drawer__uma-penca-banner svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: var(--bp-mobile-sm)) {
+  .drawer__header {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .drawer__title {
+    font-size: 0.85rem;
+  }
+
+  .drawer__close {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .drawer__close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .drawer__items {
+    padding: 0.625rem 0.875rem;
+  }
+
+  .drawer__item {
+    padding: 0.625rem 0;
+  }
+
+  .drawer__item-img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .drawer__item-name {
+    font-size: 0.725rem;
+  }
+
+  .drawer__item-size {
+    font-size: 0.6rem;
+  }
+
+  .drawer__item-price {
+    font-size: 0.725rem;
+  }
+
+  .drawer__item-qty button {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.7rem;
+  }
+
+  .drawer__item-qty span {
+    width: 1.375rem;
+    font-size: 0.65rem;
+    line-height: 1.25rem;
+  }
+
+  .drawer__uma-penca-banner {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.65rem;
+  }
+
+  .drawer__uma-penca-banner svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .drawer__footer {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .drawer__totals {
+    margin-bottom: 0.625rem;
+  }
+
+  .drawer__total-line {
+    padding: 0.2rem 0;
+    font-size: 0.725rem;
+  }
+
+  .drawer__total-price {
+    font-size: 0.95rem;
+  }
+
+  .drawer__clear {
+    font-size: 0.675rem;
+  }
+}
 </style>

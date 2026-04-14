@@ -198,4 +198,95 @@ function formatPrice(value) {
 .cart-page__empty p {
   margin-bottom: clamp(0.75rem, 2vh, 1rem);
 }
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: var(--bp-mobile-lg)) {
+  .cart-page__item {
+    gap: clamp(0.625rem, 1.25vw, 0.875rem);
+    padding: clamp(0.625rem, 1.25vw, 0.875rem);
+  }
+
+  .cart-page__item-img {
+    width: clamp(3rem, 7vw, 3.5rem);
+    height: clamp(3rem, 7vw, 3.5rem);
+  }
+}
+
+@media (max-width: var(--bp-mobile)) {
+  .cart-page__actions {
+    flex-direction: column;
+  }
+
+  .cart-page__actions .cart-page__actions button {
+    width: 100%;
+  }
+
+  .cart-page__item {
+    flex-wrap: wrap;
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+    padding: clamp(0.625rem, 1.25vw, 0.875rem);
+  }
+
+  .cart-page__item-img {
+    width: clamp(2.5rem, 6vw, 3rem);
+    height: clamp(2.5rem, 6vw, 3rem);
+  }
+
+  .cart-page__item-remove {
+    position: absolute;
+    top: clamp(0.375rem, 0.75vw, 0.5rem);
+    right: clamp(0.375rem, 0.75vw, 0.5rem);
+  }
+
+  .cart-page__item-info h3 {
+    padding-right: 1.5rem;
+  }
+}
+
+@media (max-width: var(--bp-mobile-sm)) {
+  .cart-page {
+    padding: clamp(1rem, 3vh, 1.5rem) clamp(0.75rem, 2vw, 1rem) clamp(2rem, 5vh, 3rem);
+  }
+
+  .cart-page__title {
+    font-size: clamp(1.125rem, 4vw, 1.375rem);
+  }
+
+  .cart-page__subtitle {
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+  }
+
+  .cart-page__item {
+    padding: 0.625rem;
+  }
+
+  .cart-page__item-img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .cart-page__item-info h3 {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  }
+
+  .cart-page__item-size {
+    font-size: clamp(0.675rem, 2vw, 0.75rem);
+  }
+
+  .cart-page__item-price {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  }
+
+  .cart-page__item-qty button {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+  }
+
+  .cart-page__item-qty span {
+    width: 1.5rem;
+    font-size: clamp(0.675rem, 2vw, 0.75rem);
+    line-height: 1.5rem;
+  }
+}
 </style>

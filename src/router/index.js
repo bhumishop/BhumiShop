@@ -64,6 +64,11 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition
     }
+    // Only scroll to top on route change if explicitly requested
+    // This prevents unwanted scroll resets when filtering products
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' }
+    }
     return { top: 0 }
   }
 })

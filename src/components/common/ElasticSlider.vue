@@ -126,7 +126,9 @@ watch(
 
 // Emit value changes
 watch(value, newValue => {
-  emit('change', newValue);
+  if (typeof newValue === 'number' && !isNaN(newValue) && newValue > 0) {
+    emit('change', newValue)
+  }
 });
 
 watch(clientX, latest => {

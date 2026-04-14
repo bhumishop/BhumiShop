@@ -184,7 +184,7 @@ onUnmounted(() => {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1200px) {
+@media (max-width: var(--bp-tablet)) {
   .product-grid__masonry {
     columns: 3;
   }
@@ -193,7 +193,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: var(--bp-mobile-lg)) {
   .product-grid__masonry {
     columns: 2;
   }

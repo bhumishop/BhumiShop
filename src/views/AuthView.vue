@@ -246,7 +246,12 @@ import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
 import BaseButton from '../components/common/BaseButton.vue'
 import BaseInput from '../components/common/BaseInput.vue'
-import DarkVeil from '../components/common/DarkVeil.vue'
+import { defineAsyncComponent } from 'vue'
+const DarkVeil = defineAsyncComponent({
+  loader: () => import('../components/common/DarkVeil.vue'),
+  errorComponent: { template: null },
+  loadingComponent: { template: null }
+})
 import LetterGlitch from '../components/common/LetterGlitch.vue'
 import Stepper from '../components/common/Stepper.vue'
 
@@ -1201,5 +1206,296 @@ onMounted(() => {
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: var(--bp-mobile-lg)) {
+  .auth-page {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .auth-card {
+    max-width: 100%;
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: var(--bp-mobile)) {
+  .auth-page {
+    padding: 1rem 0.5rem;
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: var(--radius-md);
+  }
+
+  .auth-card__header {
+    margin-bottom: clamp(0.75rem, 2vh, 1rem);
+  }
+
+  .auth-step__title {
+    font-size: clamp(1rem, 4vw, 1.125rem);
+  }
+
+  .auth-step__subtitle {
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    margin-bottom: 1rem;
+  }
+
+  /* Terms box mobile */
+  .auth-terms-box {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .auth-checkbox__label {
+    font-size: clamp(0.75rem, 2.5vw, 0.825rem);
+  }
+
+  /* Location search mobile */
+  .location-search__input {
+    padding: 0.625rem 2.5rem 0.625rem 2.25rem;
+    font-size: 0.825rem;
+  }
+
+  .location-search__icon {
+    left: 0.625rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Suggestion items mobile */
+  .location-search__suggestion {
+    padding: 0.5rem 0.625rem;
+    gap: 0.5rem;
+  }
+
+  .location-search__suggestion-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .location-search__suggestion-text {
+    font-size: 0.775rem;
+  }
+
+  /* Selected location mobile */
+  .location-selected {
+    padding: 0.75rem;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+  }
+
+  .location-selected__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .location-selected__name {
+    font-size: 0.825rem;
+  }
+
+  .location-selected__detail {
+    font-size: 0.7rem;
+  }
+
+  .location-selected__change {
+    font-size: 0.7rem;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.375rem;
+    padding: 0.375rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Map preview mobile */
+  .location-map-preview {
+    height: 8rem;
+  }
+
+  /* Welcome step mobile */
+  .auth-stepper__welcome {
+    padding: 1.5rem 0;
+    gap: 0.75rem;
+  }
+
+  .auth-stepper__success-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Social buttons mobile */
+  .auth-social-buttons {
+    gap: 0.5rem;
+  }
+
+  /* Form elements mobile */
+  .auth-form {
+    gap: 0.75rem;
+  }
+
+  .auth-form__error,
+  .auth-form__success {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.775rem;
+  }
+
+  /* Stepper mobile overrides */
+  :deep(.stepper) {
+    padding: 0 0.25rem;
+  }
+
+  :deep(.stepper__step) {
+    margin: 0 0.25rem;
+  }
+
+  :deep(.stepper__dot) {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  :deep(.stepper__step-label) {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: var(--bp-mobile-sm)) {
+  .auth-page {
+    padding: 0.75rem 0.375rem;
+  }
+
+  .auth-card {
+    padding: 1rem;
+  }
+
+  .auth-step__title {
+    font-size: 1rem;
+  }
+
+  .auth-step__subtitle {
+    font-size: 0.75rem;
+  }
+
+  /* More compact terms box */
+  .auth-terms-box {
+    padding: 0.625rem;
+  }
+
+  .auth-checkbox {
+    gap: 0.5rem;
+  }
+
+  .auth-checkbox__checkmark {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .auth-checkbox__label {
+    font-size: 0.725rem;
+  }
+
+  /* Very compact search */
+  .location-search__input {
+    padding: 0.5rem 2.25rem 0.5rem 2rem;
+    font-size: 0.775rem;
+  }
+
+  .location-search__icon {
+    left: 0.5rem;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  /* Suggestions more compact */
+  .location-search__suggestions {
+    max-height: 10rem;
+  }
+
+  .location-search__suggestion {
+    padding: 0.5rem;
+  }
+
+  .location-search__suggestion-text {
+    font-size: 0.725rem;
+    line-height: 1.3;
+  }
+
+  /* Selected location very compact */
+  .location-selected {
+    padding: 0.625rem;
+    gap: 0.5rem;
+  }
+
+  .location-selected__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .location-selected__name {
+    font-size: 0.775rem;
+  }
+
+  .location-selected__detail {
+    font-size: 0.675rem;
+  }
+
+  .location-selected__city-state {
+    font-size: 0.7rem;
+  }
+
+  .location-selected__country {
+    font-size: 0.65rem;
+  }
+
+  /* Map preview smaller */
+  .location-map-preview {
+    height: 7rem;
+  }
+
+  /* Welcome step very compact */
+  .auth-stepper__welcome {
+    padding: 1rem 0;
+    gap: 0.625rem;
+  }
+
+  .auth-stepper__success-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .auth-stepper__title {
+    font-size: 1rem;
+  }
+
+  .auth-stepper__text {
+    font-size: 0.8rem;
+  }
+
+  .auth-stepper__location {
+    font-size: 0.75rem;
+  }
+
+  /* Social buttons spacing */
+  .auth-social-buttons {
+    gap: 0.375rem;
+  }
+
+  /* Stepper more compact */
+  :deep(.stepper__dot) {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.65rem;
+  }
+
+  :deep(.stepper__step-label) {
+    font-size: 0.65rem;
+  }
+
+  :deep(.stepper__connector) {
+    width: 1.5rem;
+  }
 }
 </style>

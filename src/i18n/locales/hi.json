@@ -64,8 +64,26 @@
     "searchPlaceholder": "उत्पाद खोजें...",
     "clearSearch": "खोज मिटाएं",
     "notFound": "कोई उत्पाद नहीं मिला।",
+    "noImage": "{name} के लिए कोई छवि उपलब्ध नहीं है",
     "previous": "पिछला",
-    "next": "अगला"
+    "next": "अगला",
+    "filters": "फ़िल्टर",
+    "clearAll": "सभी मिटाएं",
+    "sort": "क्रमबद्ध करें",
+    "price": "मूल्य",
+    "productCountLabel": "उत्पाद",
+    "categoryCountLabel": "श्रेणियाँ",
+    "sortNewest": "नवीनतम",
+    "sortPriceAsc": "मूल्य: कम से ज़्यादा",
+    "sortPriceDesc": "मूल्य: ज़्यादा से कम",
+    "sortNameAsc": "नाम A-Z",
+    "noProductsFound": "कोई उत्पाद नहीं मिला",
+    "clearFilters": "फ़िल्टर मिटाएं",
+    "loadingMore": "और उत्पाद लोड हो रहे हैं...",
+    "allLoaded": "सभी उत्पाद लोड हो गए",
+    "maxPriceLabel": "अधिकतम",
+    "minPriceLabel": "न्यूनतम",
+    "sortNewestFirst": "नवीनतम पहले"
   },
   "productDetail": {
     "breadcrumbHome": "होम",
@@ -124,7 +142,18 @@
   },
   "productCard": {
     "add": "जोड़ें",
-    "addedToCart": "{name} कार्ट में जोड़ा गया"
+    "addedToCart": "{name} कार्ट में जोड़ा गया",
+    "quickAdd": "त्वरित जोड़ें",
+    "addToCart": "कार्ट में जोड़ें",
+    "addToCartError": "{name} कार्ट में जोड़ने में विफल",
+    "addAriaLabel": "कार्ट में जोड़ें",
+    "badges": {
+      "umaPenca": "उमा पेन्का",
+      "digital": "डिजिटल",
+      "printOnDemand": "प्रिंट-ऑन-डिमांड",
+      "bundle": "बंडल",
+      "madeToOrder": "ऑर्डर पर बनाया गया"
+    }
   },
   "productVariants": {
     "size": "आकार",

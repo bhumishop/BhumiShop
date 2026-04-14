@@ -117,4 +117,140 @@ const visiblePages = computed(() => {
   color: var(--text-muted);
   font-size: clamp(0.75rem, 1.2vw, 0.85rem);
 }
+
+/* ============================================
+   MOBILE RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: var(--bp-tablet)) {
+  .pagination {
+    gap: 0.25rem;
+    padding: 1rem 0;
+  }
+
+  .pagination__btn {
+    min-width: 2.125rem;
+    height: 2.125rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination__dots {
+    padding: 0 0.125rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Large (max-width: 768px) */
+@media (max-width: var(--bp-mobile-lg)) {
+  .pagination {
+    gap: 0.2rem;
+    padding: 0.875rem 0;
+  }
+
+  .pagination__btn {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.775rem;
+  }
+
+  .pagination__btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pagination__dots {
+    padding: 0 0.1rem;
+    font-size: 0.775rem;
+  }
+}
+
+/* Mobile (max-width: 640px) */
+@media (max-width: var(--bp-mobile)) {
+  .pagination {
+    gap: 0.15rem;
+    padding: 0.75rem 0;
+  }
+
+  .pagination__btn {
+    min-width: 44px;
+    height: 44px;
+    font-size: 0.75rem;
+  }
+
+  .pagination__btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pagination__dots {
+    padding: 0 0.05rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Small (max-width: 480px) */
+@media (max-width: var(--bp-mobile-sm)) {
+  .pagination {
+    gap: 0.125rem;
+    padding: 0.625rem 0;
+  }
+
+  .pagination__btn {
+    min-width: 44px;
+    height: 44px;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .pagination__btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Hide middle page numbers, show only first, last, prev/next */
+  .pagination__btn:not(:first-child):not(:last-child):not(.pagination__btn--active) {
+    display: none;
+  }
+
+  .pagination__dots {
+    display: none;
+  }
+}
+
+/* Mobile XS (max-width: 360px) */
+@media (max-width: var(--bp-mobile-xs)) {
+  .pagination {
+    gap: 0.1rem;
+    padding: 0.5rem 0;
+    justify-content: space-between;
+    max-width: 100%;
+  }
+
+  .pagination__btn {
+    min-width: 44px;
+    height: 44px;
+    font-size: 0.7rem;
+    padding: 0 0.75rem;
+  }
+
+  .pagination__btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Show only prev/next and active page indicator */
+  .pagination__btn:not(.pagination__btn--active):not(:first-child):not(:last-child) {
+    display: none;
+  }
+
+  .pagination__dots {
+    display: none;
+  }
+
+  .pagination__btn--active {
+    min-width: 44px;
+    font-size: 0.7rem;
+  }
+}
 </style>

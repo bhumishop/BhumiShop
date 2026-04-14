@@ -110,9 +110,9 @@ const responsiveColumns = ref(props.columns);
 function updateResponsiveColumns() {
   const width = window.innerWidth;
   if (width >= 1500) responsiveColumns.value = 5;
-  else if (width >= 1200) responsiveColumns.value = 4;
-  else if (width >= 900) responsiveColumns.value = 3;
-  else if (width >= 600) responsiveColumns.value = 2;
+  else if (width >= 1024) responsiveColumns.value = 4;
+  else if (width >= 768) responsiveColumns.value = 3;
+  else if (width >= 640) responsiveColumns.value = 2;
   else responsiveColumns.value = 1;
 }
 
@@ -324,21 +324,21 @@ onMounted(() => {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1200px) {
+@media (max-width: var(--bp-tablet)) {
   .masonry-columns,
   .masonry-skeleton {
     columns: 3;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: var(--bp-mobile-lg)) {
   .masonry-columns,
   .masonry-skeleton {
     columns: 2;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: var(--bp-mobile)) {
   .masonry-columns,
   .masonry-skeleton {
     columns: 2;

@@ -18,7 +18,7 @@ let cacheTimestamp = 0
 function normalizeCategoryMatch(productCat, categoryId) {
   if (productCat === categoryId) return true
   // Strip common suffixes and compare roots
-  const normalize = (s) => s.toLowerCase()
+  const normalize = (s) => String(s).toLowerCase()
     .replace(/s$/, '')  // remove trailing 's'
     .replace(/es$/, 'e') // remove 'es'
   return normalize(productCat) === normalize(categoryId)
@@ -637,7 +637,12 @@ export const useProductStore = defineStore('products', () => {
   }
 
   function setMaxPrice(price) {
-    maxPrice.value = price
+    // Don't set maxPrice to 0 or invalid - would filter out all products
+    if (price === null || price === undefined || price <= 0) {
+      maxPrice.value = null
+    } else {
+      maxPrice.value = price
+    }
     currentPage.value = 1
   }
 

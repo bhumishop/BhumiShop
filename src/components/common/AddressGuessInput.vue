@@ -853,7 +853,7 @@ defineExpose({
   to { transform: rotate(360deg); }
 }
 
-@media (max-width: 560px) {
+@media (max-width: var(--bp-mobile)) {
   .address-guess__row {
     flex-direction: column;
   }

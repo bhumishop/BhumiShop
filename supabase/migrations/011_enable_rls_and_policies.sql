@@ -29,15 +29,16 @@ ALTER TABLE webhook_events ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- Helper function to check if user is admin
+-- Uses user_roles table for secure server-side role checking
 -- ============================================
 CREATE OR REPLACE FUNCTION is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
-  -- Check if user has admin role in user metadata or is in admins table
+  -- Check if user has admin role in user_roles table (secure server-side check)
   RETURN EXISTS (
-    SELECT 1 FROM auth.users
-    WHERE id = auth.uid()
-    AND (raw_user_meta_data->>'is_admin')::BOOLEAN = true
+    SELECT 1 FROM user_roles
+    WHERE user_id = auth.uid()
+    AND role = 'admin'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

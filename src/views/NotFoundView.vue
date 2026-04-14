@@ -13,7 +13,7 @@
 
     <div class="not-found__content">
       <FuzzyText
-        :font-size="140"
+        :font-size="'clamp(4rem, 20vw, 8.75rem)'"
         :font-weight="900"
         color="#fff"
         :enable-hover="true"
@@ -122,5 +122,68 @@ onUnmounted(() => {
 
 .h-full {
   height: 100%;
+}
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: var(--bp-mobile-lg)) {
+  .not-found__content {
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .not-found__message {
+    font-size: 1.125rem;
+    max-width: 400px;
+  }
+
+  .not-found__btn {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: var(--bp-mobile)) {
+  .not-found__content {
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .not-found__message {
+    font-size: 1rem;
+    max-width: 320px;
+  }
+
+  .not-found__btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    gap: 0.625rem;
+  }
+
+  .not-found__btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: var(--bp-mobile-sm)) {
+  .not-found__content {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .not-found__message {
+    font-size: 0.875rem;
+    max-width: 280px;
+  }
+
+  .not-found__btn {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+  }
+
+  .not-found__btn svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 </style>

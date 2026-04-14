@@ -136,4 +136,241 @@ async function handleLogout() {
 .profile-page__empty p {
   margin-bottom: clamp(0.625rem, 1.5vh, 1rem);
 }
+
+/* ===== Tablet (max-width: 1024px) ===== */
+@media (max-width: var(--bp-tablet, 1024px)) {
+  .profile-page {
+    max-width: min(36rem, 92vw);
+  }
+
+  .profile-card__header {
+    gap: 0.875rem;
+    padding: 1.25rem;
+  }
+
+  .profile-card__avatar {
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: 1.125rem;
+  }
+
+  .profile-card__actions {
+    padding: 1.25rem;
+  }
+}
+
+/* ===== Mobile Large (max-width: 768px) ===== */
+@media (max-width: var(--bp-mobile-lg, 768px)) {
+  .profile-page {
+    padding: 1.25rem 1rem 2rem;
+    max-width: 100%;
+  }
+
+  .profile-page__title {
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .profile-card__header {
+    flex-wrap: wrap;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .profile-card__avatar {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+
+  .profile-card__name {
+    font-size: 1rem;
+  }
+
+  .profile-card__email {
+    font-size: 0.8rem;
+  }
+
+  .profile-card__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .profile-card__actions .base-button {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+    text-align: center;
+  }
+}
+
+/* ===== Mobile (max-width: 640px) ===== */
+@media (max-width: var(--bp-mobile, 640px)) {
+  .profile-page {
+    padding: 1rem 0.75rem 1.75rem;
+  }
+
+  .profile-page__title {
+    font-size: 1.375rem;
+    margin-bottom: 1rem;
+  }
+
+  .profile-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 0.625rem;
+  }
+
+  .profile-card__avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .profile-card__name {
+    font-size: 0.95rem;
+  }
+
+  .profile-card__email {
+    font-size: 0.775rem;
+  }
+
+  .profile-card__actions {
+    flex-direction: column;
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .profile-card__actions .base-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .profile-page__empty {
+    padding: 2rem 0.75rem;
+  }
+
+  .profile-page__empty p {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-page__loading {
+    gap: 0.75rem;
+  }
+}
+
+/* ===== Mobile Small (max-width: 480px) ===== */
+@media (max-width: var(--bp-mobile-sm, 480px)) {
+  .profile-page {
+    padding: 0.875rem 0.625rem 1.5rem;
+  }
+
+  .profile-page__title {
+    font-size: 1.25rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .profile-card {
+    border-radius: var(--radius-md, 0.75rem);
+  }
+
+  .profile-card__header {
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .profile-card__avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .profile-card__name {
+    font-size: 0.9rem;
+  }
+
+  .profile-card__email {
+    font-size: 0.75rem;
+  }
+
+  .profile-card__actions {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .profile-card__actions .base-button {
+    font-size: 0.85rem;
+    padding: 0.625rem 1rem;
+  }
+
+  .profile-page__empty {
+    padding: 1.75rem 0.625rem;
+  }
+
+  .profile-page__empty p {
+    font-size: 0.85rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .profile-page__loading {
+    gap: 0.625rem;
+  }
+}
+
+/* ===== Mobile Extra Small (max-width: 360px) ===== */
+@media (max-width: var(--bp-mobile-xs, 360px)) {
+  .profile-page {
+    padding: 0.75rem 0.5rem 1.25rem;
+  }
+
+  .profile-page__title {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-card__header {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .profile-card__avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.85rem;
+  }
+
+  .profile-card__name {
+    font-size: 0.85rem;
+  }
+
+  .profile-card__email {
+    font-size: 0.7rem;
+  }
+
+  .profile-card__actions {
+    padding: 0.625rem;
+    gap: 0.375rem;
+  }
+
+  .profile-card__actions .base-button {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .profile-page__empty {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .profile-page__empty p {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-page__loading {
+    gap: 0.5rem;
+  }
+}
 </style>

@@ -25,8 +25,8 @@
           loading="lazy"
           @error="handleImageError"
         />
-        <div v-else class="product-pixel-card__placeholder">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <div v-else class="product-pixel-card__placeholder" role="img" :aria-label="$t('products.noImage', { name: product.name }) || 'No image available'">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
@@ -44,13 +44,13 @@
               <path d="M2 17l10 5 10-5"/>
               <path d="M2 12l10 5 10-5"/>
             </svg>
-            Bundle
+            {{ $t('productCard.badges.bundle') }}
           </span>
           <span v-if="isDigital" class="product-pixel-card__badge product-pixel-card__badge--digital">
             <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
-            Digital
+            {{ $t('productCard.badges.digital') }}
           </span>
           <span v-if="isOnDemand" class="product-pixel-card__badge product-pixel-card__badge--ondemand">
             <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -58,7 +58,7 @@
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
               <line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
-            Made to order
+            {{ $t('productCard.badges.madeToOrder') }}
           </span>
         </div>
       </div>
@@ -83,7 +83,7 @@
           <span class="product-pixel-card__currency">R$</span>
           <span class="product-pixel-card__price">{{ formatPrice(product.price) }}</span>
         </div>
-        <button class="product-pixel-card__add" @click.stop="addToCart" aria-label="Add to cart">
+        <button class="product-pixel-card__add" @click.stop="addToCart" :aria-label="$t('productCard.addAriaLabel')">
           <span class="product-pixel-card__add-bg" aria-hidden="true"></span>
           <span class="product-pixel-card__add-shine" aria-hidden="true"></span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -91,7 +91,7 @@
             <line x1="3" y1="6" x2="21" y2="6"/>
             <path d="M16 10a4 4 0 01-8 0"/>
           </svg>
-          <span>Add to cart</span>
+          <span>{{ $t('productCard.addToCart') }}</span>
         </button>
       </div>
     </div>
@@ -128,8 +128,9 @@ const timePreviousRef = ref(performance.now())
 const reducedMotion = ref(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
 // Pixel animation config - warm spectrum (matches rainbow border energy)
+// Optimized gap size for performance: larger gap = fewer pixels = better performance
 const PIXEL_CONFIG = {
-  gap: 6,
+  gap: 8, // Increased from 6 for better performance
   speed: 30,
   colors: '#8b5cf6,#a78bfa,#c4b5fd,#7c3aed,#6d28d9,#c084fc,#e879f9'
 }
@@ -171,20 +172,25 @@ function formatPrice(value) {
 }
 
 function addToCart() {
-  cartStore.addItem({
-    id: props.product.id,
-    name: props.product.name,
-    price: props.product.price,
-    image: props.product.image,
-    category: props.product.category,
-    size: null,
-    quantity: 1,
-    fulfillment_type: props.product.fulfillment_type || 'own',
-    weight: props.product.weight || 0.3,
-    dimensions: props.product.dimensions || null,
-    shipping_zones: props.product.shipping_zones || null
-  })
-  toast.success(t('productCard.addedToCart', { name: props.product.name }))
+  try {
+    cartStore.addItem({
+      id: props.product.id,
+      name: props.product.name,
+      price: props.product.price,
+      image: props.product.image,
+      category: props.product.category,
+      size: null,
+      quantity: 1,
+      fulfillment_type: props.product.fulfillment_type || 'own',
+      weight: props.product.weight || 0.3,
+      dimensions: props.product.dimensions || null,
+      shipping_zones: props.product.shipping_zones || null
+    })
+    toast.success(t('productCard.addedToCart', { name: props.product.name }))
+  } catch (err) {
+    console.error('addToCart error:', err)
+    toast.error(t('productCard.addToCartError', { name: props.product.name }) || 'Failed to add to cart')
+  }
 }
 
 // ===== Pixel Animation Logic (self-contained, only for image area) =====
@@ -345,6 +351,11 @@ let resizeObserver = null
 let resizeDebounceTimer = null
 
 watch(() => props.product, () => {
+  // Cancel any running animation before reinitializing
+  if (animationRef.value !== null) {
+    cancelAnimationFrame(animationRef.value)
+    animationRef.value = null
+  }
   initPixels()
 }, { flush: 'post' })
 

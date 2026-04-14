@@ -736,4 +736,378 @@ onUnmounted(() => {
 :root[data-theme="light"] .header__action__badge {
   background: linear-gradient(135deg, #7c3aed, #16a34a);
 }
+
+/* ==========================================================================
+   TABLET REFINEMENTS (max-width: 1024px)
+   - Reduce spacing and font sizes
+   - Search bar begins to compress
+   - Navigation items tighten up
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .header__inner {
+    gap: 0.75rem;
+  }
+
+  .header__section {
+    gap: 0.5rem;
+  }
+
+  .header__nav {
+    gap: 0.125rem;
+    padding: 3px;
+  }
+
+  .header__nav__item {
+    padding: 0.3125rem 0.625rem;
+  }
+
+  .header__nav__text {
+    font-size: 0.75rem;
+  }
+
+  .header__logo__icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .header__logo__text {
+    font-size: clamp(0.9375rem, 2vw, 1.125rem);
+  }
+
+  .header__utils {
+    gap: 0.25rem;
+  }
+
+  .header__action {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header__action__text {
+    font-size: 0.75rem;
+  }
+
+  .header__divider {
+    height: 16px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE LARGE REFINEMENTS (max-width: 768px)
+   - Already handled by existing breakpoint above, but adding
+     supplementary refinements for utility elements
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header__logo__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+
+  .header__logo__text {
+    font-size: 1rem;
+  }
+
+  .header__action {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .header__action--login {
+    padding: 0 0.5rem;
+  }
+
+  .header__action__text {
+    display: none;
+  }
+
+  .header__action--login {
+    width: 32px;
+  }
+
+  .header__mobile-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header__mobile-toggle__icon {
+    width: 16px;
+    height: 12px;
+  }
+
+  .header__mobile-toggle__icon span {
+    height: 1.5px;
+  }
+
+  /* Ensure badge stays visible on smaller screens */
+  .header__action__badge {
+    min-width: 14px;
+    height: 14px;
+    font-size: 0.5625rem;
+    top: -3px;
+    right: -3px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE REFINEMENTS (max-width: 640px)
+   - Logo text hidden to save space
+   - Search becomes icon-triggered (handled by SearchBar component)
+   - Utility icons (theme/language) hidden to prioritize cart/auth
+   - Action buttons compact
+   ========================================================================== */
+@media (max-width: 640px) {
+  .header__inner {
+    gap: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .header__logo__text {
+    display: none;
+  }
+
+  .header__logo__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .header__section--left {
+    gap: 0.375rem;
+  }
+
+  .header__utils {
+    display: none;
+  }
+
+  .header__action {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+  }
+
+  .header__action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .header__action__badge {
+    min-width: 13px;
+    height: 13px;
+    font-size: 0.5rem;
+    padding: 0 3px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .header__mobile-toggle {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+  }
+
+  .header__mobile-toggle__icon {
+    width: 15px;
+    height: 11px;
+  }
+
+  .header__mobile-toggle__icon span {
+    height: 1.5px;
+  }
+
+  /* Mobile menu adjustments */
+  .header__nav {
+    top: var(--header-height-fixed, 4rem);
+    padding: 0.5rem;
+  }
+
+  .header__nav__item {
+    padding: 0.625rem 0.875rem;
+  }
+
+  .header__nav__text {
+    font-size: 0.875rem;
+  }
+}
+
+/* ==========================================================================
+   MOBILE SMALL REFINEMENTS (max-width: 480px)
+   - Extremely compact header
+   - Reduced padding and spacing
+   - Hamburger icon smaller
+   - Cart badge repositioned to avoid overflow
+   ========================================================================== */
+@media (max-width: 480px) {
+  .header {
+    height: var(--header-height-fixed, 3.5rem);
+  }
+
+  .header__inner {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    gap: 0.375rem;
+  }
+
+  .header__logo__icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+  }
+
+  .header__logo__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .header__action {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .header__action svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .header__action__badge {
+    min-width: 12px;
+    height: 12px;
+    font-size: 0.4375rem;
+    padding: 0 2px;
+    top: -4px;
+    right: -4px;
+  }
+
+  .header__mobile-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .header__mobile-toggle__icon {
+    width: 14px;
+    height: 10px;
+  }
+
+  .header__mobile-toggle__icon span {
+    height: 1.25px;
+  }
+
+  /* Mobile menu full-screen feel */
+  .header__nav {
+    top: var(--header-height-fixed, 3.5rem);
+    padding: 0.375rem;
+  }
+
+  .header__nav__item {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+  }
+
+  .header__nav__text {
+    font-size: 0.8125rem;
+  }
+}
+
+/* ==========================================================================
+   MOBILE EXTRA SMALL REFINEMENTS (max-width: 360px)
+   - Minimal viable header
+   - Smallest icon sizes that remain tappable (min 24px touch target via parent)
+   - Badge adjusted to not clip at edges
+   ========================================================================== */
+@media (max-width: 360px) {
+  .header {
+    height: var(--header-height-fixed, 3.25rem);
+  }
+
+  .header__inner {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .header__logo__icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+  }
+
+  .header__logo__icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .header__action {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+  }
+
+  .header__action svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .header__action__badge {
+    min-width: 11px;
+    height: 11px;
+    font-size: 0.375rem;
+    top: -4px;
+    right: -4px;
+  }
+
+  .header__mobile-toggle {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+  }
+
+  .header__mobile-toggle__icon {
+    width: 13px;
+    height: 9px;
+  }
+
+  .header__mobile-toggle__icon span {
+    height: 1px;
+  }
+
+  /* Mobile menu for very small screens */
+  .header__nav {
+    top: var(--header-height-fixed, 3.25rem);
+    padding: 0.25rem;
+  }
+
+  .header__nav__item {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .header__nav__text {
+    font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY: Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .header__nav,
+  .header__nav--open,
+  .header__mobile-toggle__icon span,
+  .header__action,
+  .header__logo__icon {
+    transition: none;
+  }
+
+  .header__nav {
+    animation: none;
+  }
+
+  .header__action__badge {
+    animation: none;
+  }
+}
+
 </style>

@@ -596,9 +596,403 @@ async function handleDeleteCategory(id) {
   margin-bottom: clamp(0.375rem, 0.75vh, 0.5rem);
 }
 
+/* ============================================
+   TABLET - 1024px
+   ============================================ */
+@media (max-width: 1024px) {
+  .admin-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .admin-page__title {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-product-cell__img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .admin-categories {
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+  }
+}
+
+/* ============================================
+   MOBILE LARGE - 768px (existing + refinements)
+   ============================================ */
 @media (max-width: 768px) {
   .admin-form__row {
     grid-template-columns: 1fr;
+  }
+
+  .admin-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .admin-page__tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .admin-page__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-page__tab {
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-section__filters {
+    flex-direction: column;
+  }
+
+  .admin-select,
+  .admin-input {
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.8rem;
+  }
+
+  .admin-input {
+    max-width: 100%;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-product-cell {
+    gap: 0.375rem;
+  }
+
+  .admin-product-cell__img {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-actions__btn {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .admin-categories {
+    grid-template-columns: repeat(auto-fill, minmax(min(10rem, 100%), 1fr));
+    gap: 0.75rem;
+  }
+
+  .admin-category-card {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-category-card--add {
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .admin-category-card--add input {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   MOBILE - 640px
+   ============================================ */
+@media (max-width: 640px) {
+  .admin-page {
+    padding: 2rem 1rem 2.5rem;
+  }
+
+  .admin-page__title {
+    font-size: 1.25rem;
+  }
+
+  .admin-page__tab {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  /* Make tables horizontally scrollable with better UX */
+  .admin-table-wrap {
+    margin-left: calc(1rem * -1);
+    margin-right: calc(1rem * -1);
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .admin-table {
+    min-width: 500px; /* Force horizontal scroll for readability */
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  .admin-product-cell__name {
+    font-size: 0.8rem;
+  }
+
+  .admin-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .admin-actions__btn {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .admin-categories {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .admin-category-card {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-select,
+  .admin-input,
+  .admin-textarea {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .admin-file {
+    font-size: 0.7rem;
+  }
+}
+
+/* ============================================
+   MOBILE SMALL - 480px
+   ============================================ */
+@media (max-width: 480px) {
+  .admin-page {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .admin-page__title {
+    font-size: 1.125rem;
+  }
+
+  .admin-page__tabs {
+    margin-bottom: 1.25rem;
+  }
+
+  .admin-page__tab {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-section__filters {
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .admin-select,
+  .admin-input {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  /* Collapse table into card-like layout for very small screens */
+  .admin-table-wrap {
+    margin-left: calc(0.75rem * -1);
+    margin-right: calc(0.75rem * -1);
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .admin-table {
+    min-width: 450px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-product-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .admin-product-cell__img {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-product-cell__name {
+    font-size: 0.7rem;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-actions__btn {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .admin-actions__btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .admin-category-card {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-category-card--add input {
+    padding: 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-form {
+    gap: 0.75rem;
+  }
+
+  .admin-form__label {
+    font-size: 0.7rem;
+  }
+
+  .admin-textarea {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-file {
+    font-size: 0.7rem;
+    margin-bottom: 0.375rem;
+  }
+}
+
+/* ============================================
+   MOBILE XS - 360px
+   ============================================ */
+@media (max-width: 360px) {
+  .admin-page {
+    padding: 0.75rem 0.5rem 1.25rem;
+  }
+
+  .admin-page__title {
+    font-size: 1rem;
+  }
+
+  .admin-page__tab {
+    padding: 0.375rem 0.375rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-section__filters {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .admin-select,
+  .admin-input {
+    padding: 0.375rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-table-wrap {
+    margin-left: calc(0.5rem * -1);
+    margin-right: calc(0.5rem * -1);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .admin-table {
+    min-width: 400px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.25rem 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-product-cell__img {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.6rem;
+  }
+
+  .admin-product-cell__name {
+    font-size: 0.65rem;
+    max-width: 80px;
+  }
+
+  .admin-mono {
+    font-size: 0.65rem;
+  }
+
+  .admin-actions__btn {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .admin-actions__btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .admin-category-card {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .admin-category-card--add {
+    gap: 0.25rem;
+  }
+
+  .admin-category-card--add input {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-form {
+    gap: 0.5rem;
+  }
+
+  .admin-form__label {
+    font-size: 0.65rem;
+  }
+
+  .admin-textarea {
+    padding: 0.375rem;
+    font-size: 0.65rem;
+  }
+
+  .admin-file {
+    font-size: 0.65rem;
+    margin-bottom: 0.25rem;
   }
 }
 </style>
