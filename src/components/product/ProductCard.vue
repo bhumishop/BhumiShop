@@ -120,7 +120,10 @@ const categoryName = computed(() => {
   return cat?.name || props.product.category || ''
 })
 
-const isUmaPenca = computed(() => props.product.fulfillment_type === 'uma_penca')
+const isUmaPenca = computed(() => {
+  const ft = props.product.fulfillment_type
+  return ft === 'uma_penca' || ft === 'uma penca'
+})
 const isDigital = computed(() => props.product.fulfillment_type === 'digital')
 const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand')
 

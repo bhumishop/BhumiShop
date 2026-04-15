@@ -1,5 +1,70 @@
 <template>
-  <div v-if="product" class="product-detail container">
+  <!-- Embedded product page for umapenca/uiclap products -->
+  <div v-if="product && isThirdParty" class="product-detail container">
+    <nav class="product-detail__breadcrumb">
+      <router-link to="/">{{ $t('productDetail.breadcrumbHome') }}</router-link>
+      <span class="product-detail__sep">/</span>
+      <router-link to="/produtos">{{ $t('productDetail.breadcrumbProducts') }}</router-link>
+      <span class="product-detail__sep">/</span>
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail__embedded-layout">
+      <!-- Embedded iframe -->
+      <div class="product-detail__embedded-iframe">
+        <iframe
+          :src="productUrl"
+          class="product-detail__iframe"
+          frameborder="0"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+
+      <!-- Product info sidebar -->
+      <div class="product-detail__embedded-info">
+        <div class="product-detail__header">
+          <BaseBadge :variant="isUmaPenca ? 'accent' : 'accent'" size="sm">
+            {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
+          </BaseBadge>
+        </div>
+        <h1 class="product-detail__name">{{ product.name }}</h1>
+        <div class="product-detail__price-row">
+          <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
+        </div>
+        <p v-if="product.description" class="product-detail__desc">{{ truncatedDescription }}</p>
+        <a :href="productUrl" target="_blank" rel="noopener noreferrer" class="product-detail__external-link">
+          {{ $t('productDetail.viewOnExternalStore', 'View on external store') }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Other in-stock products below -->
+    <section v-if="inStockProducts.length > 0" class="product-detail__section product-detail__related">
+      <h2 class="product-detail__section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        {{ $t('productDetail.inStockProducts', 'In-stock products') }}
+      </h2>
+      <div class="product-detail__masonry">
+        <Masonry
+          :items="inStockProducts"
+          :gap="16"
+          :show-info="true"
+          :on-item-click="openRelatedProduct"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Normal product detail page for in-stock/digital products -->
+  <div v-else-if="product" class="product-detail container">
     <nav class="product-detail__breadcrumb">
       <router-link to="/">{{ $t('productDetail.breadcrumbHome') }}</router-link>
       <span class="product-detail__sep">/</span>
@@ -440,8 +505,13 @@ const categoryName = computed(() => {
   return cat?.name || product.value.category || ''
 })
 
-// Product type flags
-const isUmaPenca = computed(() => product.value?.fulfillment_type === 'uma_penca')
+// Product type flags - handle both 'uma_penca' (underscore, legacy) and 'uma penca' (space, new)
+const isUmaPenca = computed(() => {
+  const ft = product.value?.fulfillment_type
+  return ft === 'uma_penca' || ft === 'uma penca'
+})
+const isUiclap = computed(() => product.value?.fulfillment_type === 'uiclap')
+const isThirdParty = computed(() => isUmaPenca.value || isUiclap.value)
 const isDigital = computed(() => product.value?.fulfillment_type === 'digital')
 const isOnDemand = computed(() => product.value?.stock === 'print-on-demand')
 
@@ -464,17 +534,20 @@ const isLivro = computed(() => {
 // Category badge label
 const categoryBadgeLabel = computed(() => {
   if (isUmaPenca.value) return 'Uma Penca'
+  if (isUiclap.value) return 'UICLAP'
   if (isDigital.value) return 'Digital'
   if (isOnDemand.value) return t('productCard.badges.printOnDemand')
   return categoryName.value
 })
 
-// Fulfillment label
+// Fulfillment labels
 const fulfillmentLabel = computed(() => {
-  if (product.value?.fulfillment_type === 'uma_penca') return 'Uma Penca'
-  if (product.value?.fulfillment_type === 'digital') return t('productDetail.digitalDelivery')
-  if (product.value?.fulfillment_type === 'own') return t('productDetail.ownFulfillment')
-  return product.value?.fulfillment_type || ''
+  const ft = product.value?.fulfillment_type
+  if (ft === 'uma_penca' || ft === 'uma penca') return 'Uma Penca'
+  if (ft === 'uiclap') return 'UICLAP'
+  if (ft === 'digital') return t('productDetail.digitalDelivery')
+  if (ft === 'own') return t('productDetail.ownFulfillment')
+  return ft || ''
 })
 
 // Dynamic product details based on product type
@@ -626,6 +699,68 @@ const relatedProducts = computed(() => {
 
     // Get the correct display image: for t-shirts, product.image points to
     // a 000 FULLCOLOR swatch. Replace 000_image with 001_image in the URL.
+    let displayImg = p.image || ''
+    if (displayImg && displayImg.includes('000_image')) {
+      displayImg = displayImg.replace('000_image', '001_image')
+    }
+
+    return {
+      id: String(p.id),
+      img: displayImg,
+      url: `/produtos/${p.id}`,
+      name: p.name || '',
+      price: p.price || 0,
+      height,
+      aspectRatio: '3/4',
+    }
+  })
+})
+
+/** URL to embed for third-party products */
+const productUrl = computed(() => {
+  if (!product.value) return ''
+  // Use product_url field if available, fallback to third_party_product_url
+  return product.value.product_url || product.value.third_party_product_url || ''
+})
+
+/** Truncated description for the embedded sidebar */
+const truncatedDescription = computed(() => {
+  const desc = product.value?.description || ''
+  if (desc.length <= 200) return desc
+  return desc.substring(0, 200) + '...'
+})
+
+/** In-stock products (non-third-party) for the "also available" section */
+const inStockProducts = computed(() => {
+  const allProducts = productStore.products.filter(p => {
+    const ft = p.fulfillment_type
+    const isThird = ft === 'uma_penca' || ft === 'uma penca' || ft === 'uiclap' || ft === 'third_party'
+    return !isThird && p.is_active !== false
+  })
+  // Take up to 12 random in-stock products, excluding current
+  const filtered = allProducts.filter(p => String(p.id) !== String(product.value?.id))
+  const shuffled = filtered.sort(() => 0.5 - Math.random())
+  const selected = shuffled.slice(0, 12)
+
+  const categoryHeightMap = {
+    camiseta: 280,
+    caneca: 240,
+    livro: 320,
+    default: 260,
+  }
+
+  return selected.map(p => {
+    const cat = productStore.categories.find(c => c.id === p.category)?.name?.toLowerCase() || ''
+    let height = categoryHeightMap.default
+    for (const [key, h] of Object.entries(categoryHeightMap)) {
+      if (cat.includes(key)) {
+        height = h
+        break
+      }
+    }
+    const variation = ((p.id * 13) % 60) - 30
+    height += variation
+
     let displayImg = p.image || ''
     if (displayImg && displayImg.includes('000_image')) {
       displayImg = displayImg.replace('000_image', '001_image')
@@ -1102,6 +1237,59 @@ async function addToCart() {
   width: 100%;
 }
 
+/* ========== EMBEDDED PRODUCT PAGE (umapenca/uiclap) ========== */
+.product-detail__embedded-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  align-items: start;
+}
+
+.product-detail__embedded-iframe {
+  width: 100%;
+  min-height: 70vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.product-detail__iframe {
+  width: 100%;
+  height: 70vh;
+  min-height: 500px;
+  border: none;
+  display: block;
+}
+
+.product-detail__embedded-info {
+  position: sticky;
+  top: calc(var(--header-height) + clamp(1rem, 2.5vh, 2rem));
+  padding: clamp(1rem, 2vh, 1.5rem);
+  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.product-detail__external-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: clamp(0.75rem, 1.5vh, 1rem);
+  padding: clamp(0.5rem, 1vh, 0.75rem) clamp(0.75rem, 1.5vw, 1rem);
+  font-size: clamp(0.8rem, 1.3vw, 0.9rem);
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.product-detail__external-link:hover {
+  background: var(--accent-subtle-hover, rgba(139, 92, 246, 0.15));
+  transform: translateY(-1px);
+}
+
 /* Not found */
 .product-detail__notfound {
   text-align: center;
@@ -1129,6 +1317,20 @@ async function addToCart() {
 
   .product-detail__specs-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Embedded layout - stack on mobile */
+  .product-detail__embedded-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .product-detail__embedded-info {
+    position: static;
+  }
+
+  .product-detail__iframe {
+    height: 60vh;
+    min-height: 400px;
   }
 }
 </style>

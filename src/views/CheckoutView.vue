@@ -50,7 +50,7 @@
           </div>
           <div class="checkout-page__items">
             <div
-              v-for="item in cartStore.fulfillmentGroups.uma_penca"
+              v-for="item in umaPencaCartItems"
               :key="`up_${item.id}_${item.size || 'default'}`"
               class="checkout-item checkout-item--uma-penca"
             >
@@ -273,20 +273,21 @@
         </div>
       </template>
 
-      <!-- Uma Penca redirect -->
+      <!-- Uma Penca redirect - opens in NEW TABS, never overlays -->
       <template v-else-if="checkoutStore.paymentMethod === 'uma_penca'">
         <div class="checkout-page__redirect-card">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          <h3 class="checkout-page__redirect-title">{{ $t('checkout.step4.redirectingUmaPenca') }}</h3>
-          <p class="checkout-page__redirect-desc">{{ $t('checkout.step4.umaPencaDesc') }}</p>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><line x1="15" y1="3" x2="21" y2="3"/><line x1="21" y1="3" x2="21" y2="9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <h3 class="checkout-page__redirect-title">{{ $t('checkout.step4.redirectingUmaPenca', 'Opening third-party products') }}</h3>
+          <p class="checkout-page__redirect-desc">{{ $t('checkout.step4.umaPencaDesc', 'Third-party products will open in new tabs. In-stock items will continue here.') }}</p>
           <BaseButton variant="primary" @click="handleUmaPencaRedirect">
             {{ $t('checkout.step4.goToUmaPenca') }}
           </BaseButton>
         </div>
       </template>
 
-      <!-- Order Confirmation (shared) -->
+      <!-- Order Confirmation (shared) - only show if an order was actually created -->
       <OrderConfirmation
+        v-if="orderStore.currentOrder?.order_number && checkoutStore.paymentMethod !== 'uma_penca'"
         :order-number="orderStore.currentOrder?.order_number"
         :payment-method="checkoutStore.paymentMethod"
         :billing-url="checkoutStore.billingData?.url"
@@ -360,6 +361,12 @@ const isInBrazil = computed(() => {
 // Whether cart has visible UmaPenca items (only shown for Brazil users)
 const showUmaPencaItems = computed(() => {
   return isInBrazil.value && cartStore.hasUmaPencaItems
+})
+
+// Uma Penca cart items - handles both 'uma_penca' and 'uma penca' fulfillment types
+const umaPencaCartItems = computed(() => {
+  const groups = cartStore.fulfillmentGroups
+  return [...(groups['uma_penca'] || []), ...(groups['uma penca'] || [])]
 })
 
 const shippingCalcRef = ref(null)
@@ -593,22 +600,62 @@ async function renderPixBricks() {
 }
 
 function handleUmaPencaRedirect() {
-  const umaPencaItems = cartStore.items.filter(item => item.fulfillment_type === 'uma_penca')
-  const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+  const productStore = useProductStore()
 
-  const cartPayload = umaPencaItems.map(item => ({
-    id: parseInt(item.id, 10) || item.id,
-    qty: Math.min(Math.max(item.quantity, 1), 99),
-    size: item.size || null
-  }))
+  // Get all third-party items (uma_penca, uma penca, uiclap)
+  const thirdPartyItems = cartStore.items.filter(item => {
+    const ft = item.fulfillment_type
+    return ft === 'uma_penca' || ft === 'uma penca' || ft === 'uiclap'
+  })
 
-  const encodedCart = btoa(JSON.stringify(cartPayload))
-  const url = new URL(`${storeUrl}/checkout`)
-  url.searchParams.set('cart', encodedCart)
-  url.searchParams.set('ref', 'bhumi-shop')
+  // Open new tabs for each third-party product
+  const umaPencaStoreUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
 
-  cartStore.clearCart()
-  window.location.href = url.toString()
+  thirdPartyItems.forEach(item => {
+    // Try to get the product URL from the product store
+    const product = productStore.getProductById(item.id)
+    const productUrl = product?.product_url || product?.third_party_product_url
+
+    if (productUrl) {
+      // Open the original product URL in a new tab
+      window.open(productUrl, '_blank')
+    } else {
+      // Fallback: open the store's checkout with cart payload
+      const cartPayload = {
+        id: parseInt(item.id, 10) || item.id,
+        qty: Math.min(Math.max(item.quantity, 1), 99),
+        size: item.size || null
+      }
+      const encodedCart = btoa(JSON.stringify([cartPayload]))
+      const url = new URL(`${umaPencaStoreUrl}/checkout`)
+      url.searchParams.set('cart', encodedCart)
+      url.searchParams.set('ref', 'bhumi-shop')
+      window.open(url.toString(), '_blank')
+    }
+  })
+
+  // Remove third-party items from cart, keep only in-stock items
+  cartStore.items = cartStore.items.filter(item => {
+    const ft = item.fulfillment_type
+    return ft !== 'uma_penca' && ft !== 'uma penca' && ft !== 'uiclap'
+  })
+
+  // If there are still in-stock items, continue with checkout
+  if (cartStore.items.length > 0) {
+    // Clear the current payment method/provider so user can select for remaining items
+    checkoutStore.paymentMethod = 'pix'
+    checkoutStore.paymentProvider = ''
+    toast.info(t('checkout.step1.thirdPartyOpened', 'Third-party products opened in new tabs. Continue checkout for in-stock items.'))
+  } else {
+    // All items were third-party, open store checkout in new tab too
+    cartStore.clearCart()
+    const url = new URL(`${umaPencaStoreUrl}/checkout`)
+    url.searchParams.set('ref', 'bhumi-shop')
+    window.open(url.toString(), '_blank')
+    // Go back to products page since cart is empty
+    toast.info(t('checkout.step1.allThirdParty', 'All products were third-party. Opened in new tab.'))
+    router.push('/produtos')
+  }
 }
 
 function startPixPolling() {

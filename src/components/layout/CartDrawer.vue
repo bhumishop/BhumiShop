@@ -163,8 +163,10 @@ function handleClearCart() {
 }
 
 function getItemClass(item) {
-  if (item.fulfillment_type === 'uma_penca') return 'drawer__item--uma-penca'
-  if (item.fulfillment_type === 'digital') return 'drawer__item--digital'
+  const ft = item.fulfillment_type
+  if (ft === 'uma_penca' || ft === 'uma penca') return 'drawer__item--uma-penca'
+  if (ft === 'digital') return 'drawer__item--digital'
+  if (ft === 'uiclap') return 'drawer__item--uma-penca'
   return ''
 }
 

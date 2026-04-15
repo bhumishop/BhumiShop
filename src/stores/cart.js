@@ -85,7 +85,10 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   const hasUmaPencaItems = computed(() => {
-    return items.value.some(item => item.fulfillment_type === 'uma_penca')
+    return items.value.some(item => {
+      const ft = item.fulfillment_type
+      return ft === 'uma_penca' || ft === 'uma penca'
+    })
   })
 
   const hasOwnItems = computed(() => {
@@ -104,7 +107,10 @@ export const useCartStore = defineStore('cart', () => {
 
   const umaPencaItemsTotal = computed(() => {
     return items.value
-      .filter(item => item.fulfillment_type === 'uma_penca')
+      .filter(item => {
+        const ft = item.fulfillment_type
+        return ft === 'uma_penca' || ft === 'uma penca'
+      })
       .reduce((sum, item) => sum + (item.price * item.quantity), 0)
   })
 

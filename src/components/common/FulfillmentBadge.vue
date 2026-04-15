@@ -1,10 +1,13 @@
 <template>
   <span class="fulfillment-badge" :class="badgeClass" :title="tooltipText">
-    <svg v-if="type === 'uma_penca'" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <svg v-if="normalizedType === 'uma_penca'" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
     </svg>
-    <svg v-else-if="type === 'digital'" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <svg v-else-if="normalizedType === 'digital'" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>
+    </svg>
+    <svg v-else-if="normalizedType === 'uiclap'" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
     </svg>
     {{ labelText }}
   </span>
@@ -20,7 +23,7 @@ const props = defineProps({
   type: {
     type: String,
     required: true,
-    validator: (v) => ['uma_penca', 'digital', 'uiclap'].includes(v)
+    validator: (v) => ['uma_penca', 'uma penca', 'digital', 'uiclap', 'third_party'].includes(v)
   },
   size: {
     type: String,
@@ -29,8 +32,13 @@ const props = defineProps({
   }
 })
 
+// Normalize 'uma penca' (space) to 'uma_penca' (underscore) for CSS class matching
+const normalizedType = computed(() => {
+  return props.type === 'uma penca' ? 'uma_penca' : props.type
+})
+
 const badgeClass = computed(() => {
-  const classes = [`fulfillment-badge--${props.type}`]
+  const classes = [`fulfillment-badge--${normalizedType.value}`]
   if (props.size === 'sm') classes.push('fulfillment-badge--sm')
   return classes
 })
@@ -77,5 +85,10 @@ const tooltipText = computed(() => {
 .fulfillment-badge--uiclap {
   background: rgba(59, 130, 246, 0.12);
   color: #2563eb;
+}
+
+.fulfillment-badge--third_party {
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
 }
 </style>

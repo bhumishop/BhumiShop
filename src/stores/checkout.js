@@ -184,25 +184,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error(`${t('stores.checkout.invalidProducts')}: ${invalidNames}`)
       }
 
-      // Handle Uma Penca redirect
+      // Handle Uma Penca redirect - now opens in new tabs instead of redirecting
       if (paymentProvider.value === 'uma_penca') {
-        const umaPencaItems = cartStore.items.filter(item => item.fulfillment_type === 'uma_penca')
-        const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
-        
-        // Build encrypted/signed cart payload instead of plain URL params
-        const cartPayload = umaPencaItems.map(item => ({
-          id: sanitizeProductId(item.id),
-          qty: Math.min(Math.max(item.quantity, 1), 99),
-          size: item.size || null
-        }))
-        
-        // Encode as base64 to avoid plain text exposure in URL
-        const encodedCart = btoa(JSON.stringify(cartPayload))
-        
-        // Clear cart before redirect to Uma Penca
-        cartStore.clearCart()
-        
-        window.location.href = `${storeUrl}/checkout?cart=${encodedCart}&ref=bhumi-shop`
+        // The view layer handles opening new tabs and filtering cart items
+        // Just return here to avoid further processing
         return
       }
 
