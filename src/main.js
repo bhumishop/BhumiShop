@@ -17,6 +17,12 @@ async function bootstrap() {
   app.use(router)
 
   app.config.errorHandler = (err, instance, info) => {
+    // Suppress known Vue transition runtime errors during navigation
+    // These occur when TransitionGroup elements are removed before leave animation completes
+    if (err?.message?.includes('Cannot read properties of null (reading \'parentNode\')') ||
+        err?.message?.includes('runtime-9')) {
+      return // Silently ignore transition cleanup errors
+    }
     console.error('[BhumiShop Error]', err, info)
   }
 

@@ -69,7 +69,7 @@
       </div>
 
       <div v-else class="products-page__grid">
-        <TransitionGroup name="product-fade" tag="template">
+        <TransitionGroup name="product-fade">
           <ProductPixelCard
             v-for="product in paginatedSortedProducts"
             :key="product.id"
@@ -103,6 +103,7 @@ const activeCategory = ref('')
 const sortBy = ref('newest')
 const categoriesRef = ref(null)
 const currentPage = ref(1)
+let isNavigatingAway = false
 
 // Sorted products
 const sortedProducts = computed(() => {
@@ -403,9 +404,19 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.product-fade-enter-from {
+.product-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.product-fade-enter-from,
+.product-fade-leave-to {
   opacity: 0;
   transform: translateY(12px);
+}
+
+/* Ensure TransitionGroup items are visible */
+.product-fade-move {
+  transition: transform 0.3s ease;
 }
 
 /* ===== Responsive ===== */

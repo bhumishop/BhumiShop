@@ -3,9 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 
-export const isDemo = !supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')
+// More robust demo mode detection
+export const isDemo = !supabaseUrl ||
+  !supabaseKey ||
+  supabaseUrl.includes('placeholder') ||
+  supabaseUrl.includes('your-project') ||
+  supabaseKey.includes('your-anon-key') ||
+  supabaseKey.includes('placeholder')
+
 if (isDemo) {
-  // Silently fall back to demo mode — no console spam
+  console.warn('[Supabase] Running in demo/mock mode. Supabase credentials not configured.')
 }
 
 const TIMEOUT_MS = 60000

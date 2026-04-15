@@ -358,11 +358,7 @@ input, textarea, select {
 }
 
 /* ===== PAGE TRANSITIONS ===== */
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
+/* GSAP handles animations in pageEnter/pageLeave - CSS only sets initial/final states */
 .page-enter-from {
   opacity: 0;
   transform: translateY(8px);

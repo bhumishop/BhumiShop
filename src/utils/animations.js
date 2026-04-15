@@ -546,7 +546,7 @@ export function pageEnter(el, done) {
     ease: 'power3.out',
     force3D: true,
     onComplete: () => {
-      refreshScrollTriggers();
+      try { refreshScrollTriggers(); } catch (e) { /* ignore */ }
       done();
     },
     onInterrupt: () => {

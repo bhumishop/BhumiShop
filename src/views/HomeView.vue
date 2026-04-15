@@ -55,7 +55,7 @@
             </div>
 
             <div class="hero__actions">
-              <button class="hero__btn-primary" @click="$router.push('/produtos')">
+              <button class="hero__btn-primary" @click="navigateToProducts">
                 <span>{{ $t('home.viewProducts') }}</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -138,10 +138,26 @@ const featuredRef = ref(null)
 const heroRef = ref(null)
 let ctx = null
 let productAnim = null
+let isNavigating = false
 
 // Hero mouse tracking - direct DOM manipulation to avoid Vue reactivity overhead
 let heroMouseRafId = 0
 let cursorGlowElement = null
+
+function navigateToProducts() {
+  if (isNavigating) return
+  isNavigating = true
+  // Kill animations before navigation to prevent transition errors
+  if (ctx) {
+    try { ctx.revert() } catch (e) { /* ignore cleanup errors */ }
+  }
+  if (productAnim) {
+    try { productAnim.kill() } catch (e) { /* ignore cleanup errors */ }
+  }
+  ctx = null
+  productAnim = null
+  router.push('/produtos')
+}
 
 function handleHeroMouseMove(e) {
   if (heroMouseRafId) return
@@ -244,6 +260,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  isNavigating = true
   if (ctx) ctx.revert()
   if (productAnim) productAnim.kill()
   if (heroMouseRafId) cancelAnimationFrame(heroMouseRafId)

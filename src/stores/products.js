@@ -17,10 +17,9 @@ let cacheTimestamp = 0
  */
 function normalizeCategoryMatch(productCat, categoryId) {
   if (productCat === categoryId) return true
-  // Strip common suffixes and compare roots
-  const normalize = (s) => s.toLowerCase()
-    .replace(/s$/, '')  // remove trailing 's'
-    .replace(/es$/, 'e') // remove 'es'
+  const normalize = (s) => String(s).toLowerCase()
+    .replace(/s$/, '')
+    .replace(/es$/, 'e')
   return normalize(productCat) === normalize(categoryId)
 }
 
@@ -366,7 +365,8 @@ export const useProductStore = defineStore('products', () => {
     error.value = null
     try {
       if (isDemo) {
-        // Use mock data in demo mode
+        // In demo mode, use mock data but log clearly
+        console.warn('[Products] Running in demo mode - using mock data. Set VITE_SUPABASE_URL and VITE_SUPABASE_KEY for production.')
         products.value = mockProducts
         totalCount.value = mockProducts.length
         invalidateRelatedCache()
@@ -426,11 +426,14 @@ export const useProductStore = defineStore('products', () => {
       invalidateRelatedCache()
     } catch (err) {
       error.value = err.message || t('stores.products.loadError')
-      console.error('fetchProducts error:', err)
-      // Fall back to demo mode on error
-      products.value = mockProducts
-      totalCount.value = mockProducts.length
-      invalidateRelatedCache()
+      console.error('[Products] fetchProducts error:', err)
+      // Only fall back to mock data if we have no products loaded yet
+      if (products.value.length === 0) {
+        console.warn('[Products] Falling back to mock data due to error')
+        products.value = mockProducts
+        totalCount.value = mockProducts.length
+        invalidateRelatedCache()
+      }
     } finally {
       loading.value = false
     }
