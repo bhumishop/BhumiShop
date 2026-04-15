@@ -301,7 +301,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to GitHub Pages
     needs: [generate-matrix, verify-site]
-    if: ${{ needs.generate-matrix.outputs.should_deploy == 'true' }}
+    if: ${{ needs.generate-matrix.outputs.should_deploy == 'true' && (needs.verify-site.result == 'success' || needs.verify-site.result == 'failure' || needs.verify-site.result == 'skipped') }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
