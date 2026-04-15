@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase, isDemo } from '../supabase'
 import { t } from '../utils/storeI18n'
+import { transformProductImagesToCdn } from '../utils/cdnImages'
 
 const PAGE_SIZE = 20
 
@@ -417,8 +418,10 @@ export const useProductStore = defineStore('products', () => {
         .order('id', { ascending: false })
 
       if (err) throw err
-      products.value = data || []
-      totalCount.value = data?.length || 0
+      // Transform all product images to GitHub CDN URLs (with WebP preference)
+      const rawProducts = data || []
+      products.value = rawProducts.map(p => transformProductImagesToCdn(p, true))
+      totalCount.value = products.value.length
 
       // Update cache
       productsCache = products.value
@@ -469,163 +472,6 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
-  async function addProduct(product) {
-    if (isDemo) {
-      throw new Error('Adding products is not available in demo mode')
-    }
-    error.value = null
-    try {
-      const productData = {
-        name: (product.name || '').trim(),
-        category: product.category,
-        price: parseFloat(product.price) || 0,
-        description: (product.description || '').trim(),
-        stock_type: product.stock_type || 'print-on-demand',
-        stock_quantity: product.stock_quantity ?? 0,
-        image: product.image || '',
-        images: product.images || [],
-        color_swatches: product.color_swatches || [],
-        artist: (product.artist || '').trim(),
-        info: (product.info || '').trim(),
-        materials: product.materials || null,
-        tags: product.tags || [],
-        fulfillment_type: product.fulfillment_type || 'own',
-        weight: parseFloat(product.weight) || 0.3,
-        dimensions: product.dimensions || null,
-        shipping_zones: product.shipping_zones || null
-      }
-
-      const { data, error: err } = await supabase
-        .from('products')
-        .insert([productData])
-        .select()
-
-      if (err) throw err
-      if (data && data[0]) {
-        products.value.unshift(data[0])
-        clearCache()
-        invalidateRelatedCache()
-      }
-      return data?.[0]
-    } catch (err) {
-      error.value = err.message || t('stores.products.addError')
-      console.error('addProduct error:', err)
-      throw err
-    }
-  }
-
-  async function updateProduct(id, updates) {
-    if (isDemo) {
-      throw new Error('Updating products is not available in demo mode')
-    }
-    error.value = null
-    try {
-      const productData = {
-        name: (updates.name || '').trim(),
-        category: updates.category,
-        price: parseFloat(updates.price) || 0,
-        description: (updates.description || '').trim(),
-        stock_type: updates.stock_type || 'print-on-demand',
-        stock_quantity: updates.stock_quantity ?? 0,
-        image: updates.image || '',
-        images: updates.images || [],
-        color_swatches: updates.color_swatches || [],
-        artist: (updates.artist || '').trim(),
-        info: (updates.info || '').trim(),
-        materials: updates.materials || null,
-        tags: updates.tags || [],
-        fulfillment_type: updates.fulfillment_type || 'own',
-        weight: parseFloat(updates.weight) || 0.3,
-        dimensions: updates.dimensions || null,
-        shipping_zones: updates.shipping_zones || null
-      }
-
-      const { data, error: err } = await supabase
-        .from('products')
-        .update(productData)
-        .eq('id', id)
-        .select()
-
-      if (err) throw err
-      if (data && data[0]) {
-        const index = products.value.findIndex(p => p.id === id)
-        if (index !== -1) {
-          products.value[index] = data[0]
-          invalidateRelatedCache()
-        }
-      }
-      return data?.[0]
-    } catch (err) {
-      error.value = err.message || t('stores.products.updateError')
-      console.error('updateProduct error:', err)
-      throw err
-    }
-  }
-
-  async function deleteProduct(id) {
-    if (isDemo) {
-      throw new Error('Deleting products is not available in demo mode')
-    }
-    error.value = null
-    try {
-      const { error: err } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id)
-
-      if (err) throw err
-      products.value = products.value.filter(p => p.id !== id)
-      invalidateRelatedCache()
-    } catch (err) {
-      error.value = err.message || t('stores.products.deleteError')
-      console.error('deleteProduct error:', err)
-      throw err
-    }
-  }
-
-  async function addCategory(category) {
-    if (isDemo) {
-      throw new Error('Adding categories is not available in demo mode')
-    }
-    error.value = null
-    try {
-      const { data, error: err } = await supabase
-        .from('categories')
-        .insert([category])
-        .select()
-
-      if (err) throw err
-      if (data && data[0]) {
-        categories.value.push(data[0])
-      }
-      return data?.[0]
-    } catch (err) {
-      error.value = err.message || t('stores.products.addCategoryError')
-      console.error('addCategory error:', err)
-      throw err
-    }
-  }
-
-  async function deleteCategory(id) {
-    if (isDemo) {
-      throw new Error('Deleting categories is not available in demo mode')
-    }
-    error.value = null
-    try {
-      const { error: err } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', id)
-
-      if (err) throw err
-      categories.value = categories.value.filter(c => c.id !== id)
-    } catch (err) {
-      error.value = err.message || t('stores.products.deleteCategoryError')
-      console.error('deleteCategory error:', err)
-      throw err
-    }
-  }
-
   function setSearchQuery(query) {
     searchQuery.value = query
     currentPage.value = 1
@@ -670,11 +516,6 @@ export const useProductStore = defineStore('products', () => {
     activeProductCount,
     fetchProducts,
     fetchCategories,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    addCategory,
-    deleteCategory,
     setSearchQuery,
     setActiveCategory,
     setMaxPrice,

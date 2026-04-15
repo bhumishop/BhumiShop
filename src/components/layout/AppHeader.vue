@@ -28,9 +28,7 @@
           <router-link to="/produtos" @click="mobileMenuOpen = false" class="header__nav__item">
             <span class="header__nav__text">{{ $t('nav.products') }}</span>
           </router-link>
-          <router-link v-if="authStore.adminRole" to="/admin" @click="mobileMenuOpen = false" class="header__nav__item">
-            <span class="header__nav__text">{{ $t('nav.admin') }}</span>
-          </router-link>
+
         </nav>
       </div>
 

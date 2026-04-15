@@ -1,1 +1,0 @@
-python3: can't open file '/home/ubuntu/bhumi-shop/clean_grey_images.py': [Errno 2] No such file or directory

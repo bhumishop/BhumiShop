@@ -29,7 +29,6 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(false)
   const initialized = ref(false)
-  const adminRole = ref(false)
   const userLocation = ref(loadSavedLocation())
 
   const isLoggedIn = computed(() => !!user.value)
@@ -60,7 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
       if (error) throw error
       if (session) {
         user.value = session.user
-        await _checkAdminRole()
       }
     } catch (err) {
       console.error('Auth init error:', err)
@@ -71,87 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     supabase.auth.onAuthStateChange(async (event, session) => {
       user.value = session?.user || null
-      if (session?.user) {
-        await _checkAdminRole()
-      } else {
-        adminRole.value = false
-      }
     })
-  }
-
-  async function _checkAdminRole() {
-    if (isDemo) {
-      adminRole.value = false
-      return
-    }
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.value?.id)
-        .eq('role', 'admin')
-        .maybeSingle()
-      if (error) throw error
-      adminRole.value = !!data
-    } catch {
-      adminRole.value = false
-    }
-  }
-
-  async function checkAdminRole() {
-    if (!user.value) return false
-    await _checkAdminRole()
-    return adminRole.value
-  }
-
-  async function assignRole(userId, role) {
-    if (isDemo) return
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({ user_id: userId, role })
-      if (error) throw error
-      // Refresh current user's admin status if it's them
-      if (user.value?.id === userId && role === 'admin') {
-        await _checkAdminRole()
-      }
-    } catch (err) {
-      console.error('assignRole error:', err)
-      throw err
-    }
-  }
-
-  async function removeRole(userId, role) {
-    if (isDemo) return
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('role', role)
-      if (error) throw error
-      // Refresh current user's admin status if it's them
-      if (user.value?.id === userId && role === 'admin') {
-        await _checkAdminRole()
-      }
-    } catch (err) {
-      console.error('removeRole error:', err)
-      throw err
-    }
-  }
-
-  async function getUserRoles(userId) {
-    if (isDemo) return []
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId || user.value?.id)
-      if (error) throw error
-      return data.map(r => r.role)
-    } catch {
-      return []
-    }
   }
 
   async function signInWithGoogle() {
@@ -214,13 +132,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function signOut() {
     if (isDemo) {
       user.value = null
-      adminRole.value = false
       return
     }
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     user.value = null
-    adminRole.value = false
   }
 
   async function updateProfile(updates) {
@@ -251,16 +167,11 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     loading,
     initialized,
-    adminRole,
     userLocation,
     isLoggedIn,
     userEmail,
     userName,
     initialize,
-    checkAdminRole,
-    assignRole,
-    removeRole,
-    getUserRoles,
     setLocation,
     clearLocation,
     signInWithGoogle,

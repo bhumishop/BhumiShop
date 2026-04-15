@@ -16,7 +16,7 @@
           <h2 class="profile-card__name">{{ authStore.userName }}</h2>
           <p class="profile-card__email">{{ authStore.userEmail }}</p>
         </div>
-        <BaseBadge v-if="authStore.adminRole" variant="accent" size="sm">{{ $t('profile.admin') }}</BaseBadge>
+
       </div>
 
       <div class="profile-card__actions">
