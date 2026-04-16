@@ -20,20 +20,20 @@ Allow: /llms.txt
 Allow: /sitemap.xml
 
 # Block admin panel (requires authentication anyway)
-Disallow: /#/admin
+Disallow: /admin
 
 # Block checkout pages (user-specific content)
-Disallow: /#/checkout
+Disallow: /checkout
 
 # Block user account pages
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
+Disallow: /minhas-compras
+Disallow: /perfil
 
 # Block authentication pages
-Disallow: /#/login
+Disallow: /login
 
 # Block cart (user-specific)
-Disallow: /#/carrinho
+Disallow: /carrinho
 
 # Block API endpoints and internal routes
 Disallow: /api/
@@ -67,12 +67,12 @@ Disallow: /INTEGRATION-COMPS.md
 # ==========================================================================
 User-agent: Googlebot
 Allow: /
-Disallow: /#/admin
-Disallow: /#/checkout
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
-Disallow: /#/login
-Disallow: /#/carrinho
+Disallow: /admin
+Disallow: /checkout
+Disallow: /minhas-compras
+Disallow: /perfil
+Disallow: /login
+Disallow: /carrinho
 
 # Google specifically can access images
 Allow: /public/images/
@@ -90,12 +90,12 @@ Allow: /images/
 # ==========================================================================
 User-agent: Bingbot
 Allow: /
-Disallow: /#/admin
-Disallow: /#/checkout
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
-Disallow: /#/login
-Disallow: /#/carrinho
+Disallow: /admin
+Disallow: /checkout
+Disallow: /minhas-compras
+Disallow: /perfil
+Disallow: /login
+Disallow: /carrinho
 
 # ==========================================================================
 # AI/LLM Crawlers
@@ -105,31 +105,31 @@ Disallow: /#/carrinho
 User-agent: GPTBot
 Allow: /
 Allow: /llms.txt
-Disallow: /#/admin
-Disallow: /#/checkout
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
-Disallow: /#/login
+Disallow: /admin
+Disallow: /checkout
+Disallow: /minhas-compras
+Disallow: /perfil
+Disallow: /login
 
 # Claude / Anthropic
 User-agent: Claude-Web
 Allow: /
 Allow: /llms.txt
-Disallow: /#/admin
-Disallow: /#/checkout
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
-Disallow: /#/login
+Disallow: /admin
+Disallow: /checkout
+Disallow: /minhas-compras
+Disallow: /perfil
+Disallow: /login
 
 # Common Crawl
 User-agent: CCBot
 Allow: /
 Allow: /llms.txt
-Disallow: /#/admin
-Disallow: /#/checkout
-Disallow: /#/minhas-compras
-Disallow: /#/perfil
-Disallow: /#/login
+Disallow: /admin
+Disallow: /checkout
+Disallow: /minhas-compras
+Disallow: /perfil
+Disallow: /login
 
 # ==========================================================================
 # Social Media Crawlers
@@ -165,8 +165,8 @@ Crawl-delay: 1
 # ==========================================================================
 # Notes
 # ==========================================================================
-# - This is a Single Page Application (SPA) using hash-based routing
+# - This is a Single Page Application (SPA) using history-based routing (Vue Router createWebHistory)
 # - Most crawlers cannot execute JavaScript, so only the root URL is indexable
 # - Consider implementing Server-Side Rendering (SSR) or Static Site Generation (SSG) for better SEO
 # - The llms.txt file provides structured information for AI crawlers
-# - Sitemap includes hash-based URLs for SPA navigation
+# - Sitemap includes path-based URLs for SPA navigation
