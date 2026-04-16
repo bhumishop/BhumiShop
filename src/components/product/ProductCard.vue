@@ -54,13 +54,12 @@
           </div>
 
           <div class="product-card__overlay">
-            <button class="product-card__quick-add" @click.stop="addToCart">
+            <button class="product-card__quick-add" @click.stop="$router.push(`/produtos/${product.id}`)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 01-8 0"/>
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
               </svg>
-              Quick Add
+              See product
             </button>
           </div>
         </div>
@@ -80,14 +79,9 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useCartStore } from '../../stores/cart'
 import { useProductStore } from '../../stores/products'
-import { useToastStore } from '../../stores/toast'
 import Magnet from '../common/Magnet.vue'
 import BorderGlow from '../common/BorderGlow.vue'
-
-const { t } = useI18n()
 
 const props = defineProps({
   product: { type: Object, required: true },
@@ -111,9 +105,7 @@ const displayImage = computed(() => {
   return img
 })
 
-const cartStore = useCartStore()
 const productStore = useProductStore()
-const toast = useToastStore()
 
 const categoryName = computed(() => {
   const cat = productStore.categories.find(c => c.id === props.product.category)
@@ -129,23 +121,6 @@ const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand'
 
 function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')
-}
-
-function addToCart() {
-  cartStore.addItem({
-    id: props.product.id,
-    name: props.product.name,
-    price: props.product.price,
-    image: props.product.image,
-    category: props.product.category,
-    size: null,
-    quantity: 1,
-    fulfillment_type: props.product.fulfillment_type || 'own',
-    weight: props.product.weight || 0.3,
-    dimensions: props.product.dimensions || null,
-    shipping_zones: props.product.shipping_zones || null
-  })
-  toast.success(t('productCard.addedToCart', { name: props.product.name }))
 }
 </script>
 

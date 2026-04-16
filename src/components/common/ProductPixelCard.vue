@@ -83,15 +83,14 @@
           <span class="product-pixel-card__currency">R$</span>
           <span class="product-pixel-card__price">{{ formatPrice(product.price) }}</span>
         </div>
-        <button class="product-pixel-card__add" @click.stop="addToCart" aria-label="Add to cart">
+        <button class="product-pixel-card__add" @click.stop="handleSeeProduct" aria-label="See product">
           <span class="product-pixel-card__add-bg" aria-hidden="true"></span>
           <span class="product-pixel-card__add-shine" aria-hidden="true"></span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 01-8 0"/>
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
           </svg>
-          <span>Add to cart</span>
+          <span>See product</span>
         </button>
       </div>
     </div>
@@ -141,8 +140,17 @@ const categoryName = computed(() => {
 })
 
 const isUmaPenca = computed(() => props.product.fulfillment_type === 'uma_penca')
+const isUiclap = computed(() => props.product.fulfillment_type === 'uiclap')
+const isThirdParty = computed(() => isUmaPenca.value || isUiclap.value)
 const isDigital = computed(() => props.product.fulfillment_type === 'digital')
 const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand')
+
+/**
+ * Get the external product URL for third-party products.
+ */
+const productUrl = computed(() => {
+  return props.product.product_url || props.product.third_party_product_url || ''
+})
 
 /**
  * Get the correct display image for the product.
@@ -189,6 +197,16 @@ function handleImageError(event) {
 
 function formatPrice(value) {
   return Number(value).toFixed(2).replace('.', ',')
+}
+
+function handleSeeProduct() {
+  if (isThirdParty.value && productUrl.value) {
+    // Open third-party product in new tab
+    window.open(productUrl.value, '_blank', 'noopener,noreferrer')
+  } else {
+    // Navigate to own product detail page in-app
+    router.push(`/produtos/${props.product.id}`)
+  }
 }
 
 function addToCart() {

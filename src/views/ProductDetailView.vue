@@ -12,12 +12,22 @@
     <div class="product-detail__embedded-layout">
       <!-- Embedded iframe -->
       <div class="product-detail__embedded-iframe">
+        <div v-if="!iframeLoaded" class="product-detail__iframe-loading">
+          <div class="product-detail__loading-spinner">
+            <svg class="product-detail__spinner" width="40" height="40" viewBox="0 0 40 40">
+              <circle class="product-detail__spinner-track" cx="20" cy="20" r="16" fill="none" stroke-width="3"/>
+              <circle class="product-detail__spinner-path" cx="20" cy="20" r="16" fill="none" stroke-width="3"/>
+            </svg>
+            <p>Loading product preview...</p>
+          </div>
+        </div>
         <iframe
           :src="productUrl"
           class="product-detail__iframe"
           frameborder="0"
           allowfullscreen
           loading="lazy"
+          @load="iframeLoaded = true"
         ></iframe>
       </div>
 
@@ -27,6 +37,7 @@
           <BaseBadge :variant="isUmaPenca ? 'accent' : 'accent'" size="sm">
             {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
           </BaseBadge>
+          <span class="product-detail__store-label">Sold by {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}</span>
         </div>
         <h1 class="product-detail__name">{{ product.name }}</h1>
         <div class="product-detail__price-row">
@@ -783,6 +794,9 @@ function openRelatedProduct(item) {
   window.scrollTo({ top: 0, behavior: 'instant' })
 }
 
+// Track iframe loading state
+const iframeLoaded = ref(false)
+
 onMounted(async () => {
   if (productStore.products.length === 0) {
     await productStore.fetchProducts()
@@ -1246,11 +1260,58 @@ async function addToCart() {
 }
 
 .product-detail__embedded-iframe {
+  position: relative;
   width: 100%;
   min-height: 70vh;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
+  background: var(--surface-1);
+}
+
+.product-detail__iframe-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-1);
+  z-index: 1;
+}
+
+.product-detail__loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-muted);
+}
+
+.product-detail__spinner {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.product-detail__spinner-track {
+  stroke: var(--surface-3);
+}
+
+.product-detail__spinner-path {
+  stroke: var(--accent);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 75;
+  animation: product-detail-spin 1.2s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes product-detail-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .product-detail__iframe {
@@ -1259,6 +1320,8 @@ async function addToCart() {
   min-height: 500px;
   border: none;
   display: block;
+  position: relative;
+  z-index: 2;
 }
 
 .product-detail__embedded-info {
@@ -1268,6 +1331,14 @@ async function addToCart() {
   background: var(--surface-1);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+}
+
+.product-detail__store-label {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .product-detail__external-link {
@@ -1331,6 +1402,12 @@ async function addToCart() {
   .product-detail__iframe {
     height: 60vh;
     min-height: 400px;
+  }
+
+  .product-detail__store-label {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.5rem;
   }
 }
 </style>
