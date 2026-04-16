@@ -499,10 +499,10 @@ defineExpose({
 
 .collection-item__checkbox {
   appearance: none;
-  width: 1rem;
-  height: 1rem;
+  width: clamp(0.875rem, 1.5vw, 1rem);
+  height: clamp(0.875rem, 1.5vw, 1rem);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   background: var(--surface-1);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -537,11 +537,11 @@ defineExpose({
 }
 
 .collection-item__count {
-  font-size: 0.7rem;
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
   font-family: var(--font-mono);
   color: var(--text-muted);
-  padding: 0.1rem 0.45rem;
-  border-radius: 100px;
+  padding: clamp(0.0625rem, 0.2vw, 0.1rem) clamp(0.3rem, 0.6vw, 0.45rem);
+  border-radius: var(--radius-full);
   background: var(--surface-2);
 }
 
@@ -554,18 +554,18 @@ defineExpose({
 .active-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
+  gap: clamp(0.25rem, 0.5vw, 0.375rem);
 }
 
 .active-filter-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.5rem 0.25rem 0.625rem;
-  border-radius: 100px;
+  gap: clamp(0.25rem, 0.5vw, 0.375rem);
+  padding: clamp(0.125rem, 0.3vw, 0.25rem) clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.125rem, 0.3vw, 0.25rem) clamp(0.5rem, 1vw, 0.625rem);
+  border-radius: var(--radius-full);
   background: var(--surface-0);
-  border: 1px solid var(--accent);
-  font-size: 0.7rem;
+  border: 0.0625rem solid var(--accent);
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
   color: var(--text-primary);
   font-weight: 500;
 }
@@ -574,14 +574,14 @@ defineExpose({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem;
-  height: 1rem;
+  width: clamp(0.875rem, 1.5vw, 1rem);
+  height: clamp(0.875rem, 1.5vw, 1rem);
   border-radius: 50%;
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   line-height: 1;
   transition: all var(--transition-fast);
   padding: 0;
@@ -594,7 +594,7 @@ defineExpose({
 
 /* ElasticSlider overrides */
 :deep(.elastic-slider__bar) {
-  height: 6px;
+  height: clamp(0.375rem, 0.75vw, 0.5rem);
   background: var(--surface-3);
 }
 
@@ -617,7 +617,7 @@ defineExpose({
     top: 0;
     left: 0;
     height: 100vh;
-    width: 300px;
+    width: clamp(280px, 85vw, 320px);
     max-width: 85vw;
     z-index: 1000;
     border-radius: 0;
@@ -636,7 +636,7 @@ defineExpose({
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(clamp(0.125rem, 0.5vw, 0.25rem));
   }
 
   .filter-sidebar__close-mobile {
@@ -656,7 +656,7 @@ defineExpose({
 
   .price-range__inputs {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
   }
 
   .price-range__separator {

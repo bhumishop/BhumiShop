@@ -213,13 +213,13 @@ onMounted(() => {
 .btn--primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: white;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 clamp(0.125rem, 0.4vw, 0.25rem) clamp(0.5rem, 1vw, 0.75rem) rgba(139, 92, 246, 0.25);
 }
 
 .btn--primary:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--accent-hover), var(--accent));
   box-shadow: var(--glow-accent);
-  transform: translateY(-1px);
+  transform: translateY(clamp(-0.0625rem, -0.15vw, -0.125rem));
 }
 
 .btn--primary:active:not(:disabled) {
@@ -229,14 +229,14 @@ onMounted(() => {
 .btn--secondary {
   background: var(--surface-2);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   transition: all var(--transition-fast);
 }
 
 .btn--secondary:hover:not(:disabled) {
   background: var(--surface-3);
   border-color: var(--accent-subtle);
-  transform: translateY(-1px);
+  transform: translateY(clamp(-0.0625rem, -0.15vw, -0.125rem));
 }
 
 .btn--ghost {
@@ -252,13 +252,13 @@ onMounted(() => {
 .btn--danger {
   background: linear-gradient(135deg, var(--danger), color-mix(in srgb, var(--danger) 85%, black));
   color: white;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 clamp(0.125rem, 0.4vw, 0.25rem) clamp(0.5rem, 1vw, 0.75rem) rgba(239, 68, 68, 0.2);
 }
 
 .btn--danger:hover:not(:disabled) {
   background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 85%, black), var(--danger));
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-  transform: translateY(-1px);
+  box-shadow: 0 clamp(0.25rem, 0.6vw, 0.375rem) clamp(0.75rem, 1.5vw, 1rem) rgba(239, 68, 68, 0.3);
+  transform: translateY(clamp(-0.0625rem, -0.15vw, -0.125rem));
 }
 
 .btn--full {
@@ -272,7 +272,7 @@ onMounted(() => {
 .btn__spinner {
   width: clamp(0.875rem, 1.5vw, 1rem);
   height: clamp(0.875rem, 1.5vw, 1rem);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 0.125rem solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -289,8 +289,8 @@ onMounted(() => {
 
 /* ===== Rainbow border animation (matching ProductPixelCard hover) ===== */
 .btn--rainbow {
-  --rainbow-radius: 12px;
-  --rainbow-border-width: 2px;
+  --rainbow-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+  --rainbow-border-width: 0.125rem;
 
   position: relative;
   border-radius: var(--rainbow-radius);
@@ -356,9 +356,9 @@ onMounted(() => {
 .btn--rainbow:hover {
   background: transparent;
   box-shadow:
-    0 4px 20px rgba(139, 92, 246, 0.2),
-    0 0 30px rgba(139, 92, 246, 0.05);
-  transform: translateY(-2px);
+    0 clamp(0.25rem, 0.6vw, 0.375rem) clamp(1rem, 2vw, 1.25rem) rgba(139, 92, 246, 0.2),
+    0 0 clamp(1.5rem, 3vw, 1.875rem) rgba(139, 92, 246, 0.05);
+  transform: translateY(clamp(-0.125rem, -0.3vw, -0.25rem));
 }
 
 .btn--rainbow:active {

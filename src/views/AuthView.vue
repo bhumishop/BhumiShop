@@ -693,8 +693,8 @@ onMounted(() => {
   flex-shrink: 0;
   width: 1.125rem;
   height: 1.125rem;
-  border: 2px solid var(--border);
-  border-radius: 4px;
+.border: 0.125rem solid var(--border);
+  border-radius: clamp(0.125rem, 0.5vw, 0.25rem);
   background: var(--surface-2);
   transition: all 0.2s ease;
   position: relative;
@@ -714,7 +714,7 @@ onMounted(() => {
   width: 0.35rem;
   height: 0.65rem;
   border: solid var(--accent-foreground, #000);
-  border-width: 0 2px 2px 0;
+  border-width: 0 0.125rem 0.125rem 0;
   transform: rotate(45deg);
 }
 
@@ -816,7 +816,7 @@ onMounted(() => {
 .location-search__spinner {
   width: 1rem;
   height: 1rem;
-  border: 2px solid var(--border);
+  border: 0.125rem solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -833,7 +833,7 @@ onMounted(() => {
   right: 0;
   margin-top: 0.25rem;
   background: var(--surface-0);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   max-height: 12rem;
@@ -887,7 +887,7 @@ onMounted(() => {
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   background: var(--accent-light);
-  border: 1px solid var(--accent);
+  border: 0.0625rem solid var(--accent);
   border-radius: var(--radius-md);
   margin-bottom: 1rem;
 }
@@ -967,7 +967,7 @@ onMounted(() => {
   border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: 1rem;
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .location-map-preview__image {
@@ -1077,7 +1077,7 @@ onMounted(() => {
   top: 50%;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: var(--border);
 }
 

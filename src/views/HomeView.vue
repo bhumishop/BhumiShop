@@ -171,7 +171,7 @@ function handleHeroMouseMove(e) {
     const y = ((e.clientY - rect.top) / rect.height) * 100
 
     // Direct DOM manipulation instead of Vue reactive update
-    cursorGlowElement.style.background = `radial-gradient(circle 400px at ${x}% ${y}%, rgba(139, 92, 246, 0.12), transparent 70%)`
+    cursorGlowElement.style.background = `radial-gradient(circle clamp(20rem, 40vw, 25rem) at ${x}% ${y}%, rgba(139, 92, 246, 0.12), transparent 70%)`
   })
 }
 
@@ -343,9 +343,9 @@ const galleryItems = computed(() => {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(63, 63, 70, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(63, 63, 70, 0.03) 1px, transparent 1px);
-  background-size: clamp(40px, 6vw, 60px) clamp(40px, 6vw, 60px);
+    linear-gradient(rgba(63, 63, 70, 0.03) 0.0625rem, transparent 0.0625rem),
+    linear-gradient(90deg, rgba(63, 63, 70, 0.03) 0.0625rem, transparent 0.0625rem);
+  background-size: clamp(2.5rem, 6vw, 3.75rem) clamp(2.5rem, 6vw, 3.75rem);
   pointer-events: none;
 }
 
@@ -394,7 +394,7 @@ const galleryItems = computed(() => {
   text-transform: uppercase;
   color: var(--accent);
   font-family: var(--font-mono);
-  text-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+  text-shadow: 0 0 0.5rem rgba(139, 92, 246, 0.3);
 }
 
 .hero__title {
@@ -456,7 +456,7 @@ const galleryItems = computed(() => {
   font-size: clamp(0.85rem, 1.2vw + 0.25rem, 1.125rem);
   color: var(--text-secondary);
   line-height: clamp(1.4, 2vw, 1.6);
-  max-width: clamp(280px, 50vw, 540px);
+  max-width: clamp(17.5rem, 50vw, 33.75rem);
   margin-bottom: clamp(1rem, 3vh, 1.75rem);
 }
 
@@ -475,7 +475,7 @@ const galleryItems = computed(() => {
   font-weight: 700;
   letter-spacing: 0.2em;
   color: #ef4444;
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 0.5rem rgba(239, 68, 68, 0.5);
   animation: vhs-rec-blink 1.5s ease-in-out infinite;
   position: relative;
 }
@@ -488,7 +488,7 @@ const galleryItems = computed(() => {
   background: #ef4444;
   border-radius: 50%;
   margin-right: 0.375rem;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 0.375rem rgba(239, 68, 68, 0.6);
   animation: vhs-rec-blink 1.5s ease-in-out infinite;
   vertical-align: middle;
 }
@@ -497,7 +497,7 @@ const galleryItems = computed(() => {
   font-size: clamp(0.55rem, 1vw, 0.7rem);
   letter-spacing: 0.1em;
   color: var(--text-muted);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 0.375rem rgba(255, 255, 255, 0.2);
 }
 
 .hero__actions {
@@ -620,22 +620,22 @@ const galleryItems = computed(() => {
 /* VHS text glitch */
 @keyframes vhs-text-glitch {
   0%, 100% { transform: translate(0); }
-  2% { transform: translate(2px, -1px); }
-  4% { transform: translate(-2px, 1px); }
+  2% { transform: translate(0.125rem, -0.0625rem); }
+  4% { transform: translate(-0.125rem, 0.0625rem); }
   6% { transform: translate(0); }
   48% { transform: translate(0); }
-  50% { transform: translate(-1px, 0); }
-  52% { transform: translate(1px, 0); }
+  50% { transform: translate(-0.0625rem, 0); }
+  52% { transform: translate(0.0625rem, 0); }
   54% { transform: translate(0); }
 }
 
 /* VHS glitch layers */
 @keyframes vhs-glitch-layers {
   0%, 100% { opacity: 0; transform: translate(0); }
-  2% { opacity: 0.8; transform: translate(-2px, 1px); }
+  2% { opacity: 0.8; transform: translate(-0.125rem, 0.0625rem); }
   4% { opacity: 0; transform: translate(0); }
   48% { opacity: 0; transform: translate(0); }
-  50% { opacity: 0.6; transform: translate(2px, -1px); }
+  50% { opacity: 0.6; transform: translate(0.125rem, -0.0625rem); }
   52% { opacity: 0; transform: translate(0); }
 }
 

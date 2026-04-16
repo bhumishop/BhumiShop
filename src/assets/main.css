@@ -83,22 +83,22 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Shadows - Colored shadows for modern feel */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
-  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.8);
-  --shadow-colored: 0 8px 24px rgba(139, 92, 246, 0.15);
+  --shadow-sm: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 1.5rem 3rem rgba(0, 0, 0, 0.8);
+  --shadow-colored: 0 0.5rem 1.5rem rgba(139, 92, 246, 0.15);
 
   /* Glow effects */
-  --glow-accent: 0 0 20px rgba(139, 92, 246, 0.15);
-  --glow-green: 0 0 10px rgba(34, 197, 94, 0.15);
+  --glow-accent: 0 0 1.25rem rgba(139, 92, 246, 0.15);
+  --glow-green: 0 0 0.625rem rgba(34, 197, 94, 0.15);
 
   /* Radius */
   --radius-sm: clamp(0.375rem, 0.5vw, 0.5rem);
   --radius-md: clamp(0.5rem, 0.75vw, 0.75rem);
   --radius-lg: clamp(0.75rem, 1vw, 1rem);
   --radius-xl: clamp(1rem, 1.5vw, 1.25rem);
-  --radius-full: 9999px;
+  --radius-full: 624.9375rem;
 
   /* Transitions */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -111,7 +111,7 @@
   --gpu-will-change: transform, opacity;
 
   /* Spacing - dynamic */
-  --container-max: min(92vw, 1400px);
+  --container-max: min(92vw, clamp(60rem, 80vw, 87.5rem));
   --header-height: clamp(3.5rem, 6vh, 4rem);
   --header-height-fixed: 4rem;
   --section-padding: clamp(2rem, 5vh, 4rem);
@@ -160,15 +160,15 @@
   --green-adorn-glow: rgba(22, 163, 74, 0.15);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.12);
-  --shadow-colored: 0 8px 24px rgba(124, 58, 237, 0.08);
+  --shadow-sm: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1.5rem 3rem rgba(0, 0, 0, 0.12);
+  --shadow-colored: 0 0.5rem 1.5rem rgba(124, 58, 237, 0.08);
 
   /* Glow effects */
-  --glow-accent: 0 0 16px rgba(124, 58, 237, 0.08);
-  --glow-green: 0 0 8px rgba(22, 163, 74, 0.1);
+  --glow-accent: 0 0 1rem rgba(124, 58, 237, 0.08);
+  --glow-green: 0 0 0.5rem rgba(22, 163, 74, 0.1);
 }
 
 /* ===== RESET ===== */
@@ -303,10 +303,10 @@ input, textarea, select {
 
 .sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 0.0625rem;
+  height: 0.0625rem;
   padding: 0;
-  margin: -1px;
+  margin: -0.0625rem;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -361,12 +361,12 @@ input, textarea, select {
 /* GSAP handles animations in pageEnter/pageLeave - CSS only sets initial/final states */
 .page-enter-from {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(clamp(0.375rem, 1vw, 0.5rem));
 }
 
 .page-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateY(clamp(-0.375rem, -1vw, -0.5rem));
 }
 
 /* ===== SLIDE-IN DRAWER ===== */
@@ -691,9 +691,9 @@ img {
   z-index: 0;
   opacity: 0.03;
   background-image: 
-    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.01) 1px, rgba(255,255,255,0.01) 2px),
-    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
-  background-size: 100% 3px, 3px 100%;
+    repeating-linear-gradient(0deg, transparent, transparent 0.0625rem, rgba(255,255,255,0.01) 0.0625rem, rgba(255,255,255,0.01) 0.125rem),
+    repeating-linear-gradient(90deg, transparent, transparent 0.0625rem, rgba(255,255,255,0.008) 0.0625rem, rgba(255,255,255,0.008) 0.125rem);
+  background-size: 100% 0.1875rem, 0.1875rem 100%;
   background-repeat: repeat;
 }
 
@@ -706,8 +706,8 @@ img {
 /* Add subtle paper-like texture to all surfaces */
 :root {
   /* Premium shadow with velvet feel */
-  --shadow-velvet: 0 2px 4px rgba(0,0,0,0.02), 0 8px 16px rgba(0,0,0,0.04);
-  --shadow-velvet-lg: 0 4px 8px rgba(0,0,0,0.03), 0 16px 32px rgba(0,0,0,0.06);
+  --shadow-velvet: 0 0.125rem 0.25rem rgba(0,0,0,0.02), 0 0.5rem 1rem rgba(0,0,0,0.04);
+  --shadow-velvet-lg: 0 0.25rem 0.5rem rgba(0,0,0,0.03), 0 1rem 2rem rgba(0,0,0,0.06);
 }
 
 /* Input fields with velvet texture */
@@ -722,9 +722,9 @@ input::after, textarea::after, select::after {
   background: repeating-linear-gradient(
     90deg,
     transparent,
-    transparent 2px,
-    rgba(255, 255, 255, 0.005) 2px,
-    rgba(255, 255, 255, 0.005) 4px
+    transparent 0.125rem,
+    rgba(255, 255, 255, 0.005) 0.125rem,
+    rgba(255, 255, 255, 0.005) 0.25rem
   );
   pointer-events: none;
   border-radius: inherit;
@@ -756,9 +756,9 @@ input::after, textarea::after, select::after {
   background: repeating-linear-gradient(
     45deg,
     transparent,
-    transparent 2px,
-    rgba(139, 92, 246, 0.005) 2px,
-    rgba(139, 92, 246, 0.005) 4px
+    transparent 0.125rem,
+    rgba(139, 92, 246, 0.005) 0.125rem,
+    rgba(139, 92, 246, 0.005) 0.25rem
   );
   pointer-events: none;
   border-radius: inherit;

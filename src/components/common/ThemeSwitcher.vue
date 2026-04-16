@@ -67,9 +67,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: clamp(1.75rem, 3.5vw, 2rem);
+  height: clamp(1.75rem, 3.5vw, 2rem);
+  border-radius: clamp(0.4375rem, 1vw, 0.5625rem);
   color: var(--text-secondary);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
@@ -79,7 +79,7 @@ onMounted(() => {
 .theme-switcher:hover {
   color: var(--accent);
   background: var(--accent-light);
-  transform: translateY(-1px);
+  transform: translateY(clamp(-0.0625rem, -0.15vw, -0.125rem));
 }
 
 .theme-switcher:active {

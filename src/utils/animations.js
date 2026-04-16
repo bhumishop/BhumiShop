@@ -535,8 +535,19 @@ export function pageEnter(el, done) {
     return;
   }
 
-  // Set initial state - slightly deeper start for momentum feel
-  gsap.set(el, { opacity: 0, y: 20, scale: 0.995 });
+  // Ensure element is visible before animating
+  gsap.set(el, { opacity: 0, y: 20, scale: 0.995, visibility: 'visible' });
+
+  // Safety timeout to ensure done() is called even if animation fails
+  let doneCalled = false;
+  const safetyTimeout = setTimeout(() => {
+    if (!doneCalled) {
+      doneCalled = true;
+      gsap.set(el, { opacity: 1, y: 0, scale: 1 });
+      try { refreshScrollTriggers(); } catch (e) { /* ignore */ }
+      done();
+    }
+  }, 1000);
 
   gsap.to(el, {
     opacity: 1,
@@ -546,12 +557,20 @@ export function pageEnter(el, done) {
     ease: 'power3.out',
     force3D: true,
     onComplete: () => {
-      try { refreshScrollTriggers(); } catch (e) { /* ignore */ }
-      done();
+      if (!doneCalled) {
+        doneCalled = true;
+        clearTimeout(safetyTimeout);
+        try { refreshScrollTriggers(); } catch (e) { /* ignore */ }
+        done();
+      }
     },
     onInterrupt: () => {
-      gsap.set(el, { opacity: 1, y: 0, scale: 1 });
-      done();
+      if (!doneCalled) {
+        doneCalled = true;
+        clearTimeout(safetyTimeout);
+        gsap.set(el, { opacity: 1, y: 0, scale: 1 });
+        done();
+      }
     }
   });
 }
@@ -565,6 +584,16 @@ export function pageLeave(el, done) {
     return;
   }
 
+  // Safety timeout to ensure done() is called even if animation fails
+  let doneCalled = false;
+  const safetyTimeout = setTimeout(() => {
+    if (!doneCalled) {
+      doneCalled = true;
+      gsap.set(el, { opacity: 0, y: -10, scale: 0.995 });
+      done();
+    }
+  }, 500);
+
   gsap.to(el, {
     opacity: 0,
     y: -10,
@@ -572,8 +601,20 @@ export function pageLeave(el, done) {
     duration: 0.25,
     ease: 'power3.in',
     force3D: true,
-    onComplete: done,
-    onInterrupt: done,
+    onComplete: () => {
+      if (!doneCalled) {
+        doneCalled = true;
+        clearTimeout(safetyTimeout);
+        done();
+      }
+    },
+    onInterrupt: () => {
+      if (!doneCalled) {
+        doneCalled = true;
+        clearTimeout(safetyTimeout);
+        done();
+      }
+    },
   });
 }
 

@@ -22,18 +22,18 @@ defineProps({
 }
 
 .skeleton--text {
-  height: 14px;
+  height: clamp(0.75rem, 1.5vw, 0.875rem);
   width: 100%;
 }
 
 .skeleton--title {
-  height: 24px;
+  height: clamp(1.25rem, 2.5vw, 1.5rem);
   width: 60%;
 }
 
 .skeleton--avatar {
-  width: 40px;
-  height: 40px;
+  width: clamp(2rem, 4vw, 2.5rem);
+  height: clamp(2rem, 4vw, 2.5rem);
   border-radius: 50%;
 }
 
@@ -44,14 +44,14 @@ defineProps({
 }
 
 .skeleton--button {
-  height: 40px;
-  width: 120px;
+  height: clamp(2.25rem, 4.5vw, 2.5rem);
+  width: clamp(6rem, 12vw, 7.5rem);
   border-radius: var(--radius-md);
 }
 
 .skeleton--card {
   width: 100%;
-  height: 240px;
+  height: clamp(12rem, 25vh, 15rem);
   border-radius: var(--radius-lg);
 }
 

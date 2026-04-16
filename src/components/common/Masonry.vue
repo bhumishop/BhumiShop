@@ -209,21 +209,21 @@ onMounted(() => {
   border: none;
   background: none;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 clamp(0.25rem, 0.6vw, 0.375rem) clamp(1rem, 2vw, 1.25rem) rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   text-align: left;
 }
 
 .masonry-item__card:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 3vw, 2rem) rgba(0, 0, 0, 0.12);
+  transform: translateY(clamp(-0.125rem, -0.3vw, -0.25rem));
 }
 
 .masonry-item__card:focus-visible {
-  outline: 2px solid var(--accent, #8b5cf6);
-  outline-offset: 2px;
+  outline: 0.125rem solid var(--accent, #8b5cf6);
+  outline-offset: 0.125rem;
 }
 
 /* ===== Image ===== */
@@ -267,7 +267,7 @@ onMounted(() => {
 
 /* ===== Product info ===== */
 .masonry-item__info {
-  padding: 10px 12px 12px;
+  padding: clamp(0.5rem, 1.2vw, 0.625rem) clamp(0.625rem, 1.5vw, 0.75rem) clamp(0.625rem, 1.5vw, 0.75rem);
   background: var(--surface-0, #fff);
 }
 
@@ -276,7 +276,7 @@ onMounted(() => {
   font-weight: 500;
   color: var(--text-primary, #111);
   line-height: 1.3;
-  margin: 0 0 4px;
+  margin: 0 0 0.25rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -300,7 +300,7 @@ onMounted(() => {
 .masonry-skeleton__item {
   break-inside: avoid;
   margin-bottom: v-bind(`${props.gap}px`);
-  border-radius: 12px;
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
   overflow: hidden;
   background: var(--surface-1, #e5e5e7);
 }
@@ -345,7 +345,7 @@ onMounted(() => {
   }
 
   .masonry-item__info {
-    padding: 8px 10px 10px;
+    padding: clamp(0.4375rem, 1vw, 0.5rem) clamp(0.5rem, 1.2vw, 0.625rem) clamp(0.5rem, 1.2vw, 0.625rem);
   }
 
   .masonry-item__name {

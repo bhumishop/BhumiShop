@@ -173,7 +173,7 @@ function addToCart() {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.06);
 }
 
 /* Variable sizing for masonry */
@@ -219,19 +219,19 @@ function addToCart() {
 
 .product-card__badges {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 0.5rem;
+  left: 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
   z-index: 3;
 }
 
 .product-card__badge {
-  padding: 2px 7px;
+  padding: 0.125rem 0.4375rem;
   font-size: 0.55rem;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -249,7 +249,7 @@ function addToCart() {
 .product-card__badge--ondemand {
   background: rgba(82, 82, 91, 0.9);
   color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.08);
 }
 
 .product-card__overlay {
@@ -259,7 +259,7 @@ function addToCart() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 2;
@@ -273,12 +273,12 @@ function addToCart() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   background: rgba(255, 255, 255, 0.95);
   color: #111;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   transition: transform 0.15s ease, background 0.15s ease;
   cursor: pointer;
 }
@@ -295,14 +295,14 @@ function addToCart() {
 .product-card__quick-add {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
   background: white;
   color: #111;
   font-size: 0.75rem;
   font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   transition: transform 0.15s ease;
 }
 
@@ -315,19 +315,19 @@ function addToCart() {
 }
 
 .product-card__body {
-  padding: 12px 14px 14px;
+  padding: 0.75rem 0.875rem 0.875rem;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .product-card__meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  min-height: 16px;
+  gap: 0.5rem;
+  min-height: 1rem;
 }
 
 .product-card__category {
@@ -371,7 +371,7 @@ function addToCart() {
   }
 
   .product-card__body {
-    padding: 10px 12px 12px;
+    padding: 0.625rem 0.75rem 0.75rem;
   }
 
   .product-card__name {

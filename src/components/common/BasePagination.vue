@@ -96,13 +96,13 @@ const visiblePages = computed(() => {
 .pagination__btn:hover:not(:disabled):not(.pagination__btn--active) {
   background: var(--surface-2);
   color: var(--text-primary);
-  transform: translateY(-1px);
+  transform: translateY(clamp(-0.0625rem, -0.15vw, -0.125rem));
 }
 
 .pagination__btn--active {
   background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: white;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 clamp(0.125rem, 0.4vw, 0.25rem) clamp(0.5rem, 1vw, 0.75rem) rgba(139, 92, 246, 0.3);
 }
 
 .pagination__btn:disabled {

@@ -334,7 +334,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-xl), var(--glow-accent);
-  border-left: 1px solid var(--border);
+  border-left: 0.0625rem solid var(--border);
 }
 
 .drawer__header {
@@ -342,7 +342,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 2.5vw, 1.5rem);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0.0625rem solid var(--border);
   position: relative;
   flex-shrink: 0;
 }
@@ -353,7 +353,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(90deg, transparent, var(--green-adorn), var(--accent), transparent);
   opacity: 0.3;
 }
@@ -416,17 +416,17 @@ onUnmounted(() => {
   display: flex;
   gap: clamp(0.5rem, 1.2vw, 0.75rem);
   padding: clamp(0.75rem, 1.5vh, 1rem) 0;
-  border-bottom: 1px solid var(--surface-2);
+  border-bottom: 0.0625rem solid var(--surface-2);
   position: relative;
 }
 
 .drawer__item--uma-penca {
-  border-left: 3px solid #8b5cf6;
+  border-left: 0.1875rem solid #8b5cf6;
   padding-left: clamp(0.5rem, 1.2vw, 0.75rem);
 }
 
 .drawer__item--digital {
-  border-left: 3px solid #10b981;
+  border-left: 0.1875rem solid #10b981;
   padding-left: clamp(0.5rem, 1.2vw, 0.75rem);
 }
 
@@ -494,7 +494,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0;
   margin-top: clamp(0.375rem, 0.75vh, 0.5rem);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -523,8 +523,8 @@ onUnmounted(() => {
   text-align: center;
   font-size: clamp(0.7rem, 1.2vw, 0.8rem);
   font-weight: 600;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
+  border-left: 0.0625rem solid var(--border);
+  border-right: 0.0625rem solid var(--border);
   line-height: clamp(1.5rem, 3vw, 1.75rem);
 }
 
@@ -551,8 +551,8 @@ onUnmounted(() => {
   gap: 0.5rem;
   padding: clamp(0.625rem, 1.2vw, 0.75rem) clamp(1.25rem, 2.5vw, 1.5rem);
   background: rgba(139, 92, 246, 0.08);
-  border-top: 1px solid rgba(139, 92, 246, 0.2);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  border-top: 0.0625rem solid rgba(139, 92, 246, 0.2);
+  border-bottom: 0.0625rem solid rgba(139, 92, 246, 0.2);
   font-size: clamp(0.7rem, 1.2vw, 0.75rem);
   color: #7c3aed;
   flex-shrink: 0;
@@ -561,7 +561,7 @@ onUnmounted(() => {
 /* Footer */
 .drawer__footer {
   padding: clamp(1rem, 2vw, 1.25rem) clamp(1.25rem, 2.5vw, 1.5rem);
-  border-top: 1px solid var(--border);
+  border-top: 0.0625rem solid var(--border);
   background: var(--surface-1);
   position: relative;
   flex-shrink: 0;
@@ -573,7 +573,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(90deg, transparent, var(--accent-subtle), transparent);
   opacity: 0.4;
 }
@@ -594,7 +594,7 @@ onUnmounted(() => {
 .drawer__total-line--final {
   padding-top: clamp(0.5rem, 1vh, 0.75rem);
   margin-top: clamp(0.25rem, 0.5vh, 0.375rem);
-  border-top: 1px solid var(--border);
+  border-top: 0.0625rem solid var(--border);
   font-weight: 600;
   color: var(--text-primary);
 }

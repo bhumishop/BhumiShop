@@ -262,8 +262,8 @@ const shouldShow = computed(() => isCamiseta.value)
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
   padding: clamp(1rem, 3vw, 2rem);
   animation: size-table__overlay-in var(--transition-smooth);
 }
@@ -276,7 +276,7 @@ const shouldShow = computed(() => isCamiseta.value)
 /* ========== MODAL ========== */
 .size-table__modal {
   width: 100%;
-  max-width: 640px;
+  max-width: 40rem;
   max-height: 90vh;
   background: var(--surface-2);
   border-radius: var(--radius-xl);
@@ -318,8 +318,8 @@ const shouldShow = computed(() => isCamiseta.value)
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   transition: all var(--transition-fast);
@@ -398,8 +398,8 @@ const shouldShow = computed(() => isCamiseta.value)
 }
 
 .size-table__diagram-tshirt {
-  width: clamp(180px, 50vw, 240px);
-  height: clamp(140px, 38vw, 185px);
+  width: clamp(11.25rem, 50vw, 15rem);
+  height: clamp(8.75rem, 38vw, 11.5625rem);
 }
 
 .size-table__diagram-svg {
@@ -460,7 +460,7 @@ const shouldShow = computed(() => isCamiseta.value)
 .size-table__unit {
   font-size: 0.65rem;
   color: var(--text-muted);
-  margin-left: 1px;
+  margin-left: 0.0625rem;
 }
 
 .size-table__table tbody tr:last-child td {
@@ -486,7 +486,7 @@ const shouldShow = computed(() => isCamiseta.value)
 .size-table__baby-info svg {
   flex-shrink: 0;
   color: var(--accent);
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 .size-table__baby-info h4 {
@@ -526,7 +526,7 @@ const shouldShow = computed(() => isCamiseta.value)
 
 .size-table__note svg {
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 0.0625rem;
   color: var(--warning);
 }
 
@@ -549,8 +549,8 @@ const shouldShow = computed(() => isCamiseta.value)
   }
 
   .size-table__diagram-tshirt {
-    width: 160px;
-    height: 125px;
+    width: 10rem;
+    height: 7.8125rem;
   }
 
   .size-table__notes {

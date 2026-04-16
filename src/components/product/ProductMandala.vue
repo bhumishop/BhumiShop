@@ -151,16 +151,16 @@ onMounted(() => {
 
 <style scoped>
 .flower-related {
-  --flower-radius: 105px;
-  --flower-radius-outer: 142px;
-  --flower-petal-size: 48px;
-  --flower-petal-size-outer: 42px;
-  --flower-center-size: 62px;
+  --flower-radius: clamp(5rem, 12vw, 6.5625rem);
+  --flower-radius-outer: clamp(6.5rem, 16vw, 8.875rem);
+  --flower-petal-size: clamp(2.25rem, 5.5vw, 3rem);
+  --flower-petal-size-outer: clamp(2rem, 4.8vw, 2.625rem);
+  --flower-center-size: clamp(3rem, 7vw, 3.875rem);
   --petal-bloom-scale: 0;
 
   position: relative;
-  width: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 20px);
-  height: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 40px);
+  width: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 1.25rem);
+  height: calc(var(--flower-radius-outer) * 2 + var(--flower-petal-size-outer) + 2.5rem);
   margin: 2rem auto;
   opacity: 0;
   animation: flower-fade-in 0.6s ease forwards;
@@ -184,7 +184,7 @@ onMounted(() => {
     var(--accent-subtle) 0%,
     transparent 70%
   );
-  filter: blur(20px);
+  filter: blur(1.25rem);
   opacity: 0.4;
   animation: glow-ring-pulse 4s ease-in-out infinite;
   pointer-events: none;
@@ -207,22 +207,22 @@ onMounted(() => {
 
 .flower-related__bg-petal {
   position: absolute;
-  width: 12px;
-  height: 24px;
+  width: clamp(0.5rem, 1.2vw, 0.75rem);
+  height: clamp(1rem, 2.5vw, 1.5rem);
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background: linear-gradient(
     to bottom,
     var(--accent-subtle) 0%,
     rgba(139, 92, 246, 0.02) 100%
   );
-  border: 1px solid rgba(139, 92, 246, 0.04);
+  border: 0.0625rem solid rgba(139, 92, 246, 0.04);
   top: 50%;
   left: 50%;
-  margin-left: -6px;
-  margin-top: -12px;
+  margin-left: clamp(-0.375rem, -0.8vw, -0.5rem);
+  margin-top: clamp(-0.75rem, -1.5vw, -1rem);
   transform:
     rotate(calc(22.5deg * var(--petal-idx)))
-    translateY(calc(-1 * var(--flower-radius) - 8px));
+    translateY(calc(-1 * var(--flower-radius) - 0.5rem));
   opacity: 0.25;
   animation: bg-petal-sway 10s ease-in-out infinite;
   animation-delay: calc(var(--petal-idx) * 0.4s);
@@ -230,13 +230,13 @@ onMounted(() => {
 
 @keyframes bg-petal-sway {
   0%, 100% {
-    transform: rotate(calc(22.5deg * var(--petal-idx))) translateY(calc(-1 * var(--flower-radius) - 8px)) scaleY(1) rotate(0deg);
+    transform: rotate(calc(22.5deg * var(--petal-idx))) translateY(calc(-1 * var(--flower-radius) - 0.5rem)) scaleY(1) rotate(0deg);
   }
   25% {
-    transform: rotate(calc(22.5deg * var(--petal-idx) + 2deg)) translateY(calc(-1 * var(--flower-radius) - 10px)) scaleY(1.08) rotate(1deg);
+    transform: rotate(calc(22.5deg * var(--petal-idx) + 2deg)) translateY(calc(-1 * var(--flower-radius) - 0.625rem)) scaleY(1.08) rotate(1deg);
   }
   75% {
-    transform: rotate(calc(22.5deg * var(--petal-idx) - 2deg)) translateY(calc(-1 * var(--flower-radius) - 6px)) scaleY(0.95) rotate(-1deg);
+    transform: rotate(calc(22.5deg * var(--petal-idx) - 2deg)) translateY(calc(-1 * var(--flower-radius) - 0.375rem)) scaleY(0.95) rotate(-1deg);
   }
 }
 
@@ -249,8 +249,8 @@ onMounted(() => {
 
 .flower-related__particle {
   position: absolute;
-  width: 3px;
-  height: 3px;
+  width: 0.1875rem;
+  height: 0.1875rem;
   border-radius: 50%;
   background: var(--accent);
   opacity: 0.3;
@@ -282,7 +282,7 @@ onMounted(() => {
   width: calc(var(--flower-radius) * 1.6);
   height: calc(var(--flower-radius) * 1.6);
   border-radius: 50%;
-  border: 1px dashed rgba(139, 92, 246, 0.1);
+  border: 0.0625rem dashed rgba(139, 92, 246, 0.1);
   animation: inner-ring-rotate 60s linear infinite;
 }
 
@@ -302,7 +302,7 @@ onMounted(() => {
 
 .flower-related__center-pulse {
   position: absolute;
-  inset: -15px;
+  inset: clamp(-0.75rem, -2vw, -0.9375rem);
   border-radius: 50%;
   background: radial-gradient(circle, var(--accent-subtle) 0%, transparent 70%);
   animation: center-pulse 3s ease-out infinite;
@@ -316,10 +316,10 @@ onMounted(() => {
 
 .flower-related__center-ring {
   position: absolute;
-  inset: -6px;
+  inset: -0.375rem;
   border-radius: 50%;
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 12px var(--accent-subtle);
+  border: 0.125rem solid var(--accent);
+  box-shadow: 0 0 0.75rem var(--accent-subtle);
   animation: center-ring-pulse 3s ease-in-out infinite;
 }
 
@@ -334,11 +334,11 @@ onMounted(() => {
   border-radius: 50%;
   overflow: hidden;
   background: var(--surface-2);
-  border: 2px solid var(--accent);
+  border: 0.125rem solid var(--accent);
   box-shadow:
-    0 0 20px var(--accent-subtle),
-    0 6px 16px rgba(0, 0, 0, 0.4),
-    inset 0 2px 8px rgba(255, 255, 255, 0.05);
+    0 0 1.25rem var(--accent-subtle),
+    0 0.375rem 1rem rgba(0, 0, 0, 0.4),
+    inset 0 0.125rem 0.5rem rgba(255, 255, 255, 0.05);
   transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
   position: relative;
 }
@@ -359,9 +359,9 @@ onMounted(() => {
 .flower-related__center-inner:hover {
   transform: scale(1.08);
   box-shadow:
-    0 0 28px var(--accent-subtle),
-    0 8px 20px rgba(0, 0, 0, 0.5),
-    inset 0 2px 8px rgba(255, 255, 255, 0.08);
+    0 0 1.75rem var(--accent-subtle),
+    0 0.5rem 1.25rem rgba(0, 0, 0, 0.5),
+    inset 0 0.125rem 0.5rem rgba(255, 255, 255, 0.08);
 }
 
 .flower-related__center-img {
@@ -444,13 +444,13 @@ onMounted(() => {
   33% {
     transform: translate(
       calc(var(--flower-x) * var(--flower-radius) + var(--organic-x)),
-      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) - 4px)
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) - 0.25rem)
     ) scale(1.03) rotate(1deg);
   }
   66% {
     transform: translate(
-      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x) + 2px),
-      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) + 3px)
+      calc(var(--flower-x) * var(--flower-radius) + var(--organic-x) + 0.125rem),
+      calc(var(--flower-y) * var(--flower-radius) + var(--organic-y) + 0.1875rem)
     ) scale(0.98) rotate(-1deg);
   }
 }
@@ -469,8 +469,8 @@ onMounted(() => {
   }
   50% {
     transform: translate(
-      calc(var(--flower-x) * var(--flower-radius-outer) + var(--organic-x) - 3px),
-      calc(var(--flower-y) * var(--flower-radius-outer) + var(--organic-y) - 5px)
+      calc(var(--flower-x) * var(--flower-radius-outer) + var(--organic-x) - 0.1875rem),
+      calc(var(--flower-y) * var(--flower-radius-outer) + var(--organic-y) - 0.3125rem)
     ) scale(1.04) rotate(-1.5deg);
   }
 }
@@ -490,10 +490,10 @@ onMounted(() => {
   border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
   overflow: hidden;
   background: var(--surface-2);
-  border: 2px solid var(--border);
+  border: 0.125rem solid var(--border);
   box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(139, 92, 246, 0.05);
+    0 0.1875rem 0.625rem rgba(0, 0, 0, 0.3),
+    0 0 0 0.0625rem rgba(139, 92, 246, 0.05);
   transition:
     border-color var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -519,7 +519,7 @@ onMounted(() => {
 .flower-related__petal-shape::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: -0.125rem;
   border-radius: inherit;
   background: conic-gradient(
     from 0deg,
@@ -543,9 +543,9 @@ onMounted(() => {
 .flower-related__petal:hover .flower-related__petal-shape {
   border-color: var(--accent);
   box-shadow:
-    0 6px 20px var(--accent-subtle),
-    0 3px 10px rgba(0, 0, 0, 0.4),
-    0 0 0 3px rgba(139, 92, 246, 0.1);
+    0 0.375rem 1.25rem var(--accent-subtle),
+    0 0.1875rem 0.625rem rgba(0, 0, 0, 0.4),
+    0 0 0 0.1875rem rgba(139, 92, 246, 0.1);
   transform: rotate(var(--flower-angle)) scale(1.22);
   z-index: 20;
   filter: brightness(1.1);
@@ -602,19 +602,19 @@ onMounted(() => {
 /* Tooltip */
 .flower-related__petal-tooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 0.5rem);
   left: 50%;
-  transform: translateX(-50%) translateY(4px);
+  transform: translateX(-50%) translateY(0.25rem);
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   border-radius: var(--radius-md);
-  padding: 6px 10px;
+  padding: 0.375rem 0.625rem;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-fast);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
   z-index: 100;
 }
 
@@ -624,7 +624,7 @@ onMounted(() => {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent;
+  border: 0.3125rem solid transparent;
   border-top-color: var(--surface-2);
 }
 
@@ -639,7 +639,7 @@ onMounted(() => {
   font-size: 0.65rem;
   font-weight: 600;
   color: var(--text-primary);
-  max-width: 120px;
+  max-width: 7.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
@@ -651,7 +651,7 @@ onMounted(() => {
   font-weight: 500;
   color: var(--green-adorn);
   font-family: var(--font-mono);
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 /* ========== STEM ========== */
@@ -660,10 +660,10 @@ onMounted(() => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 2px;
-  height: 20px;
+  width: 0.125rem;
+  height: 1.25rem;
   background: linear-gradient(to bottom, var(--accent-subtle), transparent);
-  border-radius: 1px;
+  border-radius: 0.0625rem;
   opacity: 0.4;
 }
 
@@ -671,7 +671,7 @@ onMounted(() => {
 .flower-related::before {
   content: 'Produtos Relacionados';
   position: absolute;
-  bottom: -32px;
+  bottom: -2rem;
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.75rem;
@@ -685,11 +685,11 @@ onMounted(() => {
 /* ========== MOBILE ========== */
 @media (max-width: 768px) {
   .flower-related {
-    --flower-radius: 85px;
-    --flower-radius-outer: 115px;
-    --flower-petal-size: 42px;
-    --flower-petal-size-outer: 36px;
-    --flower-center-size: 52px;
+    --flower-radius: clamp(4.5rem, 11vw, 5.3125rem);
+    --flower-radius-outer: clamp(5.5rem, 13.5vw, 7.1875rem);
+    --flower-petal-size: clamp(2rem, 5vw, 2.625rem);
+    --flower-petal-size-outer: clamp(1.75rem, 4.2vw, 2.25rem);
+    --flower-center-size: clamp(2.5rem, 6vw, 3.25rem);
     margin: 1.5rem auto;
   }
 
@@ -698,23 +698,23 @@ onMounted(() => {
   }
 
   .flower-related__bg-petal {
-    width: 10px;
-    height: 20px;
+    width: clamp(0.5rem, 1.1vw, 0.625rem);
+    height: clamp(0.875rem, 2.2vw, 1.25rem);
   }
 
   .flower-related::before {
     font-size: 0.65rem;
-    bottom: -28px;
+    bottom: -1.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .flower-related {
-    --flower-radius: 72px;
-    --flower-radius-outer: 98px;
-    --flower-petal-size: 38px;
-    --flower-petal-size-outer: 32px;
-    --flower-center-size: 46px;
+    --flower-radius: clamp(3.75rem, 10vw, 4.5rem);
+    --flower-radius-outer: clamp(4.75rem, 12vw, 6.125rem);
+    --flower-petal-size: clamp(1.75rem, 4.5vw, 2.375rem);
+    --flower-petal-size-outer: clamp(1.5rem, 3.8vw, 2rem);
+    --flower-center-size: clamp(2.25rem, 5.5vw, 2.875rem);
     margin: 1rem auto;
   }
 

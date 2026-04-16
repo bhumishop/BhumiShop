@@ -26,9 +26,9 @@
         <div class="velvet-texture" aria-hidden="true"></div>
         <AppHeader />
         <main class="app-main">
-          <router-view v-slot="{ Component }">
+          <router-view v-slot="{ Component, route: currentRoute }">
             <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
-              <component :is="Component" />
+              <component :is="Component" :key="currentRoute.path" />
             </transition>
           </router-view>
         </main>
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch, computed, defineAsyncComponent } from 'vue'
+import { onMounted, onUnmounted, watch, computed, defineAsyncComponent, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
@@ -112,17 +112,27 @@ function updateRouteSEO() {
 }
 
 // Refresh ScrollTrigger and update SEO on every route change
-watch(() => route.path, () => {
+watch(() => route.path, async (newPath, oldPath) => {
+  if (newPath === oldPath) return
+
   // Close cart drawer on navigation
   cartStore.closeDrawer()
 
-  // Clean up old ScrollTrigger instances before refreshing
-  revertGlobalAnimations()
-  initGlobalAnimations()
+  // Wait for next tick to ensure the new component has mounted
+  await nextTick()
 
-  // Debounced refresh - animations.js handles the timing
-  refreshScrollTriggers(150)
-  updateRouteSEO()
+  // Additional delay to ensure DOM updates are complete
+  setTimeout(() => {
+    // Clean up old ScrollTrigger instances before refreshing
+    try {
+      revertGlobalAnimations()
+      initGlobalAnimations()
+      refreshScrollTriggers(150)
+      updateRouteSEO()
+    } catch (e) {
+      console.warn('[App.vue] Route watch error:', e)
+    }
+  }, 50)
 })
 
 onMounted(() => {

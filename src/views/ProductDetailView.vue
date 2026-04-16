@@ -239,18 +239,18 @@
         <div class="skeleton product-detail__skeleton-img"></div>
       </div>
       <div class="product-detail__skeleton-info">
-        <div class="skeleton" style="width: 30%; height: 20px;"></div>
-        <div class="skeleton" style="width: 80%; height: 28px; margin-top: 0.75rem;"></div>
-        <div class="skeleton" style="width: 40%; height: 16px; margin-top: 0.5rem;"></div>
-        <div class="skeleton" style="width: 25%; height: 32px; margin-top: 1rem;"></div>
-        <div class="skeleton" style="width: 100%; height: 60px; margin-top: 1rem;"></div>
-        <div class="skeleton" style="width: 60%; height: 40px; margin-top: 1.5rem;"></div>
-        <div class="skeleton" style="width: 100%; height: 48px; margin-top: 1.5rem;"></div>
+        <div class="skeleton" style="width: 30%; height: clamp(1rem, 2vh, 1.25rem);"></div>
+        <div class="skeleton" style="width: 80%; height: clamp(1.5rem, 3vh, 1.75rem); margin-top: 0.75rem;"></div>
+        <div class="skeleton" style="width: 40%; height: clamp(0.875rem, 1.5vh, 1rem); margin-top: 0.5rem;"></div>
+        <div class="skeleton" style="width: 25%; height: clamp(1.75rem, 3vh, 2rem); margin-top: 1rem;"></div>
+        <div class="skeleton" style="width: 100%; height: clamp(3rem, 6vh, 3.75rem); margin-top: 1rem;"></div>
+        <div class="skeleton" style="width: 60%; height: clamp(2rem, 4vh, 2.5rem); margin-top: 1.5rem;"></div>
+        <div class="skeleton" style="width: 100%; height: clamp(2.5rem, 5vh, 3rem); margin-top: 1.5rem;"></div>
       </div>
     </div>
     <!-- Skeleton detail sections -->
-    <div class="skeleton" style="width: 100%; height: 120px; margin-top: 2rem; border-radius: var(--radius-lg);"></div>
-    <div class="skeleton" style="width: 100%; height: 100px; margin-top: 1rem; border-radius: var(--radius-lg);"></div>
+    <div class="skeleton" style="width: 100%; height: clamp(6rem, 12vh, 7.5rem); margin-top: 2rem; border-radius: var(--radius-lg);"></div>
+    <div class="skeleton" style="width: 100%; height: clamp(5rem, 10vh, 6.25rem); margin-top: 1rem; border-radius: var(--radius-lg);"></div>
   </div>
 
   <!-- Not found -->
@@ -966,7 +966,7 @@ async function addToCart() {
   padding: clamp(0.5rem, 1vh, 0.75rem);
   background: var(--surface-1);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 /* Inline details section (in right column) */
@@ -975,7 +975,7 @@ async function addToCart() {
   padding: clamp(0.625rem, 1.2vh, 0.875rem);
   background: var(--surface-1);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .product-detail__inline-title {
@@ -1015,13 +1015,13 @@ async function addToCart() {
 
 .product-detail__inline-bullet {
   display: inline-block;
-  width: 5px;
-  height: 5px;
+  width: 0.3125rem;
+  height: 0.3125rem;
   border-radius: 50%;
   background: var(--accent);
   margin-top: 0.4em;
   flex-shrink: 0;
-  box-shadow: 0 0 4px var(--accent-subtle);
+  box-shadow: 0 0 0.25rem var(--accent-subtle);
 }
 
 .product-detail__inline-text {
@@ -1045,7 +1045,7 @@ async function addToCart() {
 .product-detail__qty-controls {
   display: flex;
   align-items: center;
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -1076,8 +1076,8 @@ async function addToCart() {
   text-align: center;
   font-size: clamp(0.8rem, 1.4vw, 0.9rem);
   font-weight: 600;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
+  border-left: 0.0625rem solid var(--border);
+  border-right: 0.0625rem solid var(--border);
   line-height: clamp(2rem, 4vw, 2.25rem);
 }
 
@@ -1109,7 +1109,7 @@ async function addToCart() {
   padding: clamp(1.25rem, 3vw, 2rem);
   background: var(--surface-2);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .product-detail__section-title {
@@ -1147,13 +1147,13 @@ async function addToCart() {
 
 .product-detail__detail-bullet {
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: var(--accent);
   margin-top: 0.5em;
   flex-shrink: 0;
-  box-shadow: 0 0 6px var(--accent-subtle);
+  box-shadow: 0 0 0.375rem var(--accent-subtle);
 }
 
 /* Info card (legacy) */
@@ -1169,7 +1169,7 @@ async function addToCart() {
 .product-detail__info-card svg {
   color: var(--accent);
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 /* Care instructions */
@@ -1186,21 +1186,21 @@ async function addToCart() {
   padding: clamp(0.75rem, 1.5vh, 1rem) clamp(0.875rem, 2vw, 1.25rem);
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  border-left: 3px solid var(--accent);
+  border-left: 0.1875rem solid var(--accent);
   transition: all var(--transition-fast);
 }
 
 .product-detail__care-card:hover {
   background: var(--surface-3);
-  transform: translateX(4px);
+  transform: translateX(0.25rem);
 }
 
 .product-detail__care-num {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: clamp(1.5rem, 3vw, 1.75rem);
+  height: clamp(1.5rem, 3vw, 1.75rem);
   border-radius: 50%;
   background: var(--accent);
   color: white;
@@ -1218,7 +1218,7 @@ async function addToCart() {
 /* Specifications */
 .product-detail__specs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(clamp(8rem, 15vw, 10rem), 1fr));
   gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
@@ -1229,7 +1229,7 @@ async function addToCart() {
   padding: clamp(0.75rem, 1.5vh, 1rem);
   background: var(--surface-1);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .product-detail__spec-label {
@@ -1254,7 +1254,7 @@ async function addToCart() {
 /* ========== EMBEDDED PRODUCT PAGE (umapenca/uiclap) ========== */
 .product-detail__embedded-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr clamp(18rem, 25vw, 20rem);
   gap: clamp(1rem, 2vw, 1.5rem);
   align-items: start;
 }
@@ -1265,7 +1265,7 @@ async function addToCart() {
   min-height: 70vh;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   background: var(--surface-1);
 }
 
@@ -1289,8 +1289,8 @@ async function addToCart() {
 
 .product-detail__spinner {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: clamp(2rem, 4vw, 2.5rem);
+  height: clamp(2rem, 4vw, 2.5rem);
 }
 
 .product-detail__spinner-track {
@@ -1317,7 +1317,7 @@ async function addToCart() {
 .product-detail__iframe {
   width: 100%;
   height: 70vh;
-  min-height: 500px;
+  min-height: clamp(25rem, 50vh, 31.25rem);
   border: none;
   display: block;
   position: relative;
@@ -1330,7 +1330,7 @@ async function addToCart() {
   padding: clamp(1rem, 2vh, 1.5rem);
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .product-detail__store-label {
@@ -1358,7 +1358,7 @@ async function addToCart() {
 
 .product-detail__external-link:hover {
   background: var(--accent-subtle-hover, rgba(139, 92, 246, 0.15));
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 
 /* Not found */
@@ -1401,7 +1401,7 @@ async function addToCart() {
 
   .product-detail__iframe {
     height: 60vh;
-    min-height: 400px;
+    min-height: clamp(20rem, 40vh, 25rem);
   }
 
   .product-detail__store-label {

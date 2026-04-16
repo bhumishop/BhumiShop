@@ -113,12 +113,12 @@ function hide() {
   50% {
     opacity: 0.8;
     transform: scale(1.02);
-    filter: blur(2px);
+    filter: blur(0.125rem);
   }
   100% {
     opacity: 0;
     transform: scale(1.05);
-    filter: blur(8px);
+    filter: blur(0.5rem);
   }
 }
 
@@ -131,16 +131,16 @@ function hide() {
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 4px
+    transparent 0.125rem,
+    rgba(0, 0, 0, 0.15) 0.125rem,
+    rgba(0, 0, 0, 0.15) 0.25rem
   );
   animation: scanlines-drift 0.1s linear infinite;
 }
 
 @keyframes scanlines-drift {
   0% { transform: translateY(0); }
-  100% { transform: translateY(4px); }
+  100% { transform: translateY(0.25rem); }
 }
 
 /* Noise overlay */
@@ -151,7 +151,7 @@ function hide() {
   pointer-events: none;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
+  background-size: clamp(10rem, 20vw, 12.5rem) clamp(10rem, 20vw, 12.5rem);
   animation: noise-shift 0.5s steps(5) infinite;
 }
 
@@ -179,12 +179,12 @@ function hide() {
   0% {
     opacity: 0;
     transform: scale(1.1) skewX(-5deg);
-    filter: blur(10px);
+    filter: blur(0.625rem);
   }
   50% {
     opacity: 1;
     transform: scale(0.98) skewX(2deg);
-    filter: blur(2px);
+    filter: blur(0.125rem);
   }
   100% {
     opacity: 1;
@@ -196,8 +196,8 @@ function hide() {
 /* Logo container */
 .logo-wrapper {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: clamp(5rem, 12vw, 6.25rem);
+  height: clamp(5rem, 12vw, 6.25rem);
 }
 
 .logo-main,
@@ -257,14 +257,14 @@ function hide() {
   }
   91% {
     opacity: 0.8;
-    transform: translate(-3px, -2px);
+    transform: translate(-0.1875rem, -0.125rem);
   }
   92% {
     opacity: 0;
   }
   93% {
     opacity: 0.8;
-    transform: translate(3px, 2px);
+    transform: translate(0.1875rem, 0.125rem);
   }
   94%, 89% {
     opacity: 0;
@@ -314,12 +314,12 @@ function hide() {
     text-shadow: none;
   }
   89% {
-    transform: translate(-2px, 1px);
-    text-shadow: 2px 0 #8b5cf6, -2px 0 #22c55e;
+    transform: translate(-0.125rem, 0.0625rem);
+    text-shadow: 0.125rem 0 #8b5cf6, -0.125rem 0 #22c55e;
   }
   90% {
-    transform: translate(2px, -1px);
-    text-shadow: -2px 0 #8b5cf6, 2px 0 #22c55e;
+    transform: translate(0.125rem, -0.0625rem);
+    text-shadow: -0.125rem 0 #8b5cf6, 0.125rem 0 #22c55e;
   }
   91% {
     transform: translate(0);
@@ -329,30 +329,30 @@ function hide() {
 
 @keyframes glitch-text-purple {
   0%, 85%, 100% { opacity: 0; transform: translate(0); }
-  86% { opacity: 0.7; transform: translate(-3px, -1px); }
+  86% { opacity: 0.7; transform: translate(-0.1875rem, -0.0625rem); }
   87% { opacity: 0; }
-  88% { opacity: 0.7; transform: translate(2px, 1px); }
+  88% { opacity: 0.7; transform: translate(0.125rem, 0.0625rem); }
   89%, 100% { opacity: 0; }
 }
 
 @keyframes glitch-text-green {
   0%, 87%, 100% { opacity: 0; transform: translate(0); }
-  88% { opacity: 0.7; transform: translate(3px, 1px); }
+  88% { opacity: 0.7; transform: translate(0.1875rem, 0.0625rem); }
   89% { opacity: 0; }
-  90% { opacity: 0.7; transform: translate(-2px, -1px); }
+  90% { opacity: 0.7; transform: translate(-0.125rem, -0.0625rem); }
   91%, 100% { opacity: 0; }
 }
 
 /* Five dots loading animation */
 .loading-dots {
   display: flex;
-  gap: 12px;
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
   align-items: center;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: clamp(0.5rem, 1vw, 0.625rem);
+  height: clamp(0.5rem, 1vw, 0.625rem);
   border-radius: 50%;
   background: #8b5cf6;
   display: block;
@@ -387,23 +387,23 @@ function hide() {
   0%, 100% {
     transform: scale(0.4) translateY(0);
     opacity: 0.3;
-    filter: blur(2px);
+    filter: blur(0.125rem);
   }
   20% {
-    transform: scale(1.2) translateY(-8px);
+    transform: scale(1.2) translateY(-0.5rem);
     opacity: 1;
     filter: blur(0);
-    box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
+    box-shadow: 0 0 0.75rem currentColor, 0 0 1.5rem currentColor;
   }
   40% {
     transform: scale(0.8) translateY(0);
     opacity: 0.6;
-    filter: blur(1px);
+    filter: blur(0.0625rem);
   }
   60% {
     transform: scale(0.4) translateY(0);
     opacity: 0.3;
-    filter: blur(2px);
+    filter: blur(0.125rem);
   }
 }
 
@@ -413,7 +413,7 @@ function hide() {
   position: absolute;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 0.125rem;
   background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
   opacity: 0;
   animation: glitch-line 2.5s infinite;
@@ -445,14 +445,14 @@ function hide() {
 .preloader-content::after {
   content: '';
   position: absolute;
-  inset: -20px;
+  inset: -1.25rem;
   background: transparent;
   opacity: 0;
   animation: rgb-split 3s infinite;
   pointer-events: none;
   box-shadow:
-    -2px 0 0 rgba(139, 92, 246, 0.3),
-    2px 0 0 rgba(34, 197, 94, 0.3);
+    -0.125rem 0 0 rgba(139, 92, 246, 0.3),
+    0.125rem 0 0 rgba(34, 197, 94, 0.3);
 }
 
 @keyframes rgb-split {
@@ -462,14 +462,14 @@ function hide() {
   }
   93% {
     opacity: 1;
-    transform: translate(-3px, 0);
+    transform: translate(-0.1875rem, 0);
   }
   94% {
     opacity: 0;
   }
   95% {
     opacity: 1;
-    transform: translate(3px, 0);
+    transform: translate(0.1875rem, 0);
   }
   96%, 100% {
     opacity: 0;

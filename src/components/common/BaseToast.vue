@@ -62,25 +62,25 @@ const toastStore = useToastStore()
 }
 
 .toast--success {
-  border-left: 3px solid var(--success);
+  border-left: 0.1875rem solid var(--success);
   box-shadow: var(--shadow-lg), 0 0 clamp(0.5rem, 1.5vw, 0.75rem) var(--success-light);
 }
 .toast--error {
-  border-left: 3px solid var(--danger);
+  border-left: 0.1875rem solid var(--danger);
   box-shadow: var(--shadow-lg), 0 0 clamp(0.5rem, 1.5vw, 0.75rem) var(--danger-light);
 }
 .toast--warning {
-  border-left: 3px solid var(--warning);
+  border-left: 0.1875rem solid var(--warning);
   box-shadow: var(--shadow-lg), 0 0 clamp(0.5rem, 1.5vw, 0.75rem) var(--warning-light);
 }
 .toast--info {
-  border-left: 3px solid var(--info);
+  border-left: 0.1875rem solid var(--info);
   box-shadow: var(--shadow-lg), 0 0 clamp(0.5rem, 1.5vw, 0.75rem) var(--info-light);
 }
 
 .toast__icon {
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 0.0625rem;
 }
 
 .toast--success .toast__icon { color: var(--success); }
@@ -100,7 +100,7 @@ const toastStore = useToastStore()
   flex-shrink: 0;
   color: var(--text-muted);
   transition: color var(--transition-fast);
-  margin-top: 1px;
+  margin-top: 0.0625rem;
 }
 
 .toast__close:hover {

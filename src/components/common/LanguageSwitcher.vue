@@ -59,10 +59,10 @@ onUnmounted(() => document.removeEventListener('click', outside))
 .lang-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 9px;
-  border: 1px solid rgba(139, 92, 246, 0.18);
-  border-radius: 8px;
+  gap: clamp(0.25rem, 0.6vw, 0.3125rem);
+  padding: clamp(0.25rem, 0.6vw, 0.3125rem) clamp(0.4375rem, 1vw, 0.5625rem);
+  border: 0.0625rem solid rgba(139, 92, 246, 0.18);
+  border-radius: clamp(0.375rem, 1vw, 0.5rem);
   background: rgba(139, 92, 246, 0.07);
   color: var(--text-secondary);
   cursor: pointer;
@@ -85,7 +85,7 @@ onUnmounted(() => document.removeEventListener('click', outside))
 }
 
 .code {
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
 }
 
 .arrow {
@@ -100,26 +100,26 @@ onUnmounted(() => document.removeEventListener('click', outside))
 
 .lang-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 0.375rem);
   right: 0;
-  min-width: 200px;
+  min-width: clamp(12rem, 15vw, 12.5rem);
   background: var(--surface-0, #0a0a0b);
-  border: 1px solid var(--border, #1c1c1f);
-  border-radius: 10px;
-  padding: 5px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  border: 0.0625rem solid var(--border, #1c1c1f);
+  border-radius: clamp(0.5rem, 1.2vw, 0.625rem);
+  padding: clamp(0.25rem, 0.6vw, 0.3125rem);
+  box-shadow: 0 clamp(0.5rem, 1.5vw, 0.75rem) clamp(1.5rem, 3vw, 2rem) rgba(0, 0, 0, 0.5);
   z-index: 10000;
 }
 
 .lang-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(0.375rem, 0.8vw, 0.5rem);
   width: 100%;
-  padding: 7px 9px;
+  padding: clamp(0.375rem, 0.8vw, 0.4375rem) clamp(0.4375rem, 1vw, 0.5625rem);
   border: none;
   background: none;
-  border-radius: 7px;
+  border-radius: clamp(0.3125rem, 0.8vw, 0.4375rem);
   cursor: pointer;
   font-size: 0.8rem;
   color: var(--text-secondary);

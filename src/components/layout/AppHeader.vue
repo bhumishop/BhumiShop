@@ -142,8 +142,8 @@ const headerStyle = computed(() => {
   
   return {
     background: 'rgba(10, 10, 11, 0.72)',
-    backdropFilter: 'blur(20px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+    backdropFilter: 'blur(1.25rem) saturate(180%)',
+    WebkitBackdropFilter: 'blur(1.25rem) saturate(180%)',
     borderBottomColor: 'rgba(139, 92, 246, 0.08)',
   }
 })
@@ -197,7 +197,7 @@ function animateHeaderState(isScrolled) {
   if (scrollTween) scrollTween.kill()
   
   scrollTween = gsap.to(header, {
-    boxShadow: isScrolled ? '0 8px 40px rgba(139, 92, 246, 0.06)' : 'none',
+    boxShadow: isScrolled ? '0 0.5rem 2.5rem rgba(139, 92, 246, 0.06)' : 'none',
     duration: 0.4,
     ease: 'power2.out',
     force3D: true,
@@ -301,7 +301,7 @@ onUnmounted(() => {
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-bottom: 1px solid transparent;
+  border-bottom: 0.0625rem solid transparent;
   height: var(--header-height-fixed, 4rem);
   transition: 
     background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
@@ -320,7 +320,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -344,7 +344,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -398,11 +398,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: clamp(1.75rem, 4vw, 2rem);
+  height: clamp(1.75rem, 4vw, 2rem);
+  border-radius: clamp(0.5rem, 1vw, 0.5625rem);
   background: linear-gradient(135deg, #8b5cf6 0%, #22c55e 100%);
-  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0.125rem 0.75rem rgba(139, 92, 246, 0.3);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -425,10 +425,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 4px;
+  padding: 0.25rem;
   background: rgba(139, 92, 246, 0.04);
-  border: 1px solid rgba(139, 92, 246, 0.08);
-  border-radius: 12px;
+  border: 0.0625rem solid rgba(139, 92, 246, 0.08);
+  border-radius: clamp(0.625rem, 1.5vw, 0.75rem);
 }
 
 .header__nav__item {
@@ -436,7 +436,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   padding: 0.375rem 0.875rem;
-  border-radius: 9px;
+  border-radius: clamp(0.5rem, 1vw, 0.5625rem);
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -476,11 +476,11 @@ onUnmounted(() => {
 .header__nav__item::after {
   content: '';
   position: absolute;
-  bottom: 2px;
+  bottom: 0.125rem;
   left: 50%;
   transform: translateX(-50%) scaleX(0);
   width: 50%;
-  height: 2px;
+  height: 0.125rem;
   background: linear-gradient(90deg, var(--accent), var(--green-adorn));
   border-radius: 99px;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -498,8 +498,8 @@ onUnmounted(() => {
 
 /* Divider */
 .header__divider {
-  width: 1px;
-  height: 20px;
+  width: 0.0625rem;
+  height: clamp(1rem, 2.5vw, 1.25rem);
   background: linear-gradient(
     180deg,
     transparent 0%,
@@ -529,9 +529,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: clamp(1.875rem, 4vw, 2.125rem);
+  height: clamp(1.875rem, 4vw, 2.125rem);
+  border-radius: clamp(0.5625rem, 1.2vw, 0.625rem);
   color: var(--text-secondary);
   background: transparent;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -541,7 +541,7 @@ onUnmounted(() => {
 .header__action:hover {
   color: var(--accent);
   background: var(--accent-light);
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 
 .header__action:active {
@@ -562,11 +562,11 @@ onUnmounted(() => {
 /* Badge */
 .header__action__badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  top: -0.125rem;
+  right: -0.125rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
   background: linear-gradient(135deg, #8b5cf6, #22c55e);
   color: white;
   font-size: 0.625rem;
@@ -575,7 +575,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   border-radius: 99px;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 0.125rem 0.5rem rgba(139, 92, 246, 0.35);
   animation: badge-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -589,9 +589,9 @@ onUnmounted(() => {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: clamp(1.875rem, 4vw, 2.125rem);
+  height: clamp(1.875rem, 4vw, 2.125rem);
+  border-radius: clamp(0.5625rem, 1.2vw, 0.625rem);
   transition: all 0.2s ease;
 }
 
@@ -601,17 +601,17 @@ onUnmounted(() => {
 
 .header__mobile-toggle__icon {
   position: relative;
-  width: 18px;
-  height: 14px;
+  width: clamp(1rem, 2vw, 1.125rem);
+  height: clamp(0.75rem, 1.8vw, 0.875rem);
 }
 
 .header__mobile-toggle__icon span {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 0.125rem;
   background: var(--text-secondary);
-  border-radius: 2px;
+  border-radius: 0.125rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
@@ -629,7 +629,7 @@ onUnmounted(() => {
 
 .header__mobile-toggle__icon--open span:nth-child(2) {
   opacity: 0;
-  transform: translateX(-10px);
+  transform: translateX(-0.625rem);
 }
 
 .header__mobile-toggle__icon--open span:nth-child(3) {
@@ -655,13 +655,13 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     background: rgba(10, 10, 11, 0.96);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+    backdrop-filter: blur(1.5rem) saturate(180%);
+    -webkit-backdrop-filter: blur(1.5rem) saturate(180%);
+    border-bottom: 0.0625rem solid rgba(139, 92, 246, 0.1);
     padding: 0.75rem;
     flex-direction: column;
     gap: 0.25rem;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.75rem 3rem rgba(0, 0, 0, 0.5);
     animation: mobile-menu-slide 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 0;
     background: none;
@@ -671,7 +671,7 @@ onUnmounted(() => {
   @keyframes mobile-menu-slide {
     from {
       opacity: 0;
-      transform: translateY(-8px);
+      transform: translateY(-0.5rem);
     }
     to {
       opacity: 1;
