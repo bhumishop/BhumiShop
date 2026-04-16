@@ -246,13 +246,22 @@ export const useCheckoutStore = defineStore('checkout', () => {
         pixData.value = pix
         await orderStore.updateOrderPaymentStatus(order.id, 'pending', pix.id)
       } else {
+        const shippingCost = computeShippingCostTotal()
         const billing = await abacatePay.createBilling({
-          products: cartStore.items.map(item => ({
-            name: item.name,
-            price: Math.round(item.price * 100),
-            quantity: item.quantity,
-            description: item.size ? `${t('stores.checkout.sizePrefix')}: ${item.size}` : undefined
-          })),
+          products: [
+            ...cartStore.items.map(item => ({
+              name: item.name,
+              price: Math.round(item.price * 100),
+              quantity: item.quantity,
+              description: item.size ? `${t('stores.checkout.sizePrefix')}: ${item.size}` : undefined
+            })),
+            ...(shippingCost > 0 ? [{
+              name: t('stores.checkout.shipping'),
+              price: Math.round(shippingCost * 100),
+              quantity: 1,
+              description: 'Shipping cost'
+            }] : [])
+          ],
           customer: customer,
           returnUrl: `${window.location.origin}/minhas-compras`,
           completionUrl: `${window.location.origin}/minhas-compras`

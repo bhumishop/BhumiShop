@@ -330,6 +330,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import { useCheckoutStore } from '../stores/checkout'
 import { useOrderStore } from '../stores/orders'
+import { useProductStore } from '../stores/products'
 import { useToastStore } from '../stores/toast'
 import { useAuthStore } from '../stores/auth'
 import { usePixBricks } from '../composables/usePixBricks'
@@ -376,6 +377,10 @@ const pixPaid = ref(false)
 const pixBricksRendered = ref(false)
 const isProcessingPayment = ref(false)
 let pixPollingTimer = null
+let pixPollAttempts = 0
+let pixConsecutiveFailures = 0
+const MAX_PIX_POLL_ATTEMPTS = 360 // 360 * 10s = 1 hour (matches expiresIn)
+const MAX_CONSECUTIVE_POLL_FAILURES = 5
 
 // Map checkout store step (1-5) to stepper index (0-3)
 const stepperIndex = computed(() => {
@@ -557,10 +562,7 @@ async function handlePayment() {
     // If uma_penca, the store already redirected — do nothing more
     if (checkoutStore.paymentProvider === 'uma_penca') return
 
-    // Clear cart on successful order creation
-    if (order) {
-      cartStore.clearCart()
-    }
+    // Don't clear cart yet — wait until payment is confirmed (PIX or billing redirect)
 
     // Start PIX polling if AbacatePay PIX
     if (checkoutStore.paymentMethod === 'pix' && checkoutStore.pixData) {
@@ -702,12 +704,19 @@ function handleUmaPencaRedirect() {
 
 function startPixPolling() {
   if (pixPollingTimer) clearInterval(pixPollingTimer)
+  pixPollAttempts = 0
+  pixConsecutiveFailures = 0
   pixPollingTimer = setInterval(async () => {
+    pixPollAttempts++
     const result = await checkPixPayment()
-    // Stop polling immediately if payment is confirmed
+    // Stop polling if payment confirmed or max attempts reached
     if (result?.confirmed) {
       clearInterval(pixPollingTimer)
       pixPollingTimer = null
+    } else if (pixPollAttempts >= MAX_PIX_POLL_ATTEMPTS) {
+      clearInterval(pixPollingTimer)
+      pixPollingTimer = null
+      toast.error(t('checkout.step4.pixExpired'))
     }
   }, 10000)
 }
@@ -716,6 +725,7 @@ async function checkPixPayment() {
   checkingPix.value = true
   try {
     const { status, confirmed } = await checkoutStore.checkPixStatus()
+    pixConsecutiveFailures = 0
     if (confirmed || status === 'paid') {
       pixPaid.value = true
       clearInterval(pixPollingTimer)
@@ -725,7 +735,12 @@ async function checkPixPayment() {
     }
     return { confirmed: false, status }
   } catch {
-    // Silent polling failure
+    pixConsecutiveFailures++
+    if (pixConsecutiveFailures >= MAX_CONSECUTIVE_POLL_FAILURES) {
+      clearInterval(pixPollingTimer)
+      pixPollingTimer = null
+      toast.warning(t('checkout.step4.pixCheckError', 'Payment status check is unavailable. Please check your order status later.'))
+    }
     return { confirmed: false, status: null }
   } finally {
     checkingPix.value = false
@@ -733,8 +748,8 @@ async function checkPixPayment() {
 }
 
 function handleBillingRedirect() {
-  // Clear cart when redirecting to external payment
-  cartStore.clearCart()
+  // Cart will be cleared after user returns and payment is confirmed
+  // Don't clear now in case payment fails and user needs to retry
   checkoutStore.redirectToBillingCheckout()
 }
 

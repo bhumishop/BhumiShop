@@ -244,7 +244,9 @@
       "goToUmaPenca": "Ir para Uma Penca",
       "continueShopping": "Continuar Comprando",
       "viewOrders": "Ver Meus Pedidos",
-      "pixConfirmed": "Pagamento PIX confirmado!"
+      "pixConfirmed": "Pagamento PIX confirmado!",
+      "pixExpired": "O código PIX expirou. Por favor, inicie um novo pagamento.",
+      "pixCheckError": "Verificação de pagamento indisponível. Verifique seu pedido mais tarde."
     },
     "steps": {
       "cart": "Carrinho",
@@ -495,7 +497,8 @@
       "orderSuccess": "Pedido criado com sucesso!",
       "pixConfirmed": "Pagamento PIX confirmado!",
       "orderPrefix": "Pedido",
-      "sizePrefix": "Tamanho"
+      "sizePrefix": "Tamanho",
+      "shipping": "Frete"
     },
     "shipping": {
       "invalidCEP": "CEP inválido ou região não atendida",

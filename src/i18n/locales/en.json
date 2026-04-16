@@ -244,7 +244,9 @@
       "goToUmaPenca": "Go to Uma Penca",
       "continueShopping": "Continue Shopping",
       "viewOrders": "View My Orders",
-      "pixConfirmed": "PIX payment confirmed!"
+      "pixConfirmed": "PIX payment confirmed!",
+      "pixExpired": "The PIX code has expired. Please start a new payment.",
+      "pixCheckError": "Payment status check unavailable. Please check your order later."
     },
     "steps": {
       "cart": "Cart",
@@ -495,7 +497,8 @@
       "orderSuccess": "Order created successfully!",
       "pixConfirmed": "PIX payment confirmed!",
       "orderPrefix": "Order",
-      "sizePrefix": "Size"
+      "sizePrefix": "Size",
+      "shipping": "Shipping"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",

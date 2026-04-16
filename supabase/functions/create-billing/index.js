@@ -4,7 +4,14 @@ const ABACATEPAY_API = 'https://api.abacatepay.com'
 
 function corsHeaders(origin?: string) {
   const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').filter(Boolean)
-  const allowOrigin = allowedOrigins.includes(origin) ? origin : (allowedOrigins[0] || '*')
+  if (!allowedOrigins.length) {
+    return {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    }
+  }
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0]
 
   return {
     'Access-Control-Allow-Origin': allowOrigin,
@@ -29,11 +36,12 @@ function isValidCPF(cpf: string): boolean {
 }
 
 /**
- * Sanitize string input - remove potentially dangerous characters
+ * Sanitize string input - trim whitespace and limit length
+ * No character stripping needed as AbacatePay API handles its own validation
  */
 function sanitizeString(str: string): string {
   if (typeof str !== 'string') return ''
-  return str.replace(/[<>'"&]/g, '').trim()
+  return str.trim().substring(0, 255)
 }
 
 async function callAbacatePay(endpoint: string, method: string, body: any, maxRetries = 2) {

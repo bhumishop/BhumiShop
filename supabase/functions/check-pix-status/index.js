@@ -4,7 +4,14 @@ const ABACATEPAY_API = 'https://api.abacatepay.com'
 
 function corsHeaders(origin?: string) {
   const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').filter(Boolean)
-  const allowOrigin = allowedOrigins.includes(origin) ? origin : (allowedOrigins[0] || '*')
+  if (!allowedOrigins.length) {
+    return {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    }
+  }
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0]
 
   return {
     'Access-Control-Allow-Origin': allowOrigin,
