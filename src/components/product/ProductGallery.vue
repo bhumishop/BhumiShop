@@ -2,10 +2,11 @@
   <div class="gallery">
     <div class="gallery__main">
       <img
-        v-if="currentImage && (currentImage.startsWith('data:') || currentImage.startsWith('http'))"
+        v-if="currentImage && isValidImage(currentImage)"
         :src="currentImage"
         :alt="productName"
         class="gallery__image"
+        @error="handleImageError"
       />
       <div v-else class="gallery__placeholder">
         {{ productName?.charAt(0) || '?' }}
@@ -18,7 +19,7 @@
         :class="['gallery__thumb', { 'gallery__thumb--active': activeIndex === index }]"
         @click="activeIndex = index"
       >
-        <img v-if="img && (img.startsWith('data:') || img.startsWith('http'))" :src="img" :alt="`${productName} ${index + 1}`" />
+        <img v-if="img && isValidImage(img)" :src="img" :alt="`${productName} ${index + 1}`" @error="handleThumbError($event, index)" />
         <span v-else class="gallery__thumb-placeholder">{{ index + 1 }}</span>
       </button>
     </div>
@@ -27,6 +28,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../../utils/brokenImages'
 
 const props = defineProps({
   images: { type: Array, default: () => [] },
@@ -36,11 +38,43 @@ const props = defineProps({
 })
 
 const activeIndex = ref(0)
+const brokenThumbs = ref(new Set())
 
 const currentImage = computed(() => props.images[activeIndex.value] || '')
 
+/**
+ * Check if an image URL is valid (not broken, not marked as broken CDN).
+ */
+function isValidImage(url) {
+  if (!url) return false
+  if (brokenThumbs.value.has(url)) return false
+  // Allow data URLs
+  if (url.startsWith('data:')) return true
+  // For HTTP URLs, check if they're likely broken
+  if (url.startsWith('http')) {
+    return !isLikelyBrokenCdnUrl(url)
+  }
+  return false
+}
+
+function handleImageError(event) {
+  const src = event.target?.src
+  if (src) {
+    markImageUrlAsBroken(src)
+  }
+}
+
+function handleThumbError(event, index) {
+  const src = event.target?.src
+  if (src) {
+    markImageUrlAsBroken(src)
+    brokenThumbs.value.add(src)
+  }
+}
+
 watch(() => props.images, () => {
   activeIndex.value = 0
+  brokenThumbs.value.clear()
 })
 
 watch(() => props.selectedColorImageIndex, (newIndex) => {

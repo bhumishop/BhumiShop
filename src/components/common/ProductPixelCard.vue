@@ -18,7 +18,7 @@
       <!-- Content overlaid on the pixel canvas (inside image area only) -->
       <div class="product-pixel-card__image-layer" @click="$router.push(`/produtos/${product.id}`)">
         <img
-          v-if="!imageError && displayImage && (displayImage.startsWith('data:') || displayImage.startsWith('http'))"
+          v-if="shouldShowImage"
           :src="displayImage"
           :alt="product.name"
           class="product-pixel-card__image"
@@ -106,6 +106,7 @@ import { useI18n } from 'vue-i18n'
 import { useCartStore } from '../../stores/cart'
 import { useProductStore } from '../../stores/products'
 import { useToastStore } from '../../stores/toast'
+import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../../utils/brokenImages'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -162,8 +163,28 @@ const displayImage = computed(() => {
 
 const imageError = ref(false)
 
+/**
+ * Determine if we should try to show the image.
+ * Returns false if: no image, data URL check fails, or URL is known to be broken.
+ */
+const shouldShowImage = computed(() => {
+  if (imageError.value) return false
+  if (!displayImage.value) return false
+  // Allow data URLs
+  if (displayImage.value.startsWith('data:')) return true
+  // For HTTP URLs, check if they're likely broken
+  if (displayImage.value.startsWith('http')) {
+    return !isLikelyBrokenCdnUrl(displayImage.value)
+  }
+  return false
+})
+
 function handleImageError(event) {
   imageError.value = true
+  const src = event.target?.src
+  if (src) {
+    markImageUrlAsBroken(src)
+  }
 }
 
 function formatPrice(value) {
