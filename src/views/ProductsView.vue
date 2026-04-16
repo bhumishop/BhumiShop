@@ -378,7 +378,7 @@ onUnmounted(() => {
 .products-page__grid {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(min(clamp(16rem, 20vw, 260px), 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
 
@@ -386,7 +386,7 @@ onUnmounted(() => {
 .products-page__skeleton {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(min(clamp(16rem, 20vw, 260px), 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
 
@@ -555,12 +555,12 @@ onUnmounted(() => {
   }
 
   .products-page__grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(clamp(10rem, 25vw, 160px), 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: clamp(0.75rem, 2vw, 1rem);
   }
 
   .products-page__skeleton {
-    grid-template-columns: repeat(auto-fill, minmax(min(clamp(10rem, 25vw, 160px), 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: clamp(0.75rem, 2vw, 1rem);
   }
 }
