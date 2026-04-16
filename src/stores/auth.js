@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase, isDemo } from '../supabase'
+import { supabase } from '../supabase'
 
 const LOCATION_STORAGE_KEY = 'bhumi_user_location'
 
@@ -48,11 +48,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function initialize() {
     if (initialized.value) return
-    if (isDemo) {
-      // Skip auth initialization in demo mode
-      initialized.value = true
-      return
-    }
 
     loading.value = true
     try {
@@ -80,10 +75,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function _checkAdminRole() {
-    if (isDemo) {
-      adminRole.value = false
-      return
-    }
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -105,7 +96,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function assignRole(userId, role) {
-    if (isDemo) return
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -122,7 +112,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function removeRole(userId, role) {
-    if (isDemo) return
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -141,7 +130,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function getUserRoles(userId) {
-    if (isDemo) return []
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -155,9 +143,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithGoogle() {
-    if (isDemo) {
-      throw new Error('Google sign in is not available in demo mode')
-    }
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -174,9 +159,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithWechat() {
-    if (isDemo) {
-      throw new Error('WeChat sign in is not available in demo mode')
-    }
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -193,9 +175,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithPhone(phone) {
-    if (isDemo) {
-      throw new Error('Phone sign in is not available in demo mode')
-    }
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
@@ -212,11 +191,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut() {
-    if (isDemo) {
-      user.value = null
-      adminRole.value = false
-      return
-    }
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     user.value = null
@@ -224,9 +198,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function updateProfile(updates) {
-    if (isDemo) {
-      throw new Error('Profile update is not available in demo mode')
-    }
     if (!updates || typeof updates !== 'object') {
       throw new Error('Invalid profile data')
     }

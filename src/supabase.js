@@ -3,16 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 
-// More robust demo mode detection
-export const isDemo = !supabaseUrl ||
-  !supabaseKey ||
-  supabaseUrl.includes('placeholder') ||
-  supabaseUrl.includes('your-project') ||
-  supabaseKey.includes('your-anon-key') ||
-  supabaseKey.includes('placeholder')
-
-if (isDemo) {
-  console.warn('[Supabase] Running in demo/mock mode. Supabase credentials not configured.')
+if (!supabaseUrl || !supabaseKey) {
+  console.error('[BhumiShop] Supabase credentials missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_KEY in .env')
 }
 
 const TIMEOUT_MS = 60000
@@ -34,42 +26,15 @@ const withTimeout = (promise) => {
   })
 }
 
-const noOp = () => ({ data: null, error: { message: 'Demo mode' } })
-const noOpAuth = {
-  getSession: noOp,
-  onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-  signUp: noOp,
-  signInWithPassword: noOp,
-  signInWithOAuth: noOp,
-  signInWithOtp: noOp,
-  signOut: noOp,
-  resetPasswordForEmail: noOp,
-  updateUser: noOp,
-  getUser: noOp
-}
-const noOpFrom = () => ({
-  select: () => ({
-    eq: () => ({ then: () => ({ data: [] }) }),
-    order: () => ({ then: () => ({ data: [] }) }),
-    insert: noOp,
-    update: () => ({ eq: noOp }),
-    delete: noOp
-  }),
-  insert: () => ({ select: () => ({ then: () => ({ data: [] }) }) })
-})
-const noOpClient = { auth: noOpAuth, from: noOpFrom, rpc: noOp }
-
-export const supabase = !isDemo && supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey, {
-      global: {
-        fetch: (url, options) => withTimeout(fetch(url, {
-          ...options,
-          headers: {
-            ...options?.headers,
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`
-          }
-        }))
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  global: {
+    fetch: (url, options) => withTimeout(fetch(url, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
       }
-    })
-  : noOpClient
+    }))
+  }
+})
