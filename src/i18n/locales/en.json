@@ -65,7 +65,19 @@
     "clearSearch": "Clear search",
     "notFound": "No products found.",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "filters": "Filters",
+    "clearAll": "Clear all",
+    "priceRange": "Price Range",
+    "min": "Min",
+    "max": "Max",
+    "collections": "Collections",
+    "activeFilters": "Active Filters",
+    "filterActive": "filter(s) active",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low",
+    "sortName": "Name A-Z"
   },
   "productDetail": {
     "breadcrumbHome": "Home",
