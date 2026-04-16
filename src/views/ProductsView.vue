@@ -278,7 +278,7 @@ onUnmounted(() => {
 /* ===== Layout ===== */
 .products-page__layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: clamp(240px, 18vw, 300px) 1fr;
   gap: clamp(1rem, 3vw, 1.5rem);
   align-items: start;
 }
@@ -331,12 +331,12 @@ onUnmounted(() => {
 .products-page__summary-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 100px;
+  gap: clamp(0.25rem, 0.5vw, 0.375rem);
+  padding: clamp(0.25rem, 0.5vw, 0.375rem) clamp(0.5rem, 1vw, 0.75rem);
+  border-radius: var(--radius-full);
   background: var(--accent-subtle);
-  border: 1px solid var(--accent);
-  font-size: 0.75rem;
+  border: 0.0625rem solid var(--accent);
+  font-size: clamp(0.65rem, 1vw, 0.75rem);
   color: var(--accent);
   font-weight: 600;
 }
@@ -354,7 +354,7 @@ onUnmounted(() => {
   font-size: 0.8rem;
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   transition: border-color 0.2s ease;
@@ -374,23 +374,23 @@ onUnmounted(() => {
 .products-page__categories {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  padding: 0.75rem 1rem;
+  gap: clamp(0.375rem, 1vw, 0.5rem);
+  margin-bottom: clamp(1rem, 2vh, 1.5rem);
+  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.75rem, 1.5vw, 1rem);
   background: var(--surface-0);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .products-page__pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 100px;
-  border: 1px solid var(--border);
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.75rem, 1.5vw, 1rem);
+  border-radius: var(--radius-full);
+  border: 0.0625rem solid var(--border);
   background: var(--surface-0);
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
@@ -421,10 +421,10 @@ onUnmounted(() => {
 }
 
 .products-page__pill-count {
-  font-size: 0.7rem;
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
   font-family: var(--font-mono);
-  padding: 0.1rem 0.45rem;
-  border-radius: 100px;
+  padding: clamp(0.0625rem, 0.2vw, 0.1rem) clamp(0.3rem, 0.6vw, 0.45rem);
+  border-radius: var(--radius-full);
   background: var(--surface-2);
   color: var(--text-muted);
 }
@@ -438,7 +438,7 @@ onUnmounted(() => {
 .products-page__grid {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(clamp(16rem, 20vw, 260px), 100%), 1fr));
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
 
@@ -446,18 +446,18 @@ onUnmounted(() => {
 .products-page__skeleton {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(clamp(16rem, 20vw, 260px), 100%), 1fr));
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 .products-page__skeleton-card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+  padding: clamp(0.75rem, 1.5vw, 1rem);
   background: var(--surface-0);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
 }
 
 .products-page__skeleton-img {
@@ -527,7 +527,7 @@ onUnmounted(() => {
 .product-fade-enter-from,
 .product-fade-leave-to {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(clamp(0.5rem, 1.5vw, 0.75rem));
 }
 
 .product-fade-move {
@@ -543,16 +543,16 @@ onUnmounted(() => {
   .products-page__filter-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    gap: clamp(0.375rem, 0.75vw, 0.5rem);
+    padding: clamp(0.5rem, 1vw, 0.625rem) clamp(0.75rem, 1.5vw, 1rem);
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border: 0.0625rem solid var(--border);
     background: var(--surface-0);
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 1.2vw, 0.85rem);
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 1rem;
+    margin-bottom: clamp(0.75rem, 1.5vw, 1rem);
     transition: all var(--transition-fast);
   }
 
@@ -565,12 +565,12 @@ onUnmounted(() => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: clamp(1rem, 2vw, 1.25rem);
+    height: clamp(1rem, 2vw, 1.25rem);
     border-radius: 50%;
     background: var(--accent);
     color: white;
-    font-size: 0.7rem;
+    font-size: clamp(0.6rem, 1vw, 0.7rem);
     font-weight: 700;
   }
 }
@@ -579,7 +579,7 @@ onUnmounted(() => {
   .products-page__categories {
     overflow-x: auto;
     flex-wrap: nowrap;
-    padding-bottom: 0.5rem;
+    padding-bottom: clamp(0.375rem, 1vw, 0.5rem);
     -webkit-overflow-scrolling: touch;
   }
 
@@ -590,7 +590,7 @@ onUnmounted(() => {
 
   .products-page__toolbar {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
     align-items: stretch;
   }
 
@@ -599,12 +599,12 @@ onUnmounted(() => {
   }
 
   .products-page__grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(clamp(10rem, 25vw, 160px), 100%), 1fr));
     gap: clamp(0.75rem, 2vw, 1rem);
   }
 
   .products-page__skeleton {
-    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(clamp(10rem, 25vw, 160px), 100%), 1fr));
     gap: clamp(0.75rem, 2vw, 1rem);
   }
 }
@@ -612,12 +612,12 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .products-page__grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
   }
 
   .products-page__skeleton {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
   }
 }
 

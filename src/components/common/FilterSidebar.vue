@@ -293,11 +293,11 @@ defineExpose({
 
 <style scoped>
 .filter-sidebar {
-  width: 280px;
+  width: clamp(240px, 18vw, 300px);
   flex-shrink: 0;
   background: var(--surface-0);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   height: fit-content;
   position: sticky;
   top: clamp(1rem, 3vh, 1.5rem);
@@ -308,8 +308,8 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--border);
+  padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.25rem);
+  border-bottom: 0.0625rem solid var(--border);
 }
 
 .filter-sidebar__title {
@@ -354,11 +354,11 @@ defineExpose({
 }
 
 .filter-sidebar__content {
-  padding: 1rem 1.25rem;
+  padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.25rem);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  max-height: calc(100vh - 200px);
+  gap: clamp(1rem, 2vh, 1.5rem);
+  max-height: calc(100vh - clamp(10rem, 15vh, 15rem));
   overflow-y: auto;
 }
 
@@ -370,18 +370,18 @@ defineExpose({
 .filter-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 1vw, 0.75rem);
 }
 
 .filter-section--active {
-  padding: 0.75rem;
+  padding: clamp(0.5rem, 1vw, 0.75rem);
   background: var(--accent-subtle);
   border-radius: var(--radius-md);
-  border: 1px solid var(--accent);
+  border: 0.0625rem solid var(--accent);
 }
 
 .filter-section__title {
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.1vw, 0.8rem);
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -389,49 +389,49 @@ defineExpose({
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
 }
 
 .filter-section__content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
 }
 
 /* Price Range */
 .price-range {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
 .price-range__inputs {
   display: flex;
   align-items: flex-end;
-  gap: 0.5rem;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
 }
 
 .price-range__input-group {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: clamp(0.125rem, 0.3vw, 0.25rem);
 }
 
 .price-range__label {
-  font-size: 0.7rem;
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
   color: var(--text-muted);
   font-weight: 500;
 }
 
 .price-range__input {
   width: 100%;
-  padding: 0.5rem 0.625rem;
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.625rem);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 0.0625rem solid var(--border);
   background: var(--surface-1);
   color: var(--text-primary);
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   font-family: var(--font-mono);
   transition: all var(--transition-fast);
 }
@@ -439,7 +439,7 @@ defineExpose({
 .price-range__input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-subtle);
+  box-shadow: 0 0 0 clamp(0.125rem, 0.3vw, 0.25rem) var(--accent-subtle);
 }
 
 .price-range__input::-webkit-inner-spin-button {
@@ -447,15 +447,15 @@ defineExpose({
 }
 
 .price-range__separator {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   color: var(--text-muted);
-  padding-bottom: 0.5rem;
+  padding-bottom: clamp(0.375rem, 0.75vw, 0.5rem);
 }
 
 .price-range__sliders {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: clamp(0.375rem, 0.75vw, 0.5rem);
 }
 
 .price-range__slider-min,
@@ -464,7 +464,7 @@ defineExpose({
 }
 
 .slider-icon {
-  font-size: 0.7rem;
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
   font-weight: 600;
   color: var(--text-muted);
   font-family: var(--font-mono);
@@ -474,18 +474,18 @@ defineExpose({
 .collection-list {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: clamp(0.25rem, 0.5vw, 0.375rem);
 }
 
 .collection-item {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 0.625rem;
+  gap: clamp(0.375rem, 1vw, 0.625rem);
+  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.5rem, 1vw, 0.625rem);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
-  border: 1px solid transparent;
+  border: 0.0625rem solid transparent;
 }
 
 .collection-item:hover {
