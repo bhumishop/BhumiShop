@@ -91,6 +91,10 @@ export const useCartStore = defineStore('cart', () => {
     })
   })
 
+  const hasUiclapItems = computed(() => {
+    return items.value.some(item => item.fulfillment_type === 'uiclap')
+  })
+
   const hasOwnItems = computed(() => {
     return items.value.some(item => !item.fulfillment_type || item.fulfillment_type === 'own')
   })
@@ -111,6 +115,12 @@ export const useCartStore = defineStore('cart', () => {
         const ft = item.fulfillment_type
         return ft === 'uma_penca' || ft === 'uma penca'
       })
+      .reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  })
+
+  const uiclapItemsTotal = computed(() => {
+    return items.value
+      .filter(item => item.fulfillment_type === 'uiclap')
       .reduce((sum, item) => sum + (item.price * item.quantity), 0)
   })
 
@@ -196,10 +206,12 @@ export const useCartStore = defineStore('cart', () => {
     totalPrice,
     fulfillmentGroups,
     hasUmaPencaItems,
+    hasUiclapItems,
     hasOwnItems,
     hasDigitalItems,
     ownItemsTotal,
     umaPencaItemsTotal,
+    uiclapItemsTotal,
     totalWeight,
     addItem,
     removeItem,

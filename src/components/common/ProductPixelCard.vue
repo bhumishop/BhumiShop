@@ -83,15 +83,24 @@
           <span class="product-pixel-card__currency">R$</span>
           <span class="product-pixel-card__price">{{ formatPrice(product.price) }}</span>
         </div>
-        <button class="product-pixel-card__add" @click.stop="handleSeeProduct" aria-label="See product">
-          <span class="product-pixel-card__add-bg" aria-hidden="true"></span>
-          <span class="product-pixel-card__add-shine" aria-hidden="true"></span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
-          <span>See product</span>
-        </button>
+        <div class="product-pixel-card__actions">
+          <button class="product-pixel-card__cart" @click.stop="addToCart" aria-label="Add to cart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+          </button>
+          <button class="product-pixel-card__add" @click.stop="handleSeeProduct" aria-label="See product">
+            <span class="product-pixel-card__add-bg" aria-hidden="true"></span>
+            <span class="product-pixel-card__add-shine" aria-hidden="true"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span>See product</span>
+          </button>
+        </div>
       </div>
     </div>
     </div><!-- /product-pixel-card__inner -->
@@ -737,7 +746,7 @@ onUnmounted(() => {
   margin-top: 4px;
 }
 
-/* Footer: Price + Add Button */
+/* Footer: Price + Actions */
 .product-pixel-card__footer {
   display: flex;
   align-items: center;
@@ -745,6 +754,53 @@ onUnmounted(() => {
   margin-top: auto;
   padding-top: 4px;
   gap: 10px;
+}
+
+.product-pixel-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Small cart icon button */
+.product-pixel-card__cart {
+  --cart-radius: 10px;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--cart-radius);
+  font-size: 0.675rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  background: #2a2a2a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.product-pixel-card__cart:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: #333333;
+}
+
+.product-pixel-card__cart:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.product-pixel-card__cart svg {
+  flex-shrink: 0;
 }
 
 .product-pixel-card__price-block {
@@ -880,6 +936,12 @@ onUnmounted(() => {
     --add-radius: 9px;
   }
 
+  .product-pixel-card__cart {
+    width: 36px;
+    height: 36px;
+    --cart-radius: 9px;
+  }
+
   .product-pixel-card__badges {
     top: 10px;
     left: 10px;
@@ -935,6 +997,17 @@ onUnmounted(() => {
   .product-pixel-card__add svg {
     width: 14px;
     height: 14px;
+  }
+
+  .product-pixel-card__cart {
+    width: 34px;
+    height: 34px;
+    --cart-radius: 8px;
+  }
+
+  .product-pixel-card__cart svg {
+    width: 15px;
+    height: 15px;
   }
 
   .product-pixel-card__badges {
