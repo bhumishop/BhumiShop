@@ -4,32 +4,32 @@
     <div class="products-page__header">
       <div class="products-page__header-inner container">
         <h1 class="products-page__title">{{ $t('products.title') }}</h1>
-        <p class="products-page__subtitle">{{ $t('products.subtitle') || 'Browse our collection' }}</p>
+        <p class="products-page__subtitle">{{ $t('products.subtitle') }}</p>
       </div>
     </div>
 
     <!-- Main Content -->
     <div class="products-page__main container">
       <div class="products-page__layout">
-        <!-- Mobile Filter Toggle -->
-        <button class="products-page__filter-toggle" @click="openFilters">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="4" y1="6" x2="20" y2="6"/>
-            <line x1="8" y1="12" x2="20" y2="12"/>
-            <line x1="12" y1="18" x2="20" y2="18"/>
-            <circle cx="6" cy="6" r="2" fill="currentColor"/>
-            <circle cx="10" cy="12" r="2" fill="currentColor"/>
-            <circle cx="14" cy="18" r="2" fill="currentColor"/>
-          </svg>
-          {{ $t('products.filters') || 'Filters' }}
-          <span v-if="hasActiveFilters" class="products-page__filter-count"></span>
-        </button>
-
-        <!-- Filter Sidebar -->
+        <!-- Modern Left Sidebar Dock -->
         <FilterSidebar ref="filterSidebarRef" />
 
         <!-- Product Area -->
         <div class="products-page__content">
+          <!-- Mobile Filter Toggle -->
+          <button class="products-page__filter-toggle" @click="openFilters">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"/>
+              <line x1="8" y1="12" x2="20" y2="12"/>
+              <line x1="12" y1="18" x2="20" y2="18"/>
+              <circle cx="6" cy="6" r="2" fill="currentColor"/>
+              <circle cx="10" cy="12" r="2" fill="currentColor"/>
+              <circle cx="14" cy="18" r="2" fill="currentColor"/>
+            </svg>
+            {{ $t('products.filters') }}
+            <span v-if="hasActiveFilters" class="products-page__filter-count">{{ activeFilterCount }}</span>
+          </button>
+
           <!-- Toolbar -->
           <div class="products-page__toolbar">
             <p class="products-page__count">
@@ -39,44 +39,26 @@
 
             <!-- Active filter summary -->
             <div v-if="hasActiveFilters" class="products-page__active-summary">
-              <span class="products-page__summary-tag">
+              <button class="products-page__summary-tag" @click="clearFilters">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
-                {{ activeFilterCount }} {{ $t('products.filterActive') || 'filter(s) active' }}
-              </span>
+                {{ activeFilterCount }} {{ $t('products.filterActive') }}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
             </div>
 
             <!-- Sort dropdown -->
             <div class="products-page__sort">
               <select v-model="sortBy" class="products-page__sort-select">
-                <option value="newest">{{ $t('products.sortNewest') || 'Newest' }}</option>
-                <option value="price-asc">{{ $t('products.sortPriceAsc') || 'Price: Low to High' }}</option>
-                <option value="price-desc">{{ $t('products.sortPriceDesc') || 'Price: High to Low' }}</option>
-                <option value="name-asc">{{ $t('products.sortName') || 'Name A-Z' }}</option>
+                <option value="newest">{{ $t('products.sortNewest') }}</option>
+                <option value="price-asc">{{ $t('products.sortPriceAsc') }}</option>
+                <option value="price-desc">{{ $t('products.sortPriceDesc') }}</option>
+                <option value="name-asc">{{ $t('products.sortName') }}</option>
               </select>
             </div>
-          </div>
-
-          <!-- Category pills (inline, compact) -->
-          <div class="products-page__categories" ref="categoriesRef">
-            <button
-              :class="['products-page__pill', { 'products-page__pill--active': activeCategory === '' }]"
-              @click="setCategory('')"
-            >
-              {{ $t('products.all') || 'All' }}
-              <span class="products-page__pill-count">{{ productStore.activeProductCount }}</span>
-            </button>
-            <button
-              v-for="cat in productStore.categoriesWithProducts"
-              :key="cat.id"
-              :class="['products-page__pill', { 'products-page__pill--active': activeCategory === cat.id }]"
-              @click="setCategory(cat.id)"
-            >
-              <span v-if="cat.icon" class="products-page__pill-icon">{{ cat.icon }}</span>
-              {{ cat.name }}
-              <span class="products-page__pill-count">{{ cat.productCount }}</span>
-            </button>
           </div>
 
           <!-- Product Grid -->
@@ -88,6 +70,18 @@
             </div>
           </div>
 
+          <div v-else-if="productStore.error" class="products-page__error">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>{{ productStore.error }}</p>
+            <button class="products-page__clear-filters" @click="retryFetch">
+              {{ $t('products.retry') || 'Retry' }}
+            </button>
+          </div>
+
           <div v-else-if="sortedProducts.length === 0" class="products-page__empty">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
               <circle cx="12" cy="12" r="10"/>
@@ -95,9 +89,16 @@
               <line x1="9" y1="9" x2="9.01" y2="9"/>
               <line x1="15" y1="9" x2="15.01" y2="9"/>
             </svg>
-            <p>{{ $t('products.notFound') || 'No products found' }}</p>
+            <p>{{ $t('products.notFound') }}</p>
+            <p v-if="productStore.products.length === 0" class="products-page__empty-hint">
+              {{ $t('products.noProductsInStore') || 'No products available in the database.' }}
+            </p>
+            <p v-else class="products-page__empty-hint">
+              {{ productStore.products.length }} {{ $t('products.totalInStore') || 'total in store' }}
+              ({{ productStore.filteredProducts.length }} {{ $t('products.afterFilters') || 'after filters' }})
+            </p>
             <button v-if="hasActiveFilters" class="products-page__clear-filters" @click="clearFilters">
-              {{ $t('products.clearAll') || 'Clear all filters' }}
+              {{ $t('products.clearAll') }}
             </button>
           </div>
 
@@ -135,9 +136,7 @@ import FilterSidebar from '../components/common/FilterSidebar.vue'
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
-const activeCategory = ref('')
 const sortBy = ref('newest')
-const categoriesRef = ref(null)
 const currentPage = ref(1)
 const filterSidebarRef = ref(null)
 
@@ -146,7 +145,7 @@ const hasActiveFilters = computed(() => {
   return (productStore.minPrice !== null && productStore.minPrice > 0) ||
     (productStore.maxPrice !== null && productStore.maxPrice < getMaxPrice()) ||
     productStore.activeCollections.length > 0 ||
-    activeCategory.value !== ''
+    productStore.activeCategory !== ''
 })
 
 const activeFilterCount = computed(() => {
@@ -154,7 +153,7 @@ const activeFilterCount = computed(() => {
   if (productStore.minPrice !== null && productStore.minPrice > 0) count++
   if (productStore.maxPrice !== null && productStore.maxPrice < getMaxPrice()) count++
   count += productStore.activeCollections.length
-  if (activeCategory.value !== '') count++
+  if (productStore.activeCategory !== '') count++
   return count
 })
 
@@ -168,9 +167,17 @@ function openFilters() {
   filterSidebarRef.value?.open()
 }
 
+async function retryFetch() {
+  productStore.error = null
+  await Promise.all([
+    productStore.fetchProducts(),
+    productStore.fetchCategories(),
+    productStore.fetchCollections()
+  ])
+}
+
 function clearFilters() {
   productStore.clearFilters()
-  activeCategory.value = ''
   router.replace({ query: {} })
 }
 
@@ -202,20 +209,6 @@ function setPage(page) {
   currentPage.value = Math.max(1, Math.min(page, totalPages.value))
 }
 
-function setCategory(catId) {
-  activeCategory.value = catId
-  productStore.setActiveCategory(catId)
-  currentPage.value = 1
-  // Update URL
-  if (catId) {
-    router.replace({ query: { ...route.query, category: catId } })
-  } else {
-    const newQuery = { ...route.query }
-    delete newQuery.category
-    router.replace({ query: newQuery })
-  }
-}
-
 // Cleanup route watcher on unmount
 let routeWatchCleanup = null
 onMounted(async () => {
@@ -225,17 +218,10 @@ onMounted(async () => {
     productStore.fetchCollections()
   ])
 
-  if (route.query.category) {
-    activeCategory.value = route.query.category
-    productStore.setActiveCategory(route.query.category)
-  }
-
   routeWatchCleanup = watch(() => route.query.category, (val) => {
     if (val) {
-      activeCategory.value = val
       productStore.setActiveCategory(val)
     } else {
-      activeCategory.value = ''
       productStore.setActiveCategory('')
     }
     currentPage.value = 1
@@ -278,8 +264,8 @@ onUnmounted(() => {
 /* ===== Layout ===== */
 .products-page__layout {
   display: grid;
-  grid-template-columns: clamp(240px, 18vw, 300px) 1fr;
-  gap: clamp(1rem, 3vw, 1.5rem);
+  grid-template-columns: 280px 1fr;
+  gap: clamp(1.25rem, 3vw, 2rem);
   align-items: start;
 }
 
@@ -296,13 +282,14 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.875rem 1.125rem;
   background: var(--surface-0);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   gap: 1rem;
   flex-wrap: wrap;
+  backdrop-filter: blur(8px);
 }
 
 .products-page__count {
@@ -313,14 +300,15 @@ onUnmounted(() => {
 }
 
 .products-page__count-number {
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-mono);
+  line-height: 1;
 }
 
 .products-page__count-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -332,13 +320,29 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: clamp(0.25rem, 0.5vw, 0.375rem);
-  padding: clamp(0.25rem, 0.5vw, 0.375rem) clamp(0.5rem, 1vw, 0.75rem);
+  padding: clamp(0.375rem, 0.6vw, 0.5rem) clamp(0.625rem, 1.2vw, 0.875rem);
   border-radius: var(--radius-full);
   background: var(--accent-subtle);
-  border: 0.0625rem solid var(--accent);
+  border: 1px solid var(--accent);
   font-size: clamp(0.65rem, 1vw, 0.75rem);
   color: var(--accent);
   font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.products-page__summary-tag:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.products-page__summary-tag svg:last-child {
+  opacity: 0.6;
+  margin-left: 0.125rem;
+}
+
+.products-page__summary-tag:hover svg:last-child {
+  opacity: 1;
 }
 
 .products-page__sort {
@@ -346,7 +350,7 @@ onUnmounted(() => {
 }
 
 .products-page__sort-select {
-  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  padding: 0.5rem 2rem 0.5rem 0.875rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--surface-1);
@@ -357,7 +361,7 @@ onUnmounted(() => {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
-  transition: border-color 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .products-page__sort-select:hover {
@@ -367,71 +371,7 @@ onUnmounted(() => {
 .products-page__sort-select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-subtle);
-}
-
-/* ===== Category Pills ===== */
-.products-page__categories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(0.375rem, 1vw, 0.5rem);
-  margin-bottom: clamp(1rem, 2vh, 1.5rem);
-  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.75rem, 1.5vw, 1rem);
-  background: var(--surface-0);
-  border-radius: var(--radius-lg);
-  border: 0.0625rem solid var(--border);
-}
-
-.products-page__pill {
-  display: inline-flex;
-  align-items: center;
-  gap: clamp(0.375rem, 0.75vw, 0.5rem);
-  padding: clamp(0.375rem, 0.75vw, 0.5rem) clamp(0.75rem, 1.5vw, 1rem);
-  border-radius: var(--radius-full);
-  border: 0.0625rem solid var(--border);
-  background: var(--surface-0);
-  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.products-page__pill:hover {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  border-color: var(--text-muted);
-}
-
-.products-page__pill--active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.products-page__pill--active:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-  opacity: 0.9;
-}
-
-.products-page__pill-icon {
-  font-size: 1rem;
-}
-
-.products-page__pill-count {
-  font-size: clamp(0.6rem, 1vw, 0.7rem);
-  font-family: var(--font-mono);
-  padding: clamp(0.0625rem, 0.2vw, 0.1rem) clamp(0.3rem, 0.6vw, 0.45rem);
-  border-radius: var(--radius-full);
-  background: var(--surface-2);
-  color: var(--text-muted);
-}
-
-.products-page__pill--active .products-page__pill-count {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ===== Grid ===== */
@@ -498,6 +438,34 @@ onUnmounted(() => {
   opacity: 0.3;
 }
 
+.products-page__error {
+  text-align: center;
+  padding: clamp(3rem, 10vh, 5rem) clamp(1rem, 3vw, 1.5rem);
+  color: var(--danger);
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.875rem, 2vw, 1.25rem);
+}
+
+.products-page__error svg {
+  opacity: 0.5;
+}
+
+.products-page__error p {
+  color: var(--text-secondary);
+  max-width: 30rem;
+  word-break: break-word;
+}
+
+.products-page__empty-hint {
+  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+  color: var(--text-muted);
+  margin: 0;
+  opacity: 0.7;
+}
+
 .products-page__clear-filters {
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius-md);
@@ -546,7 +514,7 @@ onUnmounted(() => {
     gap: clamp(0.375rem, 0.75vw, 0.5rem);
     padding: clamp(0.5rem, 1vw, 0.625rem) clamp(0.75rem, 1.5vw, 1rem);
     border-radius: var(--radius-md);
-    border: 0.0625rem solid var(--border);
+    border: 1px solid var(--border);
     background: var(--surface-0);
     color: var(--text-primary);
     font-size: clamp(0.75rem, 1.2vw, 0.85rem);
@@ -576,21 +544,9 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .products-page__categories {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: clamp(0.375rem, 1vw, 0.5rem);
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .products-page__pill {
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
   .products-page__toolbar {
     flex-direction: column;
-    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    gap: clamp(0.625rem, 1.5vw, 0.875rem);
     align-items: stretch;
   }
 
