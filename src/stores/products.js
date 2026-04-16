@@ -190,6 +190,7 @@ const mockProducts = [
 export const useProductStore = defineStore('products', () => {
   const products = ref([])
   const categories = ref([])
+  const collections = ref([])
   const loading = ref(false)
   const error = ref(null)
   const searchQuery = ref('')
@@ -197,6 +198,8 @@ export const useProductStore = defineStore('products', () => {
   const currentPage = ref(1)
   const totalCount = ref(0)
   const maxPrice = ref(null) // null means no price filter
+  const minPrice = ref(null) // null means no minimum price filter
+  const activeCollections = ref([]) // array of collection IDs to filter by
 
   // Cache for related products to avoid recomputation
   const relatedProductsCache = new Map()
@@ -313,8 +316,18 @@ export const useProductStore = defineStore('products', () => {
     }
 
     // Apply price filter if set
+    if (minPrice.value !== null && minPrice.value !== undefined) {
+      result = result.filter(p => p.price >= minPrice.value)
+    }
     if (maxPrice.value !== null && maxPrice.value !== undefined) {
       result = result.filter(p => p.price <= maxPrice.value)
+    }
+
+    // Apply collection filter if set
+    if (activeCollections.value.length > 0) {
+      result = result.filter(p =>
+        p.collection_id && activeCollections.value.includes(p.collection_id)
+      )
     }
 
     return result
@@ -349,6 +362,26 @@ export const useProductStore = defineStore('products', () => {
       .filter(p => p.is_active !== false && p.is_archived !== true && p.category && normalizeCategoryMatch(p.category, catId))
       .length
   }
+
+  /** Collections that have at least one active, non-archived product, with product count */
+  const collectionsWithProducts = computed(() => {
+    const counts = {}
+    products.value
+      .filter(p => p.is_active !== false && p.is_archived !== true && p.collection_id)
+      .forEach(p => {
+        const collId = p.collection_id
+        collections.value.forEach(c => {
+          if (c.id === collId) {
+            counts[c.id] = (counts[c.id] || 0) + 1
+          }
+        })
+      })
+
+    return collections.value
+      .filter(c => c.is_active !== false && counts[c.id] > 0)
+      .map(c => ({ ...c, productCount: counts[c.id] || 0 }))
+      .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+  })
 
   /** Total count of active, non-archived products */
   const activeProductCount = computed(() =>
@@ -469,6 +502,27 @@ export const useProductStore = defineStore('products', () => {
     } catch (err) {
       error.value = err.message || t('stores.products.loadCategoriesError')
       console.error('fetchCategories error:', err)
+    }
+  }
+
+  async function fetchCollections() {
+    error.value = null
+    try {
+      if (isDemo) {
+        collections.value = []
+        return
+      }
+
+      const { data, error: err } = await supabase
+        .from('collections')
+        .select('id, name, is_active, sort_order')
+        .order('sort_order')
+
+      if (err) throw err
+      collections.value = data || []
+    } catch (err) {
+      console.error('fetchCollections error:', err)
+      collections.value = []
     }
   }
 
@@ -644,6 +698,41 @@ export const useProductStore = defineStore('products', () => {
     currentPage.value = 1
   }
 
+  function setMinPrice(price) {
+    minPrice.value = price
+    currentPage.value = 1
+  }
+
+  function setPriceRange(min, max) {
+    minPrice.value = min
+    maxPrice.value = max
+    currentPage.value = 1
+  }
+
+  function setActiveCollections(collections) {
+    activeCollections.value = Array.isArray(collections) ? collections : [collections]
+    currentPage.value = 1
+  }
+
+  function toggleCollection(collectionId) {
+    const idx = activeCollections.value.indexOf(collectionId)
+    if (idx === -1) {
+      activeCollections.value.push(collectionId)
+    } else {
+      activeCollections.value.splice(idx, 1)
+    }
+    currentPage.value = 1
+  }
+
+  function clearFilters() {
+    minPrice.value = null
+    maxPrice.value = null
+    activeCollections.value = []
+    activeCategory.value = ''
+    searchQuery.value = ''
+    currentPage.value = 1
+  }
+
   function setPage(page) {
     currentPage.value = Math.max(1, Math.min(page, totalPages.value))
   }
@@ -651,6 +740,7 @@ export const useProductStore = defineStore('products', () => {
   return {
     products,
     categories,
+    collections,
     loading,
     error,
     searchQuery,
@@ -658,16 +748,21 @@ export const useProductStore = defineStore('products', () => {
     currentPage,
     totalCount,
     totalPages,
+    minPrice,
+    maxPrice,
+    activeCollections,
     getProductById,
     getProductsByCategory,
     getRelatedProducts,
     filteredProducts,
     paginatedProducts,
     categoriesWithProducts,
+    collectionsWithProducts,
     getCategoryProductCount,
     activeProductCount,
     fetchProducts,
     fetchCategories,
+    fetchCollections,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -676,6 +771,11 @@ export const useProductStore = defineStore('products', () => {
     setSearchQuery,
     setActiveCategory,
     setMaxPrice,
+    setMinPrice,
+    setPriceRange,
+    setActiveCollections,
+    toggleCollection,
+    clearFilters,
     setPage
   }
 })
