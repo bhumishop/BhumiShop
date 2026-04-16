@@ -587,12 +587,17 @@ async function renderPixBricks() {
     await pixBricks.loadSDK()
     await pixBricks.renderPaymentBrick('pix-bricks-container', {
       amount: checkoutStore.totalWithShipping,
+      onReady: () => {
+        pixBricksRendered.value = true
+      },
       onSubmit: async (formData) => {
-        // Handle MP brick submission
         console.log('MP payment submitted:', formData)
+      },
+      onError: (error) => {
+        console.error('PIX Bricks error:', error)
+        toast.error(t('checkout.step4.mercadoPagoError', 'Payment error occurred'))
       }
     })
-    pixBricksRendered.value = true
   } catch (err) {
     console.error('Failed to render PIX Bricks:', err)
     toast.error(t('checkout.step4.loadingMercadoPago'))
@@ -733,9 +738,17 @@ function handleBillingRedirect() {
   checkoutStore.redirectToBillingCheckout()
 }
 
-onUnmounted(() => {
+onUnmounted(async () => {
   if (pixPollingTimer) clearInterval(pixPollingTimer)
   if (shippingDebounceTimer) clearTimeout(shippingDebounceTimer)
+  // Clean up MercadoPago bricks
+  try {
+    const { usePixBricks } = await import('../composables/usePixBricks')
+    const pixBricks = usePixBricks()
+    await pixBricks.unmount()
+  } catch {
+    // Ignore cleanup errors
+  }
 })
 
 // Stop pix polling when navigating away from checkout
