@@ -280,7 +280,7 @@
           <h3 class="checkout-page__redirect-title">{{ $t('checkout.step4.redirectingUmaPenca', 'Opening third-party products') }}</h3>
           <p class="checkout-page__redirect-desc">{{ $t('checkout.step4.umaPencaDesc', 'Third-party products will open in new tabs. In-stock items will continue here.') }}</p>
           <BaseButton variant="primary" @click="handleUmaPencaRedirect">
-            {{ $t('checkout.step4.goToUmaPenca') }}
+            {{ $t('checkout.step4.goToExternalStores', 'Complete purchase at external stores') }}
           </BaseButton>
         </div>
       </template>
@@ -602,25 +602,26 @@ async function renderPixBricks() {
 function handleUmaPencaRedirect() {
   const productStore = useProductStore()
 
-  // Get all third-party items (uma_penca, uma penca, uiclap)
-  const thirdPartyItems = cartStore.items.filter(item => {
+  // Get uma_penca items
+  const umaPencaItems = cartStore.items.filter(item => {
     const ft = item.fulfillment_type
-    return ft === 'uma_penca' || ft === 'uma penca' || ft === 'uiclap'
+    return ft === 'uma_penca' || ft === 'uma penca'
   })
 
-  // Open new tabs for each third-party product
-  const umaPencaStoreUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+  // Get uiclap items
+  const uiclapItems = cartStore.items.filter(item => item.fulfillment_type === 'uiclap')
 
-  thirdPartyItems.forEach(item => {
-    // Try to get the product URL from the product store
+  const umaPencaStoreUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+  const uiclapStoreUrl = import.meta.env.VITE_UICLAP_STORE_URL || 'https://loja.uiclap.com'
+
+  // Handle Uma Penca items
+  umaPencaItems.forEach(item => {
     const product = productStore.getProductById(item.id)
     const productUrl = product?.product_url || product?.third_party_product_url
 
     if (productUrl) {
-      // Open the original product URL in a new tab
       window.open(productUrl, '_blank')
     } else {
-      // Fallback: open the store's checkout with cart payload
       const cartPayload = {
         id: parseInt(item.id, 10) || item.id,
         qty: Math.min(Math.max(item.quantity, 1), 99),
@@ -628,6 +629,28 @@ function handleUmaPencaRedirect() {
       }
       const encodedCart = btoa(JSON.stringify([cartPayload]))
       const url = new URL(`${umaPencaStoreUrl}/checkout`)
+      url.searchParams.set('cart', encodedCart)
+      url.searchParams.set('ref', 'bhumi-shop')
+      window.open(url.toString(), '_blank')
+    }
+  })
+
+  // Handle UICLAP items
+  uiclapItems.forEach(item => {
+    const product = productStore.getProductById(item.id)
+    const productUrl = product?.product_url || product?.third_party_product_url
+
+    if (productUrl) {
+      window.open(productUrl, '_blank')
+    } else {
+      // UICLAP uses a different URL pattern: https://loja.uiclap.com/titulo/{product_id}/
+      // Or we can use their cart API if available
+      const url = new URL(`${uiclapStoreUrl}/checkout`)
+      const cartPayload = {
+        id: parseInt(item.id, 10) || item.id,
+        qty: Math.min(Math.max(item.quantity, 1), 99)
+      }
+      const encodedCart = btoa(JSON.stringify([cartPayload]))
       url.searchParams.set('cart', encodedCart)
       url.searchParams.set('ref', 'bhumi-shop')
       window.open(url.toString(), '_blank')
@@ -642,18 +665,32 @@ function handleUmaPencaRedirect() {
 
   // If there are still in-stock items, continue with checkout
   if (cartStore.items.length > 0) {
-    // Clear the current payment method/provider so user can select for remaining items
     checkoutStore.paymentMethod = 'pix'
     checkoutStore.paymentProvider = ''
     toast.info(t('checkout.step1.thirdPartyOpened', 'Third-party products opened in new tabs. Continue checkout for in-stock items.'))
   } else {
-    // All items were third-party, open store checkout in new tab too
+    // All items were third-party
     cartStore.clearCart()
-    const url = new URL(`${umaPencaStoreUrl}/checkout`)
-    url.searchParams.set('ref', 'bhumi-shop')
-    window.open(url.toString(), '_blank')
-    // Go back to products page since cart is empty
-    toast.info(t('checkout.step1.allThirdParty', 'All products were third-party. Opened in new tab.'))
+    // Open the appropriate store checkout based on what was in cart
+    if (umaPencaItems.length > 0 && uiclapItems.length > 0) {
+      // Mixed - open both checkouts
+      const umaUrl = new URL(`${umaPencaStoreUrl}/checkout`)
+      umaUrl.searchParams.set('ref', 'bhumi-shop')
+      window.open(umaUrl.toString(), '_blank')
+
+      const uicUrl = new URL(`${uiclapStoreUrl}/checkout`)
+      uicUrl.searchParams.set('ref', 'bhumi-shop')
+      window.open(uicUrl.toString(), '_blank')
+    } else if (umaPencaItems.length > 0) {
+      const url = new URL(`${umaPencaStoreUrl}/checkout`)
+      url.searchParams.set('ref', 'bhumi-shop')
+      window.open(url.toString(), '_blank')
+    } else if (uiclapItems.length > 0) {
+      const url = new URL(`${uiclapStoreUrl}/checkout`)
+      url.searchParams.set('ref', 'bhumi-shop')
+      window.open(url.toString(), '_blank')
+    }
+    toast.info(t('checkout.step1.allThirdParty', 'All products were third-party. Opened in new tabs.'))
     router.push('/produtos')
   }
 }
