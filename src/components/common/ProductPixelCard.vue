@@ -171,6 +171,8 @@ const productUrl = computed(() => {
   // Construct URL from fulfillment type patterns
   if (p.fulfillment_type === 'uma_penca' || p.fulfillment_type === 'uma penca') {
     const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+    // Use third_party_product_id if available, otherwise fall back to slug
+    if (p.third_party_product_id) return `${storeUrl}/produto/${p.third_party_product_id}`
     if (p.slug) return `${storeUrl}/produto/${p.slug}`
     return storeUrl
   }
