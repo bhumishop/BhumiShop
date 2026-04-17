@@ -154,11 +154,9 @@ export const useProductStore = defineStore('products', () => {
 
   const filteredProducts = computed(() => {
     let result = products.value.filter(p => p.is_active !== false && p.is_archived !== true)
-    console.log('[Products] filteredProducts: total=', products.value.length, ', after active filter=', result.length)
 
     if (activeCategory.value && activeCategory.value !== 'todos') {
       result = result.filter(p => p.category && normalizeCategoryMatch(p.category, activeCategory.value))
-      console.log('[Products] filteredProducts: after category filter (', activeCategory.value, ') =', result.length)
     }
 
     if (searchQuery.value) {
@@ -168,7 +166,6 @@ export const useProductStore = defineStore('products', () => {
         p.description?.toLowerCase().includes(query) ||
         p.artist?.toLowerCase().includes(query)
       )
-      console.log('[Products] filteredProducts: after search filter =', result.length)
     }
 
     // Apply price filter if set
@@ -184,10 +181,8 @@ export const useProductStore = defineStore('products', () => {
       result = result.filter(p =>
         p.collection_id && activeCollections.value.includes(p.collection_id)
       )
-      console.log('[Products] filteredProducts: after collection filter =', result.length)
     }
 
-    console.log('[Products] filteredProducts: final count =', result.length)
     return result
   })
 
