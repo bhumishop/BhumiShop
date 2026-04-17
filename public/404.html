@@ -8,26 +8,38 @@
     // GitHub Pages SPA fallback - redirect to index.html while preserving path
     (function() {
       var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash;
 
-      // Detect the base path (e.g., /bhumi-shop/ for GitHub Pages, / for custom domain)
+      // If already at index.html, nothing to do
+      if (path.endsWith('/index.html') || path === '/' || path === '') {
+        return;
+      }
+
+      // Detect the base path from the URL structure
+      // For GitHub Pages: path like /BhumiShop/produtos -> base = /BhumiShop/
+      // For custom domain: path like /produtos -> base = /
       var pathParts = path.split('/').filter(Boolean);
       var base = '/';
 
-      // Known app routes - if the first segment is one of these, we're at root
-      var appRoutes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin'];
-      if (pathParts.length > 0 && !appRoutes.includes(pathParts[0])) {
+      // Known app routes - if the first segment is one of these, we're at root level
+      var appRoutes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin', 'sobre-nos', 'contato', 'faq', 'privacidade', 'termos', 'trocas', 'envio'];
+
+      if (pathParts.length > 0 && !appRoutes.includes(pathParts[0].toLowerCase())) {
         // First segment is not an app route - likely the repo name for GitHub Pages
         base = '/' + pathParts[0] + '/';
       }
 
-      // Only redirect if we're not already at index.html
-      if (!path.endsWith('/index.html') && path !== base) {
-        // Store the path (relative to base) so index.html can use it
-        var relativePath = path.replace(base, '/');
-        if (!relativePath.startsWith('/')) {
-          relativePath = '/' + relativePath;
-        }
-        sessionStorage.setItem('spa-redirect-path', relativePath + window.location.search + window.location.hash);
+      // Calculate the relative path from the base
+      var relativePath = path.replace(base, '/');
+      if (!relativePath.startsWith('/')) {
+        relativePath = '/' + relativePath;
+      }
+
+      // Only redirect if we're not already at the base path
+      if (path !== base) {
+        // Store the full path (including query and hash) so index.html can use it
+        sessionStorage.setItem('spa-redirect-path', relativePath + search + hash);
         // Redirect to index.html at the detected base
         window.location.href = base + 'index.html';
       }

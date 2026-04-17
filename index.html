@@ -132,26 +132,6 @@
     <title>BhumiShop - Bhumisparsha School Virtual Store | Handcrafted Products</title>
 
     <script>
-      // Handle SPA redirect from 404 page
-      (function() {
-        var redirectPath = sessionStorage.getItem('spa-redirect-path');
-        if (redirectPath) {
-          sessionStorage.removeItem('spa-redirect-path');
-          // Detect base path from current URL or use Vite-injected BASE_URL
-          var base = window.location.pathname;
-          // Extract base: if path is /bhumi-shop/index.html, base is /bhumi-shop/
-          var idx = base.lastIndexOf('/index.html');
-          if (idx !== -1) {
-            base = base.substring(0, idx + 1);
-          } else {
-            base = '/';
-          }
-
-          var fullPath = base === '/' ? redirectPath : base + redirectPath.slice(1);
-          history.replaceState(null, '', fullPath);
-        }
-      })();
-
       // Set initial lang attribute based on stored locale or browser preference
       (function() {
         var locale = localStorage.getItem('locale');

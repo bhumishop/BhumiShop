@@ -26,6 +26,16 @@ async function bootstrap() {
   }
 
   app.mount('#app')
+
+  // Handle SPA redirect from 404 page after router is ready
+  // This ensures the router has finished initializing before navigating
+  const redirectPath = sessionStorage.getItem('spa-redirect-path')
+  if (redirectPath) {
+    sessionStorage.removeItem('spa-redirect-path')
+    // Wait for router to be ready, then navigate to the intended path
+    await router.isReady()
+    router.replace(redirectPath)
+  }
 }
 
 bootstrap()
