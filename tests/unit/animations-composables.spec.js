@@ -96,12 +96,13 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      // Advance timers and wait for GSAP ticker
-      vi.advanceTimersByTime(100)
-      await nextTick()
+      // Use real timers since GSAP ticker doesn't integrate with Vitest fake timers
+      vi.useRealTimers()
+      await new Promise((resolve) => setTimeout(resolve, 50))
 
       // Element should be animated in
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
+      vi.useFakeTimers()
     })
 
     it('should handle fadeInLeft type', async () => {
@@ -126,9 +127,10 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(100)
-      await nextTick()
+      vi.useRealTimers()
+      await new Promise((resolve) => setTimeout(resolve, 50))
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
+      vi.useFakeTimers()
     })
 
     it('should handle fadeInRight type', async () => {
@@ -153,9 +155,10 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(100)
-      await nextTick()
+      vi.useRealTimers()
+      await new Promise((resolve) => setTimeout(resolve, 50))
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
+      vi.useFakeTimers()
     })
 
     it('should handle scaleIn type', async () => {
@@ -180,9 +183,10 @@ describe('useGSAPAnimations Composable', () => {
         },
       })
 
-      vi.advanceTimersByTime(100)
-      await nextTick()
+      vi.useRealTimers()
+      await new Promise((resolve) => setTimeout(resolve, 50))
       expect(parseFloat(el.style.opacity)).toBeGreaterThan(0.5)
+      vi.useFakeTimers()
     })
 
     it('should return null for invalid animation type', () => {
