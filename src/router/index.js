@@ -107,7 +107,11 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
-  if (!authStore.initialized) {
+  // Only initialize auth when actually needed (protected routes, guest routes, or admin)
+  // Skip auth check for purely public routes like home and products
+  const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest
+
+  if (needsAuthCheck && !authStore.initialized) {
     await authStore.initialize()
   }
 

@@ -154,9 +154,11 @@ export const useProductStore = defineStore('products', () => {
 
   const filteredProducts = computed(() => {
     let result = products.value.filter(p => p.is_active !== false && p.is_archived !== true)
+    console.log('[Products] filteredProducts: total=', products.value.length, ', after active filter=', result.length)
 
     if (activeCategory.value && activeCategory.value !== 'todos') {
       result = result.filter(p => p.category && normalizeCategoryMatch(p.category, activeCategory.value))
+      console.log('[Products] filteredProducts: after category filter (', activeCategory.value, ') =', result.length)
     }
 
     if (searchQuery.value) {
@@ -166,6 +168,7 @@ export const useProductStore = defineStore('products', () => {
         p.description?.toLowerCase().includes(query) ||
         p.artist?.toLowerCase().includes(query)
       )
+      console.log('[Products] filteredProducts: after search filter =', result.length)
     }
 
     // Apply price filter if set
@@ -181,8 +184,10 @@ export const useProductStore = defineStore('products', () => {
       result = result.filter(p =>
         p.collection_id && activeCollections.value.includes(p.collection_id)
       )
+      console.log('[Products] filteredProducts: after collection filter =', result.length)
     }
 
+    console.log('[Products] filteredProducts: final count =', result.length)
     return result
   })
 
@@ -252,6 +257,7 @@ export const useProductStore = defineStore('products', () => {
     try {
       // Check cache first
       if (isCacheValid() && productsCache) {
+        console.log('[Products] Using cached products:', productsCache.length)
         products.value = productsCache
         totalCount.value = productsCache.length
         loading.value = false
@@ -264,14 +270,17 @@ export const useProductStore = defineStore('products', () => {
       let offset = 0
       const limit = 100
 
+      console.log('[Products] Fetching products via edge function...')
       while (true) {
         const result = await storefrontProducts.list({ limit, offset })
+        console.log(`[Products] Fetched batch at offset=${offset}: ${result.data?.length || 0} items`)
         if (!result.data || result.data.length === 0) break
         allProducts = allProducts.concat(result.data)
         if (result.data.length < limit) break
         offset += limit
       }
 
+      console.log('[Products] Total products fetched:', allProducts.length)
       products.value = allProducts
       totalCount.value = allProducts.length
 
@@ -292,13 +301,16 @@ export const useProductStore = defineStore('products', () => {
     try {
       // Check cache first
       if (isCacheValid() && categoriesCache) {
+        console.log('[Products] Using cached categories:', categoriesCache.length)
         categories.value = categoriesCache
         return
       }
 
       // Use storefront edge function instead of direct DB access
+      console.log('[Products] Fetching categories via edge function...')
       const result = await storefrontProducts.categories()
       categories.value = result.data || []
+      console.log('[Products] Categories fetched:', categories.value.length)
 
       // Update cache
       categoriesCache = categories.value
@@ -310,17 +322,22 @@ export const useProductStore = defineStore('products', () => {
   }
 
   async function fetchCollections() {
-    error.value = null
     try {
+      console.log('[Products] Fetching collections...')
       const { data, error: err } = await supabase
         .from('collections')
         .select('id, name, is_active, sort_order')
         .order('sort_order')
 
-      if (err) throw err
+      if (err) {
+        console.warn('[Products] fetchCollections DB error:', err.message)
+        collections.value = []
+        return
+      }
       collections.value = data || []
+      console.log('[Products] Collections fetched:', collections.value.length)
     } catch (err) {
-      console.error('fetchCollections error:', err)
+      console.warn('[Products] fetchCollections error:', err.message)
       collections.value = []
     }
   }

@@ -112,27 +112,37 @@ function updateRouteSEO() {
 }
 
 // Refresh ScrollTrigger and update SEO on every route change
+let routeWatchDebounce = null
 watch(() => route.path, async (newPath, oldPath) => {
   if (newPath === oldPath) return
 
-  // Close cart drawer on navigation
-  cartStore.closeDrawer()
+  // Close cart drawer on navigation (only if open)
+  if (cartStore.isOpen) {
+    cartStore.closeDrawer()
+  }
 
-  // Wait for next tick to ensure the new component has mounted
-  await nextTick()
+  // Debounce: cancel pending refresh to avoid redundant work on fast navigation
+  if (routeWatchDebounce) {
+    clearTimeout(routeWatchDebounce)
+  }
 
-  // Additional delay to ensure DOM updates are complete
-  setTimeout(() => {
-    // Clean up old ScrollTrigger instances before refreshing
+  // Update SEO immediately (lightweight)
+  updateRouteSEO()
+
+  // Debounce ScrollTrigger refresh - use shorter delay for snappier navigation
+  routeWatchDebounce = setTimeout(async () => {
+    // Wait for next tick to ensure the new component has mounted
+    await nextTick()
+
     try {
       revertGlobalAnimations()
       initGlobalAnimations()
-      refreshScrollTriggers(150)
-      updateRouteSEO()
+      refreshScrollTriggers(100)
     } catch (e) {
       console.warn('[App.vue] Route watch error:', e)
     }
-  }, 50)
+    routeWatchDebounce = null
+  }, 100)
 })
 
 onMounted(() => {
@@ -144,6 +154,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   revertGlobalAnimations()
+  if (routeWatchDebounce) {
+    clearTimeout(routeWatchDebounce)
+    routeWatchDebounce = null
+  }
 })
 </script>
 

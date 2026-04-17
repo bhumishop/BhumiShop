@@ -156,9 +156,28 @@ const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand'
 
 /**
  * Get the external product URL for third-party products.
+ * Falls back to constructing from known store patterns if DB field is empty.
  */
 const productUrl = computed(() => {
-  return props.product.product_url || props.product.third_party_product_url || ''
+  const p = props.product
+
+  // First check explicit DB fields
+  if (p.product_url) return p.product_url
+  if (p.third_party_product_url) return p.third_party_product_url
+
+  // Construct URL from fulfillment type patterns
+  if (p.fulfillment_type === 'uma_penca' || p.fulfillment_type === 'uma penca') {
+    const storeUrl = import.meta.env.VITE_UMAPENCA_STORE_URL || 'https://prataprint.bhumisparshaschool.org'
+    if (p.slug) return `${storeUrl}/produto/${p.slug}`
+    return storeUrl
+  }
+
+  if (p.fulfillment_type === 'uiclap') {
+    const storeUrl = import.meta.env.VITE_UICLAP_STORE_URL || 'https://uiclap.bio/levikarmadrum'
+    return storeUrl
+  }
+
+  return ''
 })
 
 /**
@@ -209,9 +228,22 @@ function formatPrice(value) {
 }
 
 function handleSeeProduct() {
-  // Always navigate to BhumiShop's product detail view
-  // ProductDetailView will handle embedded iframe for third-party products
-  // or regular product detail for in-stock products
+  console.log('[ProductPixelCard] handleSeeProduct:', props.product.name,
+    'fulfillment_type:', props.product.fulfillment_type,
+    'isThirdParty:', isThirdParty.value,
+    'productUrl:', productUrl.value)
+
+  // For third-party products (uma_penca, uiclap), open external URL
+  if (isThirdParty.value) {
+    const url = productUrl.value
+    if (url) {
+      console.log('[ProductPixelCard] Opening external URL:', url)
+      window.open(url, '_blank', 'noopener,noreferrer')
+      return
+    }
+    console.warn('[ProductPixelCard] No external URL found for third-party product')
+    // Fallback: if no external URL set, go to local detail page
+  }
   router.push(`/produtos/${props.product.id}`)
 }
 

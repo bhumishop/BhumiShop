@@ -172,8 +172,8 @@ async function retryFetch() {
   await Promise.all([
     productStore.fetchProducts(),
     productStore.fetchCategories(),
-    productStore.fetchCollections()
   ])
+  await productStore.fetchCollections()
 }
 
 function clearFilters() {
@@ -184,6 +184,7 @@ function clearFilters() {
 // Sorted products
 const sortedProducts = computed(() => {
   const products = [...productStore.filteredProducts]
+  console.log('[ProductsView] sortedProducts: input count =', products.length, ', sortBy =', sortBy.value)
   switch (sortBy.value) {
     case 'price-asc':
       return products.sort((a, b) => (a.price || 0) - (b.price || 0))
@@ -212,11 +213,18 @@ function setPage(page) {
 // Cleanup route watcher on unmount
 let routeWatchCleanup = null
 onMounted(async () => {
+  console.log('[ProductsView] onMounted - starting fetch...')
+  // Fetch products and categories together (both use edge functions)
   await Promise.all([
     productStore.fetchProducts(),
     productStore.fetchCategories(),
-    productStore.fetchCollections()
   ])
+  // Fetch collections separately (uses direct Supabase, shouldn't block products)
+  await productStore.fetchCollections()
+
+  console.log('[ProductsView] After fetch - products:', productStore.products.length, ', filtered:', productStore.filteredProducts.length, ', categories:', productStore.categories.length)
+  console.log('[ProductsView] loading:', productStore.loading, ', error:', productStore.error)
+  console.log('[ProductsView] sortedProducts:', sortedProducts.value.length)
 
   routeWatchCleanup = watch(() => route.query.category, (val) => {
     if (val) {

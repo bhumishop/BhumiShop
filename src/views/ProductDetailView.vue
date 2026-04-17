@@ -803,11 +803,17 @@ function openRelatedProduct(item) {
 const iframeLoaded = ref(false)
 
 onMounted(async () => {
+  // Fetch products and categories in parallel only if needed
+  // These use edge function caching so they're fast on subsequent calls
+  const fetches = []
   if (productStore.products.length === 0) {
-    await productStore.fetchProducts()
+    fetches.push(productStore.fetchProducts())
   }
   if (productStore.categories.length === 0) {
-    await productStore.fetchCategories()
+    fetches.push(productStore.fetchCategories())
+  }
+  if (fetches.length > 0) {
+    await Promise.all(fetches)
   }
 })
 
