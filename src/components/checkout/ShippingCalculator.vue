@@ -102,7 +102,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCartStore } from '../../stores/cart'
-import { calculateShipping, FREE_SHIPPING_ABOVE } from '../../stores/shipping'
+import { calculateShipping, getStateFromCEP, FREE_SHIPPING_ABOVE } from '../../stores/shipping'
 
 const _t = useI18n()
 const cartStore = useCartStore()

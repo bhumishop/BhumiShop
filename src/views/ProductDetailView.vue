@@ -750,7 +750,12 @@ const inStockProducts = computed(() => {
   })
   // Take up to 12 random in-stock products, excluding current
   const filtered = allProducts.filter(p => String(p.id) !== String(product.value?.id))
-  const shuffled = filtered.sort(() => 0.5 - Math.random())
+  // Fisher-Yates shuffle for uniform random distribution
+  const shuffled = [...filtered]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
   const selected = shuffled.slice(0, 12)
 
   const categoryHeightMap = {
@@ -825,7 +830,8 @@ function decrementQty() {
 }
 
 async function addToCart() {
-  if (product.value?.sizes?.length && !selectedSize.value) {
+  if (!product.value) return
+  if (product.value.sizes?.length && !selectedSize.value) {
     toast.warning(t('productDetail.selectSize'))
     return
   }

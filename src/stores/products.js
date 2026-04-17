@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase'
+import { storefrontProducts } from '../api/storefrontApi'
 import { t } from '../utils/storeI18n'
 
 const PAGE_SIZE = 20
@@ -257,44 +258,22 @@ export const useProductStore = defineStore('products', () => {
         return
       }
 
-      // Only select columns that actually exist in the database schema
-      const { data, error: err } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          slug,
-          category,
-          price,
-          compare_at_price,
-          description,
-          short_description,
-          stock_type,
-          stock_quantity,
-          fulfillment_type,
-          image,
-          images,
-          color_swatches,
-          artist,
-          brand,
-          info,
-          materials,
-          tags,
-          weight,
-          dimensions,
-          shipping_zones,
-          collection_id,
-          subcollection_id,
-          is_active,
-          is_featured,
-          is_archived,
-          created_at
-        `, { count: 'exact' })
-        .order('id', { ascending: false })
+      // Use storefront edge function instead of direct DB access
+      // Fetch all products with pagination (edge function max 100 per call)
+      let allProducts = []
+      let offset = 0
+      const limit = 100
 
-      if (err) throw err
-      products.value = data || []
-      totalCount.value = data?.length || 0
+      while (true) {
+        const result = await storefrontProducts.list({ limit, offset })
+        if (!result.data || result.data.length === 0) break
+        allProducts = allProducts.concat(result.data)
+        if (result.data.length < limit) break
+        offset += limit
+      }
+
+      products.value = allProducts
+      totalCount.value = allProducts.length
 
       // Update cache
       productsCache = products.value
@@ -317,14 +296,9 @@ export const useProductStore = defineStore('products', () => {
         return
       }
 
-      // Only select columns that are actually used
-      const { data, error: err } = await supabase
-        .from('categories')
-        .select('id, name, is_active, sort_order')
-        .order('name')
-
-      if (err) throw err
-      categories.value = data || []
+      // Use storefront edge function instead of direct DB access
+      const result = await storefrontProducts.categories()
+      categories.value = result.data || []
 
       // Update cache
       categoriesCache = categories.value

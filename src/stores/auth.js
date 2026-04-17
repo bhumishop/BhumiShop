@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase'
+import { storefrontAuth } from '../api/storefrontApi'
 
 const LOCATION_STORAGE_KEY = 'bhumi_user_location'
 
@@ -36,6 +37,8 @@ export const useAuthStore = defineStore('auth', () => {
   const userEmail = computed(() => user.value?.email || '')
   const userName = computed(() => user.value?.user_metadata?.full_name || user.value?.email?.split('@')[0] || '')
 
+  let authSubscription = null
+
   function setLocation(location) {
     userLocation.value = location
     saveLocation(location)
@@ -64,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
       initialized.value = true
     }
 
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       user.value = session?.user || null
       if (session?.user) {
         await _checkAdminRole()
@@ -72,18 +75,24 @@ export const useAuthStore = defineStore('auth', () => {
         adminRole.value = false
       }
     })
+    authSubscription = subscription
+  }
+
+  function cleanup() {
+    authSubscription?.unsubscribe()
   }
 
   async function _checkAdminRole() {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.value?.id)
-        .eq('role', 'admin')
-        .maybeSingle()
-      if (error) throw error
-      adminRole.value = !!data
+      // Use storefront edge function for user role lookup
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        adminRole.value = false
+        return
+      }
+
+      const result = await storefrontAuth.getUser(session.access_token)
+      adminRole.value = result.user?.role === 'admin'
     } catch {
       adminRole.value = false
     }
@@ -238,6 +247,7 @@ export const useAuthStore = defineStore('auth', () => {
     signInWithWechat,
     signInWithPhone,
     signOut,
-    updateProfile
+    updateProfile,
+    cleanup
   }
 })

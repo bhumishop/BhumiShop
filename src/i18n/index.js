@@ -17,7 +17,12 @@ export const defaultLocale = 'pt-BR'
 // Detect user locale from browser
 export function detectLocale() {
   // Check localStorage first (user preference)
-  const stored = localStorage.getItem('locale')
+  let stored
+  try {
+    stored = localStorage.getItem('locale')
+  } catch {
+    // localStorage unavailable, skip
+  }
   if (stored && supportedLocales.find(l => l.code === stored)) {
     return stored
   }

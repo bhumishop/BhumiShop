@@ -561,7 +561,12 @@ function onAuthComplete() {
 
 function goHome() {
   const redirect = route.query.redirect || '/'
-  router.push(redirect)
+  // Only allow relative paths starting with /
+  if (redirect.startsWith('/') && !redirect.startsWith('//')) {
+    router.push(redirect)
+  } else {
+    router.push('/')
+  }
 }
 
 onMounted(() => {
@@ -693,7 +698,7 @@ onMounted(() => {
   flex-shrink: 0;
   width: 1.125rem;
   height: 1.125rem;
-.border: 0.125rem solid var(--border);
+  border: 0.125rem solid var(--border);
   border-radius: clamp(0.125rem, 0.5vw, 0.25rem);
   background: var(--surface-2);
   transition: all 0.2s ease;

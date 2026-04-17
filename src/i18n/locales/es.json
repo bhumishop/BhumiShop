@@ -25,7 +25,7 @@
     "additionalInfo": "Informacion adicional",
     "copyright": "© {year} Bhumisparsha School. Todos los derechos reservados.",
     "securePayment": "Pago seguro via AbacatePay",
-    "contactEmail": "contacto\\@bhumisparshaschool.org"
+    "contactEmail": "contacto{'@'}bhumisparshaschool.org"
   },
   "nav": {
     "home": "Inicio",
@@ -37,7 +37,7 @@
     "cart": "Carrito",
     "account": "Mi Cuenta",
     "contact": "Contacto",
-    "menu": "Menu"
+    "menu": "Menú"
   },
   "home": {
     "heroEyebrow": "TIENDA VIRTUAL",
@@ -65,7 +65,19 @@
     "clearSearch": "Limpiar busqueda",
     "notFound": "No se encontraron productos.",
     "previous": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "filters": "Filtros",
+    "clearAll": "Limpiar todo",
+    "priceRange": "Rango de precio",
+    "min": "Mín",
+    "max": "Máx",
+    "collections": "Colecciones",
+    "activeFilters": "Filtros activos",
+    "filterActive": "filtro(s) activo(s)",
+    "sortNewest": "Más recientes",
+    "sortPriceAsc": "Precio: Menor a Mayor",
+    "sortPriceDesc": "Precio: Mayor a Menor",
+    "sortName": "Nombre A-Z"
   },
   "productDetail": {
     "breadcrumbHome": "Inicio",
@@ -152,11 +164,17 @@
     "total": "Total",
     "clearCart": "Vaciar carrito",
     "cartCount": "Carrito ({count})",
-    "umaPencaNote": "Los articulos UmaPenca se pagan en una tienda separada"
+    "umaPencaNote": "Los articulos UmaPenca se pagan en una tienda separada",
+    "subtotal": "Subtotal"
   },
   "checkout": {
     "title": "Checkout",
-    "stepperSteps": ["Carrito", "Informacion", "Entrega y Pago", "Confirmacion"],
+    "stepperSteps": [
+      "Carrito",
+      "Informacion",
+      "Entrega y Pago",
+      "Confirmacion"
+    ],
     "steps": {
       "cart": "Carrito",
       "info": "Informacion",
@@ -200,7 +218,7 @@
       "continue": "Continuar",
       "placeholders": {
         "name": "Tu nombre",
-        "email": "tu\\@correo.com",
+        "email": "tu@correo.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
@@ -249,7 +267,9 @@
       "goToUmaPenca": "Ir a Uma Penca",
       "continueShopping": "Continuar Comprando",
       "viewOrders": "Ver Mis Pedidos",
-      "pixConfirmed": "¡Pago PIX confirmado!"
+      "pixConfirmed": "¡Pago PIX confirmado!",
+      "pixExpired": "El código PIX ha expirado. Por favor, inicie un nuevo pago.",
+      "pixCheckError": "La verificación del estado del pago no está disponible. Por favor, verifique su pedido más tarde."
     }
   },
   "payment": {
@@ -330,8 +350,7 @@
       "smsCodeSent": "¡Codigo SMS enviado!"
     },
     "welcome": "¡Bienvenido!",
-    "welcomeMessage": "Ya estás listo para explorar Bhumi Shop.",
-    "exploreNow": "Explorar Ahora"
+    "welcomeMessage": "Ya estás listo para explorar Bhumi Shop."
   },
   "profile": {
     "title": "Mi Perfil",
@@ -455,7 +474,8 @@
       "orderSuccess": "¡Pedido creado con exito!",
       "pixConfirmed": "¡Pago PIX confirmado!",
       "orderPrefix": "Pedido",
-      "sizePrefix": "Talla"
+      "sizePrefix": "Talla",
+      "shipping": "Envío"
     },
     "shipping": {
       "invalidCEP": "CEP invalido o region no atendida",

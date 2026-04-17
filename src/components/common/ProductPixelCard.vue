@@ -209,13 +209,10 @@ function formatPrice(value) {
 }
 
 function handleSeeProduct() {
-  if (isThirdParty.value && productUrl.value) {
-    // Open third-party product in new tab
-    window.open(productUrl.value, '_blank', 'noopener,noreferrer')
-  } else {
-    // Navigate to own product detail page in-app
-    router.push(`/produtos/${props.product.id}`)
-  }
+  // Always navigate to BhumiShop's product detail view
+  // ProductDetailView will handle embedded iframe for third-party products
+  // or regular product detail for in-stock products
+  router.push(`/produtos/${props.product.id}`)
 }
 
 function addToCart() {

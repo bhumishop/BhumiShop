@@ -25,7 +25,7 @@
     "additionalInfo": "追加情報",
     "copyright": "© {year} Bhumisparsha School. All rights reserved.",
     "securePayment": "AbacatePay経由の安全な支払い",
-    "contactEmail": "contact\\@bhumisparshaschool.org"
+    "contactEmail": "contact{'@'}bhumisparshaschool.org"
   },
   "nav": {
     "home": "ホーム",
@@ -65,7 +65,19 @@
     "clearSearch": "検索をクリア",
     "notFound": "製品が見つかりません。",
     "previous": "前へ",
-    "next": "次へ"
+    "next": "次へ",
+    "filters": "フィルター",
+    "clearAll": "すべてクリア",
+    "priceRange": "価格帯",
+    "min": "最小",
+    "max": "最大",
+    "collections": "コレクション",
+    "activeFilters": "アクティブなフィルター",
+    "filterActive": "件のフィルター",
+    "sortNewest": "新着順",
+    "sortPriceAsc": "価格：低い順",
+    "sortPriceDesc": "価格：高い順",
+    "sortName": "名前 A-Z"
   },
   "productDetail": {
     "breadcrumbHome": "ホーム",
@@ -157,7 +169,12 @@
   },
   "checkout": {
     "title": "チェックアウト",
-    "stepperSteps": ["カート", "情報", "配送と支払い", "確認"],
+    "stepperSteps": [
+      "カート",
+      "情報",
+      "配送と支払い",
+      "確認"
+    ],
     "steps": {
       "cart": "カート",
       "info": "情報",
@@ -250,7 +267,9 @@
       "goToUmaPenca": "Uma Penca に進む",
       "continueShopping": "ショッピングを続ける",
       "viewOrders": "注文履歴を見る",
-      "pixConfirmed": "PIX支払いが確認されました！"
+      "pixConfirmed": "PIX支払いが確認されました！",
+      "pixExpired": "PIXコードの有効期限が切れました。新しい支払いを開始してください。",
+      "pixCheckError": "支払いステータスの確認は利用できません。後ほどご注文をご確認ください。"
     }
   },
   "payment": {
@@ -331,8 +350,7 @@
       "smsCodeSent": "SMSコードを送信しました！"
     },
     "welcome": "ようこそ！",
-    "welcomeMessage": "Bhumi Shop を探索する準備ができました。",
-    "exploreNow": "今すぐ探索"
+    "welcomeMessage": "Bhumi Shop を探索する準備ができました。"
   },
   "profile": {
     "title": "マイプロフィール",
@@ -455,44 +473,45 @@
       "paymentError": "支払い処理エラー",
       "orderSuccess": "注文が作成されました！",
       "pixConfirmed": "PIX支払いが確認されました！",
-      "orderPrefix": "Order",
-      "sizePrefix": "Size"
+      "orderPrefix": "注文",
+      "sizePrefix": "サイズ",
+      "shipping": "送料"
     },
     "shipping": {
       "invalidCEP": "Invalid CEP or region not served",
       "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-      "immediateDigitalDelivery": "Immediate digital delivery",
+      "immediateDigitalDelivery": "即時デジタル配信",
       "internationalShipping": "国際送料が適用されました"
     }
   },
   "shipping": {
-    "calculateShipping": "Calculate Shipping",
-    "freeShippingProgress": "Free shipping on own items!",
-    "freeShippingRemaining": "Only R$ {amount} left for free shipping",
-    "bhumiShopItems": "Bhumi Shop Items",
-    "umaPencaItems": "Uma Penca Items",
-    "digitalItems": "Digital Items",
-    "immediateDelivery": "Immediate Delivery",
-    "businessDays": "{days} business days",
-    "calculatedByUmaPenca": "Shipping calculated by Uma Penca",
-    "immediateDigitalDelivery": "Immediate digital delivery",
-    "invalidCEP": "Invalid CEP or region not served"
+    "calculateShipping": "送料を計算",
+    "freeShippingProgress": "自社商品で送料無料！",
+    "freeShippingRemaining": "送料無料まであと <strong>R$ {amount}</strong>",
+    "bhumiShopItems": "Bhumi Shop 商品",
+    "umaPencaItems": "Uma Penca 商品",
+    "digitalItems": "デジタル商品",
+    "immediateDelivery": "即時配送",
+    "businessDays": "{days} 営業日",
+    "calculatedByUmaPenca": "Uma Penca により計算された送料",
+    "immediateDigitalDelivery": "即時デジタル配信",
+    "invalidCEP": "無効なCEPまたは対象外の地域"
   },
   "paymentProvider": {
-    "title": "How do you want to pay?",
-    "subtitle": "Select payment provider",
-    "close": "Close",
-    "cancel": "Cancel",
-    "continue": "Continue",
-    "umaPencaDirect": "Uma Penca Direct",
-    "umaPencaDesc": "T-shirts, mugs and more - sent by Uma Penca",
+    "title": "お支払い方法を選択",
+    "subtitle": "支払いプロバイダーを選択",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "continue": "続ける",
+    "umaPencaDirect": "Uma Penca ダイレクト",
+    "umaPencaDesc": "Tシャツ、マグカップなど — Uma Penca より発送",
     "abacatepay": "AbacatePay",
-    "abacatepayDesc": "PIX and Card - national processing",
-    "pixBricksIntl": "PIX Bricks International",
-    "pixBricksDesc": "International PIX - pay from anywhere",
-    "externalCheckout": "External Checkout",
+    "abacatepayDesc": "PIX とカード — 国内処理",
+    "pixBricksIntl": "PIX Bricks インターナショナル",
+    "pixBricksDesc": "国際 PIX — どこからでも支払い",
+    "externalCheckout": "外部チェックアウト",
     "pix": "PIX",
-    "card": "Card",
+    "card": "カード",
     "upi": "UPI",
     "alipay": "Alipay"
   },

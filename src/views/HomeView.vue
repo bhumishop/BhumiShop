@@ -247,13 +247,16 @@ onMounted(async () => {
   })
 
   requestAnimationFrame(() => {
-    productAnim = staggerGrid('.product-grid__card-wrapper', {
-      fromY: 25,
-      fromScale: 0.97,
-      duration: 0.45,
-      stagger: 0.05,
-      ease: 'power3.out',
-    })
+    const wrappers = document.querySelectorAll('.product-grid__card-wrapper')
+    if (wrappers.length > 0) {
+      productAnim = staggerGrid('.product-grid__card-wrapper', {
+        fromY: 25,
+        fromScale: 0.97,
+        duration: 0.45,
+        stagger: 0.05,
+        ease: 'power3.out',
+      })
+    }
   })
 
   window.addEventListener('load', () => refreshScrollTriggers(), { once: true })

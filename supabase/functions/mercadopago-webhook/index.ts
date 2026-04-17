@@ -149,7 +149,7 @@ serve(async (req) => {
     const eventType = payload.type || payload.topic || 'unknown'
     const action = payload.action || ''
     const paymentId = payload.data?.id || payload.id
-    const eventId = `${eventType}-${paymentId}-${Date.now()}`
+    const eventId = `${eventType}-${paymentId}`
 
     console.log('MercadoPago webhook received:', eventType, 'action:', action, 'paymentId:', paymentId)
 

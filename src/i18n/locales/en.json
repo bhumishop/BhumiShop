@@ -25,7 +25,7 @@
     "additionalInfo": "Additional information",
     "copyright": "© {year} Bhumisparsha School. All rights reserved.",
     "securePayment": "Secure payment via AbacatePay",
-    "contactEmail": "contact\\@bhumisparshaschool.org"
+    "contactEmail": "contact{'@'}bhumisparshaschool.org"
   },
   "nav": {
     "home": "Home",
@@ -207,7 +207,7 @@
       "continue": "Continue",
       "placeholders": {
         "name": "Your name",
-        "email": "your\\@email.com",
+        "email": "your@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",

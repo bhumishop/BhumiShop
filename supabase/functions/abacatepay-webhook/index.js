@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/function.ts'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 function corsHeaders(origin?: string) {
@@ -127,7 +127,7 @@ async function isEventAlreadyProcessed(supabase: any, eventId: string): Promise<
 /**
  * Record webhook event for idempotency tracking
  */
-async function recordWebhookEvent(supabase: any, eventId: string, eventType: string, payload: any) {
+async function recordWebhookEvent(supabase: any, eventId: string, eventType: string, payload: any): Promise<boolean> {
   try {
     await supabase
       .from('webhook_events')
@@ -145,11 +145,18 @@ async function recordWebhookEvent(supabase: any, eventId: string, eventType: str
           } : null
         },
         status: 'processed',
-        processed_at: new Date().toISOString()
+        processed_at: new Date().toISOString(),
+        source_app: 'bhumi-shop'
       })
   } catch (err) {
     console.error('Failed to record webhook event:', err)
+    // Check for duplicate constraint violation
+    if (err.code === '23505' || err.message?.includes('unique')) {
+      return false
+    }
+    return true
   }
+  return true
 }
 
 serve(async (req) => {

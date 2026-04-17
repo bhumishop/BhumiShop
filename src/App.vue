@@ -54,28 +54,28 @@ import AppFooter from './components/layout/AppFooter.vue'
 // Lazy load heavy visual effect components with error handling
 const CartDrawer = defineAsyncComponent({
   loader: () => import('./components/layout/CartDrawer.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: { render: () => null },
+  loadingComponent: { render: () => null }
 })
 const ToastContainer = defineAsyncComponent({
   loader: () => import('./components/common/BaseToast.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: { render: () => null },
+  loadingComponent: { render: () => null }
 })
 const ClickSpark = defineAsyncComponent({
   loader: () => import('./components/common/ClickSpark.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: { render: () => null },
+  loadingComponent: { render: () => null }
 })
 const Preloader = defineAsyncComponent({
   loader: () => import('./components/common/Preloader.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: { render: () => null },
+  loadingComponent: { render: () => null }
 })
 const Noise = defineAsyncComponent({
   loader: () => import('./components/common/Noise.vue'),
-  errorComponent: { template: null },
-  loadingComponent: { template: null }
+  errorComponent: { render: () => null },
+  loadingComponent: { render: () => null }
 })
 
 const authStore = useAuthStore()

@@ -54,6 +54,42 @@ const router = createRouter({
       component: () => import('../views/AdminView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
     },
+    // Institutional pages
+    {
+      path: '/sobre-nos',
+      name: 'about-us',
+      component: () => import('../views/AboutUsView.vue')
+    },
+    {
+      path: '/contato',
+      name: 'contact',
+      component: () => import('../views/ContactView.vue')
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('../views/FaqView.vue')
+    },
+    {
+      path: '/privacidade',
+      name: 'privacy',
+      component: () => import('../views/PrivacyView.vue')
+    },
+    {
+      path: '/termos',
+      name: 'terms',
+      component: () => import('../views/TermsView.vue')
+    },
+    {
+      path: '/trocas',
+      name: 'returns',
+      component: () => import('../views/ReturnsView.vue')
+    },
+    {
+      path: '/envio',
+      name: 'shipping-policy',
+      component: () => import('../views/ShippingPolicyView.vue')
+    },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',

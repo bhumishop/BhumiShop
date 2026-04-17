@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { storefrontCart } from '../api/storefrontApi'
 
 const CART_STORAGE_KEY = 'bhumi-cart'
 const MAX_QUANTITY = 99
@@ -35,17 +36,22 @@ function loadCartFromStorage() {
   }
 }
 
+function saveCartToStorage(items) {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+  } catch { /* quota exceeded — silently ignore */ }
+}
+
 export const useCartStore = defineStore('cart', () => {
   const items = ref(loadCartFromStorage())
   const isOpen = ref(false)
+  const synced = ref(false) // Track if cart has been synced to server
 
   // Optimized throttled localStorage write — batch updates within 100ms window
-  // Increased from 50ms to 100ms for better batching
   let _saveTimer = null
   let _pendingSave = false
-  const _saveCart = () => {
+  const _saveCartLocal = () => {
     if (_saveTimer) {
-      // Already scheduled, mark as pending
       _pendingSave = true
       return
     }
@@ -54,15 +60,13 @@ export const useCartStore = defineStore('cart', () => {
       _saveTimer = null
       if (_pendingSave) {
         _pendingSave = false
-        try {
-          localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.value))
-        } catch { /* quota exceeded — silently ignore */ }
+        saveCartToStorage(items.value)
       }
     }, 100)
   }
 
   // Use shallow watch with manual deep comparison for better performance
-  watch(items, _saveCart, { deep: true })
+  watch(items, _saveCartLocal, { deep: true })
 
   const totalItems = computed(() => {
     return items.value.reduce((sum, item) => sum + item.quantity, 0)
@@ -134,6 +138,29 @@ export const useCartStore = defineStore('cart', () => {
     return `${item.id}_${item.size || 'default'}`
   }
 
+  /**
+   * Sync local cart to server via edge function.
+   * Called after mutations to ensure server-side persistence.
+   */
+  async function _syncToServer() {
+    if (synced.value && items.value.length > 0) {
+      try {
+        await storefrontCart.set(items.value.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          fulfillment_type: item.fulfillment_type,
+          weight: item.weight,
+          image: item.image
+        })))
+      } catch (err) {
+        console.warn('Cart sync to server failed (non-critical):', err.message)
+      }
+    }
+  }
+
   function addItem(product) {
     const quantity = Math.min(Math.max(Math.floor(product.quantity) || 1, 1), MAX_QUANTITY)
     const size = product.size || null
@@ -156,11 +183,14 @@ export const useCartStore = defineStore('cart', () => {
         quantity,
         size: sanitizedProduct.size || null,
         fulfillment_type: sanitizedProduct.fulfillment_type || 'own',
-        weight: product.weight || 0.3,
+        weight: Number(product.weight) || 0.3,
         dimensions: product.dimensions || null,
         shipping_zones: product.shipping_zones || null
       })
     }
+
+    // Sync to server asynchronously
+    _syncToServer()
   }
 
   function removeItem(productId, size) {
@@ -169,6 +199,9 @@ export const useCartStore = defineStore('cart', () => {
     if (index > -1) {
       items.value.splice(index, 1)
     }
+
+    // Sync to server asynchronously
+    _syncToServer()
   }
 
   function updateQuantity(productId, quantity, size) {
@@ -181,10 +214,51 @@ export const useCartStore = defineStore('cart', () => {
         item.quantity = Math.min(Math.max(Math.floor(quantity), 1), MAX_QUANTITY)
       }
     }
+
+    // Sync to server asynchronously
+    _syncToServer()
   }
 
-  function clearCart() {
+  async function clearCart() {
     items.value = []
+    synced.value = false
+
+    // Clear server cart
+    try {
+      await storefrontCart.clear()
+    } catch (err) {
+      console.warn('Clear server cart failed (non-critical):', err.message)
+    }
+  }
+
+  /**
+   * Load cart from server. Falls back to localStorage if server unavailable.
+   * Should be called once during app initialization.
+   */
+  async function loadCart() {
+    try {
+      const result = await storefrontCart.get()
+      if (result.items && Array.isArray(result.items)) {
+        // Map server cart items to local format
+        items.value = result.items.map(item => ({
+          id: item.product_id,
+          name: item.product_name,
+          price: item.product_price,
+          quantity: item.quantity,
+          size: item.size,
+          fulfillment_type: item.fulfillment_type || 'own',
+          weight: item.weight || 0.3,
+          image: item.image || '',
+          category: ''
+        }))
+        synced.value = true
+        saveCartToStorage(items.value) // Update localStorage backup
+        return
+      }
+    } catch (err) {
+      console.warn('Load server cart failed, using localStorage fallback:', err.message)
+    }
+    // Fallback: already loaded from localStorage in ref initialization
   }
 
   function toggleDrawer() {
@@ -202,6 +276,7 @@ export const useCartStore = defineStore('cart', () => {
   return {
     items,
     isOpen,
+    synced,
     totalItems,
     totalPrice,
     fulfillmentGroups,
@@ -213,6 +288,7 @@ export const useCartStore = defineStore('cart', () => {
     umaPencaItemsTotal,
     uiclapItemsTotal,
     totalWeight,
+    loadCart,
     addItem,
     removeItem,
     updateQuantity,

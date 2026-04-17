@@ -23,16 +23,25 @@
         </div>
 
         <div class="footer__col">
-          <h4 class="footer__heading">{{ $t('nav.home') }}</h4>
-          <router-link to="/">{{ $t('nav.home') }}</router-link>
-          <router-link to="/produtos">{{ $t('nav.products') }}</router-link>
-          <router-link to="/minhas-compras">{{ $t('nav.myOrders') }}</router-link>
+          <h4 class="footer__heading">Navegacao</h4>
+          <router-link to="/">Home</router-link>
+          <router-link to="/produtos">Produtos</router-link>
+          <router-link to="/minhas-compras">Meus Pedidos</router-link>
         </div>
 
         <div class="footer__col">
-          <h4 class="footer__heading">{{ $t('nav.account') }}</h4>
-          <router-link to="/login">{{ $t('nav.login') }}</router-link>
-          <router-link to="/perfil">{{ $t('nav.profile') }}</router-link>
+          <h4 class="footer__heading">Institucional</h4>
+          <router-link to="/sobre-nos">Sobre Nos</router-link>
+          <router-link to="/contato">Contato</router-link>
+          <router-link to="/faq">FAQ / Ajuda</router-link>
+        </div>
+
+        <div class="footer__col">
+          <h4 class="footer__heading">Politicas</h4>
+          <router-link to="/privacidade">Privacidade</router-link>
+          <router-link to="/termos">Termos de Servico</router-link>
+          <router-link to="/trocas">Trocas e Devolucoes</router-link>
+          <router-link to="/envio">Politica de Envio</router-link>
         </div>
 
         <div class="footer__col">
@@ -61,7 +70,10 @@ onMounted(() => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   if (prefersReducedMotion) {
-    gsap.set('.footer__brand, .footer__col, .footer__bottom', { opacity: 1, y: 0 })
+    const elements = document.querySelectorAll('.footer__brand, .footer__col, .footer__bottom')
+    if (elements.length) {
+      gsap.set(elements, { opacity: 1, y: 0 })
+    }
     return
   }
 
@@ -159,7 +171,7 @@ onUnmounted(() => {
 
 .footer__grid {
   display: grid;
-  grid-template-columns: 2fr repeat(3, 1fr);
+  grid-template-columns: 2fr repeat(4, 1fr);
   gap: clamp(1rem, 3vw, 2rem);
   margin-bottom: clamp(1rem, 3vh, 1.5rem);
   position: relative;

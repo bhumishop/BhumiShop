@@ -9,7 +9,7 @@
     <div
       ref="drawerRef"
       class="drawer"
-      style="display: none;"
+      :style="{ display: cartStore.isOpen ? 'flex' : 'none' }"
     >
       <div class="drawer__header">
         <h2 class="drawer__title">{{ $t('cart.cartCount', { count: cartStore.totalItems }) }}</h2>
@@ -182,7 +182,6 @@ watch(() => cartStore.isOpen, async (isOpen) => {
 
   if (isOpen) {
     shouldShowOverlay.value = true
-    if (drawerRef.value) drawerRef.value.style.display = 'flex'
     animateDrawerIn()
   } else {
     animateDrawerOut()
@@ -250,7 +249,6 @@ function animateDrawerOut() {
     gsap.set(drawerRef.value, { xPercent: 100, pointerEvents: 'none' })
     if (overlayRef.value) gsap.set(overlayRef.value, { opacity: 0, pointerEvents: 'none' })
     shouldShowOverlay.value = false
-    drawerRef.value.style.display = 'none'
     return
   }
 
@@ -297,7 +295,6 @@ function animateDrawerOut() {
     overwrite: true,
     onComplete: () => {
       gsap.set(drawerRef.value, { pointerEvents: 'none' })
-      if (drawerRef.value) drawerRef.value.style.display = 'none'
     },
   })
   activeTweens.push(drawerTween)

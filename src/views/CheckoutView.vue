@@ -634,7 +634,7 @@ function handleUmaPencaRedirect() {
         qty: Math.min(Math.max(item.quantity, 1), 99),
         size: item.size || null
       }
-      const encodedCart = btoa(JSON.stringify([cartPayload]))
+      const encodedCart = btoa(unescape(encodeURIComponent(JSON.stringify([cartPayload]))))
       const url = new URL(`${umaPencaStoreUrl}/checkout`)
       url.searchParams.set('cart', encodedCart)
       url.searchParams.set('ref', 'bhumi-shop')
@@ -657,7 +657,7 @@ function handleUmaPencaRedirect() {
         id: parseInt(item.id, 10) || item.id,
         qty: Math.min(Math.max(item.quantity, 1), 99)
       }
-      const encodedCart = btoa(JSON.stringify([cartPayload]))
+      const encodedCart = btoa(unescape(encodeURIComponent(JSON.stringify([cartPayload]))))
       url.searchParams.set('cart', encodedCart)
       url.searchParams.set('ref', 'bhumi-shop')
       window.open(url.toString(), '_blank')

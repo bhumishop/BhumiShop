@@ -25,7 +25,7 @@
     "additionalInfo": "Informações adicionais",
     "copyright": "© {year} Bhumisparsha School. Todos os direitos reservados.",
     "securePayment": "Pagamento seguro via AbacatePay",
-    "contactEmail": "contato\\@bhumisparshaschool.org"
+    "contactEmail": "contato{'@'}bhumisparshaschool.org"
   },
   "nav": {
     "home": "Início",
@@ -65,7 +65,19 @@
     "clearSearch": "Limpar busca",
     "notFound": "Nenhum produto encontrado.",
     "previous": "Anterior",
-    "next": "Próximo"
+    "next": "Próximo",
+    "filters": "Filtros",
+    "clearAll": "Limpar tudo",
+    "priceRange": "Faixa de preço",
+    "min": "Mín",
+    "max": "Máx",
+    "collections": "Coleções",
+    "activeFilters": "Filtros ativos",
+    "filterActive": "filtro(s) ativo(s)",
+    "sortNewest": "Mais recentes",
+    "sortPriceAsc": "Preço: Menor para Maior",
+    "sortPriceDesc": "Preço: Maior para Menor",
+    "sortName": "Nome A-Z"
   },
   "productDetail": {
     "breadcrumbHome": "Início",
@@ -106,7 +118,7 @@
       "idade": "Idade"
     },
     "sizeTabNormal": "Adulto",
-    "sizeTabBaby": "Baby",
+    "sizeTabBaby": "Bebê",
     "sizeTableBabyDesc": "Medidas aproximadas para camisetas infantis. Pode variar conforme o fabricante.",
     "defaultCamisetaMaterial": "Camiseta feita com 100% de fibra natural de algodão sustentável.",
     "defaultCamisetaPrint": "Estampada com impressão digital",
@@ -157,7 +169,12 @@
   },
   "checkout": {
     "title": "Checkout",
-    "stepperSteps": ["Carrinho", "Informações", "Entrega e Pagamento", "Confirmação"],
+    "stepperSteps": [
+      "Carrinho",
+      "Informações",
+      "Entrega e Pagamento",
+      "Confirmação"
+    ],
     "step1": {
       "title": "Resumo do Pedido",
       "emptyCart": "Seu carrinho está vazio",
@@ -195,7 +212,7 @@
       "continue": "Continuar",
       "placeholders": {
         "name": "Seu nome",
-        "email": "seu\\@email.com",
+        "email": "seu@email.com",
         "phone": "(11) 99999-9999",
         "cpf": "000.000.000-00",
         "cep": "00000-000",
@@ -333,8 +350,7 @@
       "smsCodeSent": "Código SMS enviado!"
     },
     "welcome": "Bem-vindo!",
-    "welcomeMessage": "Você já pode explorar a Bhumi Shop.",
-    "exploreNow": "Explorar Agora"
+    "welcomeMessage": "Você já pode explorar a Bhumi Shop."
   },
   "profile": {
     "title": "Meu Perfil",

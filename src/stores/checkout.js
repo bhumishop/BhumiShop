@@ -5,6 +5,7 @@ import { useOrderStore } from './orders'
 import { useCartStore } from './cart'
 import { useProductStore } from './products'
 import { useToastStore } from './toast'
+import { useAuthStore } from './auth'
 import { calculateShipping, getStateFromCEP, getZoneFromState } from './shipping'
 import { t } from '../utils/storeI18n'
 
@@ -192,6 +193,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       }
 
       // Create the order
+      const authStore = useAuthStore()
       const order = await orderStore.createOrder({
         idempotencyKey: idempotencyKey.value,
         total: totalWithShipping.value,
@@ -203,7 +205,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         shippingAddress: formatAddress(customerInfo.value),
         shippingCost: computeShippingCostTotal(),
         notes: customerInfo.value.notes,
-        userId: null,
+        userId: authStore.user?.id || null,
         items: cartStore.items.map(item => ({
           id: sanitizeProductId(item.id),
           name: item.name,

@@ -78,23 +78,25 @@ function animateProducts() {
       }
     })
 
-    // Stagger entrance for new items
-    gsap.fromTo(wrappers,
-      {
-        opacity: 0,
-        y: 24,
-        scale: 0.97
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.45,
-        stagger: 0.04,
-        ease: 'power3.out',
-        force3D: true
-      }
-    )
+    // Stagger entrance for new items - only if elements exist
+    if (wrappers.length > 0) {
+      gsap.fromTo(wrappers,
+        {
+          opacity: 0,
+          y: 24,
+          scale: 0.97
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.45,
+          stagger: 0.04,
+          ease: 'power3.out',
+          force3D: true
+        }
+      )
+    }
   })
 }
 

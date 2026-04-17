@@ -25,7 +25,7 @@
     "additionalInfo": "附加信息",
     "copyright": "© {year} Bhumisparsha School。保留所有权利。",
     "securePayment": "通过AbacatePay安全支付",
-    "contactEmail": "contact\\@bhumisparshaschool.org"
+    "contactEmail": "contact{'@'}bhumisparshaschool.org"
   },
   "nav": {
     "home": "首页",
@@ -65,7 +65,19 @@
     "clearSearch": "清除搜索",
     "notFound": "未找到产品。",
     "previous": "上一页",
-    "next": "下一页"
+    "next": "下一页",
+    "filters": "筛选",
+    "clearAll": "清除全部",
+    "priceRange": "价格区间",
+    "min": "最低",
+    "max": "最高",
+    "collections": "系列",
+    "activeFilters": "已激活筛选",
+    "filterActive": "个筛选条件",
+    "sortNewest": "最新",
+    "sortPriceAsc": "价格：从低到高",
+    "sortPriceDesc": "价格：从高到低",
+    "sortName": "名称 A-Z"
   },
   "productDetail": {
     "breadcrumbHome": "首页",
@@ -157,7 +169,12 @@
   },
   "checkout": {
     "title": "结算",
-    "stepperSteps": ["购物车", "信息", "配送与支付", "确认"],
+    "stepperSteps": [
+      "购物车",
+      "信息",
+      "配送与支付",
+      "确认"
+    ],
     "steps": {
       "cart": "购物车",
       "info": "信息",
@@ -250,7 +267,9 @@
       "goToUmaPenca": "前往 Uma Penca",
       "continueShopping": "继续购物",
       "viewOrders": "查看我的订单",
-      "pixConfirmed": "PIX 支付已确认！"
+      "pixConfirmed": "PIX 支付已确认！",
+      "pixExpired": "PIX 码已过期。请重新开始支付。",
+      "pixCheckError": "支付状态检查不可用。请稍后查看您的订单。"
     }
   },
   "payment": {
@@ -331,8 +350,7 @@
       "smsCodeSent": "短信验证码已发送！"
     },
     "welcome": "欢迎！",
-    "welcomeMessage": "您现在可以开始探索 Bhumi Shop 了。",
-    "exploreNow": "立即探索"
+    "welcomeMessage": "您现在可以开始探索 Bhumi Shop 了。"
   },
   "profile": {
     "title": "我的资料",
@@ -456,7 +474,8 @@
       "orderSuccess": "订单创建成功！",
       "pixConfirmed": "PIX支付已确认！",
       "orderPrefix": "订单",
-      "sizePrefix": "尺寸"
+      "sizePrefix": "尺寸",
+      "shipping": "运费"
     },
     "shipping": {
       "invalidCEP": "CEP 无效或该地区不支持",
