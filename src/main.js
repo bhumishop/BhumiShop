@@ -5,6 +5,17 @@ import router from './router'
 import { setupI18n } from './i18n'
 import './assets/main.css'
 
+// Check for SPA redirect path BEFORE bootstrapping
+const spaRedirectPath = sessionStorage.getItem('spa-redirect-path')
+if (spaRedirectPath) {
+  sessionStorage.removeItem('spa-redirect-path')
+  // Use history.replaceState to change the URL before the router reads it
+  // This way the router will initialize directly to the correct route
+  const baseUrl = import.meta.env.BASE_URL
+  const fullPath = baseUrl === '/' ? spaRedirectPath : baseUrl + spaRedirectPath.slice(1)
+  history.replaceState(null, '', fullPath)
+}
+
 async function bootstrap() {
   const app = createApp(App)
   const pinia = createPinia()
@@ -26,16 +37,6 @@ async function bootstrap() {
   }
 
   app.mount('#app')
-
-  // Handle SPA redirect from 404 page after router is ready
-  // This ensures the router has finished initializing before navigating
-  const redirectPath = sessionStorage.getItem('spa-redirect-path')
-  if (redirectPath) {
-    sessionStorage.removeItem('spa-redirect-path')
-    // Wait for router to be ready, then navigate to the intended path
-    await router.isReady()
-    router.replace(redirectPath)
-  }
 }
 
 bootstrap()

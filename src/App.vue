@@ -27,7 +27,7 @@
         <AppHeader />
         <main class="app-main">
           <router-view v-slot="{ Component, route: currentRoute }">
-            <transition name="page" mode="out-in" @enter="onPageEnter" @leave="onPageLeave">
+            <transition name="page" mode="out-in">
               <component :is="Component" :key="currentRoute.path" />
             </transition>
           </router-view>
@@ -42,14 +42,26 @@
 
 <script setup>
 import { onMounted, onUnmounted, watch, computed, defineAsyncComponent, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
-import { pageEnter, pageLeave, refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
+import { useRoute, useRouter } from 'vue-router'
+import { refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import { useCartStore } from './stores/cart'
 import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
+
+// DEBUG: Log router events
+const router = useRouter()
+router.afterEach((to, from, failure) => {
+  console.log('[App.vue] Router afterEach:', {
+    from: from.path,
+    to: to.path,
+    fromName: from.name,
+    toName: to.name,
+    failure: failure?.message || null
+  })
+})
 
 // Lazy load heavy visual effect components with error handling
 const CartDrawer = defineAsyncComponent({
@@ -85,18 +97,11 @@ const route = useRoute()
 const { updateMetaTags } = useSEO()
 const isCartRoute = computed(() => route.name === 'cart')
 
-function onPageEnter(el, done) {
-  pageEnter(el, done)
-}
-
-function onPageLeave(el, done) {
-  pageLeave(el, done)
-}
-
 // Update SEO meta tags on route change
 function updateRouteSEO() {
   const routeName = route.name
   const seoConfig = routeSEO[routeName]
+  console.log('[App.vue] updateRouteSEO:', { path: route.path, name: routeName, hasSeo: !!seoConfig })
 
   if (seoConfig) {
     updateMetaTags(seoConfig)
@@ -114,6 +119,7 @@ function updateRouteSEO() {
 // Refresh ScrollTrigger and update SEO on every route change
 let routeWatchDebounce = null
 watch(() => route.path, async (newPath, oldPath) => {
+  console.log('[App.vue] route.path changed:', { old: oldPath, new: newPath })
   if (newPath === oldPath) return
 
   // Close cart drawer on navigation (only if open)
@@ -146,6 +152,7 @@ watch(() => route.path, async (newPath, oldPath) => {
 })
 
 onMounted(() => {
+  console.log('[App.vue] onMounted, current route:', route.path, route.name)
   authStore.initialize()
   themeStore.init()
   initGlobalAnimations()
@@ -191,10 +198,41 @@ onUnmounted(() => {
   z-index: 0;
   pointer-events: none;
   opacity: 0.03;
-  background-image: 
+  background-image:
     repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.01) 1px, rgba(255,255,255,0.01) 2px),
     repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
   background-size: 100% 3px, 3px 100%;
   background-repeat: repeat;
+}
+
+/* Page transition - CSS only, no JS dependency */
+.page-enter-active {
+  animation: page-fade-slide-in 0.35s ease-out;
+}
+
+.page-leave-active {
+  animation: page-fade-slide-out 0.2s ease-in;
+}
+
+@keyframes page-fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-fade-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 </style>

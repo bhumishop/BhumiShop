@@ -38,27 +38,11 @@
 
         <!-- Badges -->
         <div class="product-pixel-card__badges">
-          <span v-if="isUmaPenca" class="product-pixel-card__badge product-pixel-card__badge--bundle">
-            <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-            Bundle
-          </span>
           <span v-if="isDigital" class="product-pixel-card__badge product-pixel-card__badge--digital">
             <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
             Digital
-          </span>
-          <span v-if="isOnDemand" class="product-pixel-card__badge product-pixel-card__badge--ondemand">
-            <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-            Made to order
           </span>
         </div>
       </div>
@@ -155,7 +139,6 @@ const isUmaPenca = computed(() => {
 const isUiclap = computed(() => props.product.fulfillment_type === 'uiclap')
 const isThirdParty = computed(() => isUmaPenca.value || isUiclap.value)
 const isDigital = computed(() => props.product.fulfillment_type === 'digital')
-const isOnDemand = computed(() => props.product.stock_type === 'print-on-demand')
 
 /**
  * Get the external product URL for third-party products.
@@ -621,10 +604,13 @@ onUnmounted(() => {
   position: absolute;
   top: clamp(0.625rem, 1.5vw, 0.75rem);
   left: clamp(0.625rem, 1.5vw, 0.75rem);
+  right: clamp(0.625rem, 1.5vw, 0.75rem);
   display: flex;
   flex-wrap: wrap;
   gap: clamp(0.25rem, 0.75vw, 0.375rem);
   z-index: 3;
+  max-width: calc(100% - clamp(1.25rem, 3vw, 1.5rem));
+  overflow: hidden;
 }
 
 .product-pixel-card__badge {
@@ -651,23 +637,6 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
-/* Bundle badge - purple */
-.product-pixel-card__badge--bundle {
-  background: rgba(139, 92, 246, 0.7);
-  color: #ffffff;
-  border: 0.0625rem solid rgba(196, 181, 253, 0.25);
-  box-shadow:
-    0 0.0625rem 0.25rem rgba(139, 92, 246, 0.2),
-    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.12);
-}
-
-.product-pixel-card__badge--bundle:hover {
-  background: rgba(139, 92, 246, 0.85);
-  box-shadow:
-    0 0.125rem 1rem rgba(139, 92, 246, 0.45),
-    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.15);
-}
-
 /* Digital badge - green */
 .product-pixel-card__badge--digital {
   background: rgba(34, 197, 94, 0.65);
@@ -683,22 +652,6 @@ onUnmounted(() => {
   box-shadow:
     0 0.125rem 1rem rgba(34, 197, 94, 0.4),
     inset 0 0.0625rem 0 rgba(255, 255, 255, 0.15);
-}
-
-/* On-demand badge - frosted glass */
-.product-pixel-card__badge--ondemand {
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.8);
-  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.04);
-}
-
-.product-pixel-card__badge--ondemand:hover {
-  background: rgba(255, 255, 255, 0.13);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 0.125rem 0.625rem rgba(255, 255, 255, 0.06),
-    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ===== Info Section ===== */
@@ -794,13 +747,26 @@ onUnmounted(() => {
   justify-content: space-between;
   margin-top: auto;
   padding-top: clamp(0.125rem, 0.5vw, 0.25rem);
-  gap: clamp(0.5rem, 1.5vw, 0.625rem);
+  gap: clamp(0.375rem, 1vw, 0.625rem);
+  min-height: 0;
 }
 
 .product-pixel-card__actions {
   display: flex;
   align-items: center;
-  gap: clamp(0.375rem, 1.25vw, 0.5rem);
+  gap: clamp(0.25rem, 1vw, 0.5rem);
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* Price block - allow shrinking on very small screens */
+.product-pixel-card__price-block {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(0.0625rem, 0.3vw, 0.125rem);
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 60%;
 }
 
 /* Small cart icon button */
@@ -1100,29 +1066,55 @@ onUnmounted(() => {
     font-size: clamp(0.7rem, 2vw, 0.9rem);
   }
 
+  .product-pixel-card__currency {
+    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
+  }
+
   /* Icon-only button on mobile */
   .product-pixel-card__add span:last-child {
     display: none;
   }
 
   .product-pixel-card__add {
-    width: clamp(1.875rem, 4vw, 2.25rem);
-    height: clamp(1.875rem, 4vw, 2.25rem);
+    width: clamp(1.75rem, 8vw, 2.125rem);
+    height: clamp(1.75rem, 8vw, 2.125rem);
+    min-width: 1.75rem;
+    min-height: 1.75rem;
     --add-radius: clamp(0.375rem, 1vw, 0.5rem);
+    padding: 0;
   }
 
   .product-pixel-card__add svg {
-    width: clamp(0.875rem, 2.5vw, 1rem);
-    height: clamp(0.875rem, 2.5vw, 1rem);
+    width: clamp(0.75rem, 2.5vw, 0.9375rem);
+    height: clamp(0.75rem, 2.5vw, 0.9375rem);
+  }
+
+  .product-pixel-card__cart {
+    width: clamp(1.75rem, 8vw, 2.125rem);
+    height: clamp(1.75rem, 8vw, 2.125rem);
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    --cart-radius: clamp(0.375rem, 1vw, 0.5rem);
+  }
+
+  .product-pixel-card__cart svg {
+    width: clamp(0.75rem, 2.5vw, 0.9375rem);
+    height: clamp(0.75rem, 2.5vw, 0.9375rem);
   }
 
   .product-pixel-card__footer {
-    gap: clamp(0.375rem, 1.5vw, 0.5rem);
+    gap: clamp(0.25rem, 1vw, 0.5rem);
+  }
+
+  .product-pixel-card__actions {
+    gap: clamp(0.25rem, 0.75vw, 0.375rem);
   }
 
   .product-pixel-card__badges {
     top: clamp(0.25rem, 1.5vw, 0.375rem);
     left: clamp(0.25rem, 1.5vw, 0.375rem);
+    right: clamp(0.25rem, 1.5vw, 0.375rem);
+    max-width: calc(100% - clamp(0.5rem, 3vw, 0.75rem));
   }
 
   .product-pixel-card__badge {
@@ -1150,15 +1142,133 @@ onUnmounted(() => {
     font-size: clamp(0.65rem, 2vw, 0.85rem);
   }
 
+  .product-pixel-card__currency {
+    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
+  }
+
   .product-pixel-card__add {
-    width: clamp(1.625rem, 4vw, 2rem);
-    height: clamp(1.625rem, 4vw, 2rem);
+    width: clamp(1.5rem, 9vw, 1.875rem);
+    height: clamp(1.5rem, 9vw, 1.875rem);
+    min-width: 1.5rem;
+    min-height: 1.5rem;
     --add-radius: clamp(0.3125rem, 1vw, 0.4375rem);
+    padding: 0;
   }
 
   .product-pixel-card__add svg {
-    width: clamp(0.75rem, 2vw, 0.875rem);
-    height: clamp(0.75rem, 2vw, 0.875rem);
+    width: clamp(0.6875rem, 2.5vw, 0.8125rem);
+    height: clamp(0.6875rem, 2.5vw, 0.8125rem);
+  }
+
+  .product-pixel-card__cart {
+    width: clamp(1.5rem, 9vw, 1.875rem);
+    height: clamp(1.5rem, 9vw, 1.875rem);
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    --cart-radius: clamp(0.3125rem, 1vw, 0.4375rem);
+  }
+
+  .product-pixel-card__cart svg {
+    width: clamp(0.6875rem, 2.5vw, 0.8125rem);
+    height: clamp(0.6875rem, 2.5vw, 0.8125rem);
+  }
+
+  .product-pixel-card__actions {
+    gap: clamp(0.1875rem, 0.5vw, 0.3125rem);
+  }
+
+  .product-pixel-card__footer {
+    gap: clamp(0.1875rem, 0.75vw, 0.375rem);
+  }
+
+  .product-pixel-card__badges {
+    top: clamp(0.1875rem, 1.5vw, 0.3125rem);
+    left: clamp(0.1875rem, 1.5vw, 0.3125rem);
+    right: clamp(0.1875rem, 1.5vw, 0.3125rem);
+    max-width: calc(100% - clamp(0.375rem, 3vw, 0.625rem));
+  }
+
+  .product-pixel-card__badge {
+    padding: clamp(0.0625rem, 0.3vw, 0.1rem) clamp(0.1875rem, 0.6vw, 0.3125rem);
+    font-size: clamp(0.375rem, 1.2vw, 0.475rem);
+    gap: clamp(0.0625rem, 0.4vw, 0.125rem);
+  }
+
+  .product-pixel-card__badge-icon {
+    width: clamp(0.3125rem, 1.5vw, 0.4375rem);
+    height: clamp(0.3125rem, 1.5vw, 0.4375rem);
+  }
+}
+
+@media (max-width: 320px) {
+  .product-pixel-card__info {
+    padding: 0.375rem;
+    gap: 0.125rem;
+  }
+
+  .product-pixel-card__name {
+    font-size: 0.55rem;
+  }
+
+  .product-pixel-card__price {
+    font-size: 0.65rem;
+  }
+
+  .product-pixel-card__currency {
+    font-size: 0.45rem;
+  }
+
+  .product-pixel-card__add {
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    --add-radius: 0.3125rem;
+    padding: 0;
+  }
+
+  .product-pixel-card__add svg {
+    width: 0.6875rem;
+    height: 0.6875rem;
+  }
+
+  .product-pixel-card__cart {
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    --cart-radius: 0.3125rem;
+  }
+
+  .product-pixel-card__cart svg {
+    width: 0.6875rem;
+    height: 0.6875rem;
+  }
+
+  .product-pixel-card__actions {
+    gap: 0.1875rem;
+  }
+
+  .product-pixel-card__footer {
+    gap: 0.1875rem;
+  }
+
+  .product-pixel-card__badges {
+    top: 0.1875rem;
+    left: 0.1875rem;
+    right: 0.1875rem;
+    max-width: calc(100% - 0.375rem);
+  }
+
+  .product-pixel-card__badge {
+    padding: 0.0625rem 0.1875rem;
+    font-size: 0.375rem;
+    gap: 0.0625rem;
+  }
+
+  .product-pixel-card__badge-icon {
+    width: 0.3125rem;
+    height: 0.3125rem;
   }
 }
 </style>

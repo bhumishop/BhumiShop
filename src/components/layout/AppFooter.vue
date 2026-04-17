@@ -131,6 +131,7 @@ onUnmounted(() => {
   min-height: 12rem;
   contain: layout style;
   transition: background var(--transition-smooth), border-color var(--transition-smooth);
+  z-index: 2;
 }
 
 .footer__darkveil {
