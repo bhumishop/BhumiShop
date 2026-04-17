@@ -430,6 +430,13 @@ const productImages = computed(() => {
       // Images are already filtered by sync script - use them as is
       product.value.images.forEach(img => {
         if (img && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('/'))) {
+          // Transform old jsDelivr URLs to raw GitHub URLs
+          if (img.includes('cdn.jsdelivr.net/gh')) {
+            img = img.replace(
+              /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
+              'https://raw.githubusercontent.com/$1/$2/$3/'
+            )
+          }
           images.push(img)
         }
       })
@@ -439,6 +446,13 @@ const productImages = computed(() => {
       product.value.images.forEach((img, index) => {
         const isFullColor = isFullColorImage(img, index)
         if (!isFullColor && img && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('/'))) {
+          // Transform old jsDelivr URLs to raw GitHub URLs
+          if (img.includes('cdn.jsdelivr.net/gh')) {
+            img = img.replace(
+              /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
+              'https://raw.githubusercontent.com/$1/$2/$3/'
+            )
+          }
           images.push(img)
         }
       })
@@ -447,8 +461,15 @@ const productImages = computed(() => {
 
   // Fallback to single image
   if (images.length === 0) {
-    const img = product.value.image
+    let img = product.value.image
     if (img && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('/'))) {
+      // Transform old jsDelivr URLs to raw GitHub URLs
+      if (img.includes('cdn.jsdelivr.net/gh')) {
+        img = img.replace(
+          /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
+          'https://raw.githubusercontent.com/$1/$2/$3/'
+        )
+      }
       images.push(img)
     }
   }

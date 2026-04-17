@@ -13,10 +13,15 @@ const brokenImageUrls = new Set()
 export function isLikelyBrokenCdnUrl(url) {
   if (!url || !url.startsWith('http')) return false
 
-  // Check for jsDelivr CDN URLs with @cdn/ branch that might be misconfigured
-  if (url.includes('cdn.jsdelivr.net') && url.includes('@cdn/')) {
-    // URLs with /uiclap/ prefix in the wrong position are typically broken
-    if (url.includes('/uiclap/')) return true
+  // Check for old jsDelivr CDN URLs that are now broken due to 50MB limit
+  if (url.includes('cdn.jsdelivr.net') && url.includes('cdn_images')) {
+    return true
+  }
+
+  // Check for raw.githubusercontent.com URLs with cdn_images
+  if (url.includes('raw.githubusercontent.com') && url.includes('cdn_images')) {
+    // Only mark as broken if it's in the broken cache
+    return brokenImageUrls.has(url)
   }
 
   // Check if this URL has been marked as broken

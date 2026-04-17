@@ -194,6 +194,13 @@ const displayImage = computed(() => {
   const p = props.product
   let img = p.image || ''
   if (!img) return ''
+  // Transform old jsDelivr URLs to raw GitHub URLs
+  if (img.includes('cdn.jsdelivr.net/gh')) {
+    img = img.replace(
+      /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
+      'https://raw.githubusercontent.com/$1/$2/$3/'
+    )
+  }
   // For t-shirts: replace 000_image with 001_image in the URL
   // This swaps the FULLCOLOR swatch for the actual tshirt photo
   if (img.includes('000_image')) {
