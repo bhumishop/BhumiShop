@@ -104,7 +104,7 @@ const router = createRouter({
   }
 })
 
-router.beforeEach(async (to) => {
+router.beforeEach(async (to, from) => {
   const authStore = useAuthStore()
 
   // Only initialize auth when actually needed (protected routes, guest routes, or admin)
@@ -115,19 +115,26 @@ router.beforeEach(async (to) => {
     await authStore.initialize()
   }
 
+  // Handle OAuth callback (Supabase returns with hash params)
+  // Must check before guest/authenticated redirects to process the callback properly
+  if (to.hash && (to.hash.includes('access_token') || to.hash.includes('error'))) {
+    // Let the auth component handle the OAuth callback
+    return
+  }
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    return { name: 'login', query: { redirect: to.fullPath } }
+    return { name: 'login', query: { redirect: to.fullPath }, replace: true }
   }
 
   if (to.meta.requiresAdmin) {
     const isAdmin = await authStore.checkAdminRole()
     if (!isAdmin) {
-      return { name: 'home' }
+      return { name: 'home', replace: true }
     }
   }
 
   if (to.meta.guest && authStore.isLoggedIn) {
-    return { name: 'home' }
+    return { name: 'home', replace: true }
   }
 })
 

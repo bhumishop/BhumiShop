@@ -49,11 +49,19 @@ export const useAuthStore = defineStore('auth', () => {
     saveLocation(null)
   }
 
+  // Helper to get the correct redirect URL accounting for base path
+  function getRedirectUrl() {
+    const baseUrl = import.meta.env.BASE_URL || '/'
+    // BASE_URL already includes trailing slash for subpath deployments
+    return `${window.location.origin}${baseUrl}login`
+  }
+
   async function initialize() {
     if (initialized.value) return
 
     loading.value = true
     try {
+      // Check if we have an OAuth callback in the URL hash
       const { data: { session }, error } = await supabase.auth.getSession()
       if (error) throw error
       if (session) {
@@ -67,15 +75,18 @@ export const useAuthStore = defineStore('auth', () => {
       initialized.value = true
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      user.value = session?.user || null
-      if (session?.user) {
-        await _checkAdminRole()
-      } else {
-        adminRole.value = false
-      }
-    })
-    authSubscription = subscription
+    // Only setup subscription once
+    if (!authSubscription) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        user.value = session?.user || null
+        if (session?.user) {
+          await _checkAdminRole()
+        } else {
+          adminRole.value = false
+        }
+      })
+      authSubscription = subscription
+    }
   }
 
   function cleanup() {
@@ -157,7 +168,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/login`
+          redirectTo: getRedirectUrl()
         }
       })
       if (error) throw error
@@ -173,7 +184,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'wechat',
         options: {
-          redirectTo: `${window.location.origin}/login`
+          redirectTo: getRedirectUrl()
         }
       })
       if (error) throw error
@@ -189,7 +200,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { data, error } = await supabase.auth.signInWithOtp({
         phone,
         options: {
-          redirectTo: `${window.location.origin}/login`
+          redirectTo: getRedirectUrl()
         }
       })
       if (error) throw error

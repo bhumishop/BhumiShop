@@ -239,7 +239,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
@@ -562,14 +562,15 @@ function onAuthComplete() {
 function goHome() {
   const redirect = route.query.redirect || '/'
   // Only allow relative paths starting with /
-  if (redirect.startsWith('/') && !redirect.startsWith('//')) {
-    router.push(redirect)
-  } else {
-    router.push('/')
-  }
+  const target = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'
+  // Use replace to avoid adding extra history entry when redirecting from login
+  router.replace(target)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Wait for next tick to ensure component is fully mounted before navigating
+  await nextTick()
+  
   if (authStore.isLoggedIn) {
     goHome()
     return
