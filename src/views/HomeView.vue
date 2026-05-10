@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" id="home-container">
     <!-- Hero Section - Full viewport height -->
     <section class="hero" @mousemove="handleHeroMouseMove">
       <div class="hero__background">
@@ -102,7 +102,7 @@
 
     <!-- Featured Products Section -->
     <section class="featured" ref="featuredRef">
-      <div class="container">
+      <div class="container" id="featured-start">
         <div class="featured__header">
           <h2 class="featured__title">{{ $t('home.highlights') }}</h2>
         </div>
@@ -190,6 +190,9 @@ onMounted(async () => {
   cursorGlowElement = document.querySelector('.hero__cursor-glow')
 
   await new Promise(r => requestAnimationFrame(r))
+
+  // Update gallery offset after DOM is ready
+  updateGalleryOffset()
 
   // Prefetch product images after initial render
   prefetchProductImages(productStore.products, 12)
@@ -284,6 +287,17 @@ const galleryItems = computed(() => {
     return { image: img }
   })
 })
+
+function updateGalleryOffset() {
+  const featuredEl = document.getElementById('featured-start')
+  const galleryEl = document.querySelector('.circular-gallery-section')
+  if (featuredEl && galleryEl) {
+    const featuredRect = featuredEl.getBoundingClientRect()
+    const galleryRect = galleryEl.getBoundingClientRect()
+    const offset = featuredRect.top - galleryRect.top
+    document.documentElement.style.setProperty('--featured-offset', `${offset}px`)
+  }
+}
 </script>
 
 <style scoped>
@@ -677,12 +691,13 @@ const galleryItems = computed(() => {
 .circular-gallery-section {
   position: relative;
   padding: clamp(1.25rem, 4vh, 2.5rem) 0;
-  background: var(--surface-1);
+  background: transparent;
   height: clamp(25rem, 50vh + 5rem, 50rem);
   min-height: clamp(21.875rem, 35vh, 31.25rem);
   display: flex;
   flex-direction: column;
   z-index: 1;
+  margin-top: calc(-1 * var(--featured-offset, 0px));
 }
 
 .circular-gallery-section .container {
