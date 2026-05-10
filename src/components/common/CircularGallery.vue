@@ -1,10 +1,10 @@
 <template>
   <div ref="containerRef" class="circular-gallery-container">
     <!-- Fallback for non-WebGL -->
-    <div v-if="!webglSupported" class="w-full h-full overflow-y-auto p-4 md:p-8">
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 md:gap-6">
-        <div v-for="(item, index) in displayItems" :key="index" class="rounded-lg overflow-hidden bg-gray-500/10 transition-transform hover:scale-[1.02]">
-          <img :src="item.image" :alt="item.text || 'Gallery image'" loading="lazy" class="w-full h-[150px] md:h-[200px] object-cover block" />
+    <div v-if="!webglSupported" class="gallery-fallback">
+      <div class="gallery-grid">
+        <div v-for="(item, index) in displayItems" :key="index" class="gallery-item">
+          <img :src="item.image" :alt="item.text || 'Gallery image'" loading="lazy" class="gallery-img" />
         </div>
       </div>
     </div>
@@ -73,7 +73,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number)
   let timeout: number;
   return function (this: unknown, ..._args: Parameters<T>) {
     window.clearTimeout(timeout);
-    timeout = window.setTimeout(() => func.apply(this, args), wait);
+    timeout = window.setTimeout(() => func.apply(this, _args), wait);
   };
 }
 
@@ -759,8 +759,12 @@ watch(
 <style scoped>
 /* Circular gallery container */
 .circular-gallery-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
 }
 
 /* Ensure WebGL canvas doesn't block interactions outside container */
@@ -776,26 +780,58 @@ watch(
   touch-action: none;
 }
 
+/* Fallback gallery for non-WebGL */
+.gallery-fallback {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-item {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: rgba(128, 128, 128, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+}
+
+.gallery-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
 /* Mobile adjustments for fallback grid */
 @media (max-width: 768px) {
-  :deep(.grid) {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-    gap: 0.75rem !important;
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
   }
 
-  :deep(img) {
-    height: 120px !important;
+  .gallery-img {
+    height: 150px;
   }
 }
 
 @media (max-width: 480px) {
-  :deep(.grid) {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    gap: 0.5rem !important;
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.5rem;
   }
 
-  :deep(img) {
-    height: 100px !important;
+  .gallery-img {
+    height: 120px;
   }
 }
 </style>
