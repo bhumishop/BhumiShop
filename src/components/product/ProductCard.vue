@@ -275,8 +275,8 @@ function addToCart() {
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  color: #111;
+  background: var(--surface-2);
+  color: var(--text-primary);
   border: none;
   border-radius: 0.375rem;
   transition: transform 0.15s ease, background 0.15s ease;
@@ -285,7 +285,8 @@ function addToCart() {
 
 .product-card__quick-cart:hover {
   transform: scale(1.04);
-  background: #ffffff;
+  background: var(--accent);
+  color: #fff;
 }
 
 .product-card__quick-cart svg {

@@ -133,12 +133,12 @@ const providerLabel = computed(() => {
   align-items: center;
   gap: 0.3rem;
   padding: 0.2rem 0.5rem;
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-subtle);
   border-radius: var(--radius-sm, 0.25rem);
   font-size: 0.65rem;
   font-weight: 600;
-  color: #7c3aed;
+  color: var(--accent);
   margin-top: 0.5rem;
   position: absolute;
   bottom: -0.5rem;

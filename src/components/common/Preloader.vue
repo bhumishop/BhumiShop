@@ -284,7 +284,7 @@ function hide() {
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: #fafafa;
+  color: var(--text-primary);
   display: block;
   animation: text-glitch 4s infinite;
 }
@@ -299,12 +299,12 @@ function hide() {
 }
 
 .brand-text::before {
-  color: #8b5cf6;
+  color: var(--accent);
   animation: glitch-text-purple 3s infinite;
 }
 
 .brand-text::after {
-  color: #22c55e;
+  color: var(--success);
   animation: glitch-text-green 3s infinite;
 }
 

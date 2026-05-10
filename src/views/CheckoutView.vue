@@ -593,7 +593,7 @@ async function renderPixBricks() {
         pixBricksRendered.value = true
       },
       onSubmit: async (formData) => {
-        console.log('MP payment submitted:', formData)
+        // Payment submitted to MercadoPago
       },
       onError: (error) => {
         console.error('PIX Bricks error:', error)
@@ -858,11 +858,11 @@ onMounted(() => {
 }
 
 .checkout-page__group-header--uma-penca {
-  border-bottom-color: #8b5cf6;
+  border-bottom-color: var(--accent);
 }
 
 .checkout-page__group-header--digital {
-  border-bottom-color: #10b981;
+  border-bottom-color: var(--success);
 }
 
 .checkout-page__group-title {
@@ -872,18 +872,18 @@ onMounted(() => {
 }
 
 .checkout-page__group-title--uma-penca {
-  color: #8b5cf6;
+  color: var(--accent);
 }
 
 .checkout-page__group-title--digital {
-  color: #10b981;
+  color: var(--success);
 }
 
 .checkout-page__group-badge {
   margin-left: auto;
   padding: clamp(0.1rem, 0.3vw, 0.2rem) clamp(0.4rem, 0.8vw, 0.6rem);
-  background: #ede9fe;
-  color: #7c3aed;
+  background: var(--accent-light);
+  color: var(--accent);
   font-size: clamp(0.55rem, 1vw, 0.65rem);
   font-weight: 600;
   border-radius: var(--radius-sm);

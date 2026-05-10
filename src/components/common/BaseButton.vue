@@ -294,8 +294,8 @@ onMounted(() => {
 
   position: relative;
   border-radius: var(--rainbow-radius);
-  background: #0a0a0a;
-  color: #ffffff;
+  background: var(--surface-1);
+  color: var(--text-primary);
   z-index: 0;
   overflow: visible;
   border: none;
@@ -338,7 +338,7 @@ onMounted(() => {
   position: absolute;
   inset: var(--rainbow-border-width);
   border-radius: calc(var(--rainbow-radius) - var(--rainbow-border-width));
-  background: #0a0a0a;
+  background: var(--surface-1);
   z-index: 0;
   pointer-events: none;
 }

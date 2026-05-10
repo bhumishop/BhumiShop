@@ -1,9 +1,9 @@
 <template>
-  <div class="lang-switcher" ref="rootRef">
+  <div class="lang-switcher" ref="rootRef" :class="{ 'lang-switcher--bubble': bubble }">
     <button type="button" class="lang-btn" @click="isOpen = !isOpen">
       <span class="flag">{{ currentLocale.flag }}</span>
-      <span class="code">{{ currentLocale.code.toUpperCase() }}</span>
-      <span class="arrow" :class="{ open: isOpen }">&#9662;</span>
+      <span v-if="!bubble" class="code">{{ currentLocale.code.toUpperCase() }}</span>
+      <span v-if="!bubble" class="arrow" :class="{ open: isOpen }">&#9662;</span>
     </button>
 
     <div v-if="isOpen" class="lang-dropdown">
@@ -27,6 +27,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { supportedLocales, changeLocale } from '@/i18n'
+
+const props = defineProps({
+  bubble: { type: Boolean, default: false }
+})
 
 const { locale } = useI18n()
 const isOpen = ref(false)
@@ -150,5 +154,46 @@ onUnmounted(() => document.removeEventListener('click', outside))
 .opt-check {
   color: var(--accent);
   flex-shrink: 0;
+}
+
+/* ===== Bubble mode (mobile floating) ===== */
+.lang-switcher--bubble {
+  position: fixed;
+  bottom: clamp(1rem, 4vw, 1.5rem);
+  right: clamp(1rem, 4vw, 1.5rem);
+  z-index: 9999;
+}
+
+.lang-switcher--bubble .lang-btn {
+  width: clamp(3rem, 10vw, 3.5rem);
+  height: clamp(3rem, 10vw, 3.5rem);
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border: none;
+  box-shadow: 0 0.25rem 1rem rgba(139, 92, 246, 0.4);
+}
+
+.lang-switcher--bubble .lang-btn:hover {
+  transform: scale(1.05);
+  background: var(--accent-hover);
+}
+
+.lang-switcher--bubble .flag {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+
+.lang-switcher--bubble .lang-dropdown {
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+}
+
+@media (min-width: 641px) {
+  .lang-switcher--bubble {
+    display: none;
+  }
 }
 </style>

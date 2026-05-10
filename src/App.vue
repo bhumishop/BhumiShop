@@ -35,6 +35,8 @@
         <AppFooter />
         <CartDrawer v-if="!isCartRoute" />
         <ToastContainer />
+        <!-- Mobile language switcher bubble -->
+        <LanguageSwitcher bubble />
       </div>
     </ClickSpark>
   </div>
@@ -51,17 +53,7 @@ import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 
-// DEBUG: Log router events
 const router = useRouter()
-router.afterEach((to, from, failure) => {
-  console.log('[App.vue] Router afterEach:', {
-    from: from.path,
-    to: to.path,
-    fromName: from.name,
-    toName: to.name,
-    failure: failure?.message || null
-  })
-})
 
 // Lazy load heavy visual effect components with error handling
 const CartDrawer = defineAsyncComponent({
@@ -101,7 +93,6 @@ const isCartRoute = computed(() => route.name === 'cart')
 function updateRouteSEO() {
   const routeName = route.name
   const seoConfig = routeSEO[routeName]
-  console.log('[App.vue] updateRouteSEO:', { path: route.path, name: routeName, hasSeo: !!seoConfig })
 
   if (seoConfig) {
     updateMetaTags(seoConfig)
@@ -119,7 +110,6 @@ function updateRouteSEO() {
 // Refresh ScrollTrigger and update SEO on every route change
 let routeWatchDebounce = null
 watch(() => route.path, async (newPath, oldPath) => {
-  console.log('[App.vue] route.path changed:', { old: oldPath, new: newPath })
   if (newPath === oldPath) return
 
   // Close cart drawer on navigation (only if open)
@@ -145,14 +135,13 @@ watch(() => route.path, async (newPath, oldPath) => {
       initGlobalAnimations()
       refreshScrollTriggers(100)
     } catch (e) {
-      console.warn('[App.vue] Route watch error:', e)
+      // Silent fail - animations may not be initialized
     }
     routeWatchDebounce = null
   }, 100)
 })
 
 onMounted(() => {
-  console.log('[App.vue] onMounted, current route:', route.path, route.name)
   authStore.initialize()
   themeStore.init()
   initGlobalAnimations()

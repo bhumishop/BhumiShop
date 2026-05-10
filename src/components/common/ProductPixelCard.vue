@@ -223,20 +223,13 @@ function formatPrice(value) {
 }
 
 function handleSeeProduct() {
-  console.log('[ProductPixelCard] handleSeeProduct:', props.product.name,
-    'fulfillment_type:', props.product.fulfillment_type,
-    'isThirdParty:', isThirdParty.value,
-    'productUrl:', productUrl.value)
-
   // For third-party products (uma_penca, uiclap), open external URL
   if (isThirdParty.value) {
     const url = productUrl.value
     if (url) {
-      console.log('[ProductPixelCard] Opening external URL:', url)
       window.open(url, '_blank', 'noopener,noreferrer')
       return
     }
-    console.warn('[ProductPixelCard] No external URL found for third-party product')
     // Fallback: if no external URL set, go to local detail page
   }
   router.push(`/produtos/${props.product.id}`)
@@ -639,9 +632,9 @@ onUnmounted(() => {
 
 /* Digital badge - green */
 .product-pixel-card__badge--digital {
-  background: rgba(34, 197, 94, 0.65);
-  color: #ffffff;
-  border: 0.0625rem solid rgba(74, 222, 128, 0.2);
+  background: var(--success);
+  color: var(--text-primary);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.15);
   box-shadow:
     0 0.0625rem 0.25rem rgba(34, 197, 94, 0.15),
     inset 0 0.0625rem 0 rgba(255, 255, 255, 0.12);
@@ -730,7 +723,7 @@ onUnmounted(() => {
 }
 
 .product-pixel-card:hover .product-pixel-card__name {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* Thin separator before footer */
@@ -779,7 +772,7 @@ onUnmounted(() => {
   justify-content: center;
   width: clamp(2rem, 4vw, 2.375rem);
   height: clamp(2rem, 4vw, 2.375rem);
-  color: #ffffff;
+  color: var(--text-primary);
   border: none;
   border-radius: var(--cart-radius);
   font-size: clamp(0.6rem, 1.2vw, 0.675rem);
@@ -789,7 +782,7 @@ onUnmounted(() => {
   transition: all 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
-  background: #2a2a2a;
+  background: var(--surface-3);
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
 }
@@ -797,7 +790,8 @@ onUnmounted(() => {
 .product-pixel-card__cart:hover {
   transform: translateY(clamp(-0.0625rem, -0.2vw, -0.1rem));
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
-  background: #333333;
+  background: var(--accent);
+  color: #fff;
 }
 
 .product-pixel-card__cart:active {
@@ -836,7 +830,7 @@ onUnmounted(() => {
 }
 
 .product-pixel-card:hover .product-pixel-card__price {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* ===== Add to Cart Button - Clean Modern ===== */
@@ -850,7 +844,7 @@ onUnmounted(() => {
   gap: clamp(0.3125rem, 1vw, 0.4375rem);
   height: clamp(2rem, 4vw, 2.375rem);
   padding: 0 clamp(0.75rem, 2vw, 1rem);
-  color: #ffffff;
+  color: var(--text-primary);
   border: none;
   border-radius: var(--add-radius);
   font-size: clamp(0.6rem, 1.2vw, 0.675rem);
@@ -861,7 +855,7 @@ onUnmounted(() => {
   transition: all 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--surface-3);
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.15);
 }
 
@@ -893,6 +887,8 @@ onUnmounted(() => {
 .product-pixel-card__add:hover {
   transform: translateY(clamp(-0.0625rem, -0.2vw, -0.1rem));
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
+  background: var(--accent);
+  color: #fff;
 }
 
 .product-pixel-card__add:active {

@@ -75,10 +75,7 @@
                 <span class="hero__stat-value">{{ productStore.categories.length }}</span>
                 <span class="hero__stat-label">{{ $t('home.statCategories') || 'Categories' }}</span>
               </div>
-              <div class="hero__stat">
-                <span class="hero__stat-value">100%</span>
-                <span class="hero__stat-label">{{ $t('home.statHandcrafted') || 'Handcrafted' }}</span>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -440,13 +437,13 @@ const galleryItems = computed(() => {
 }
 
 .hero__title-glitch::before {
-  color: #22c55e;
+  color: var(--success);
   z-index: -1;
   animation-delay: 0.1s;
 }
 
 .hero__title-glitch::after {
-  color: #8b5cf6;
+  color: var(--accent);
   z-index: -1;
   animation-delay: 0.2s;
 }
@@ -477,8 +474,8 @@ const galleryItems = computed(() => {
   font-size: clamp(0.55rem, 1vw, 0.7rem);
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: #ef4444;
-  text-shadow: 0 0 0.5rem rgba(239, 68, 68, 0.5);
+  color: var(--danger);
+  text-shadow: 0 0 0.5rem var(--danger-light);
   animation: vhs-rec-blink 1.5s ease-in-out infinite;
   position: relative;
 }

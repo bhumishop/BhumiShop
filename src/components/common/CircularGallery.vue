@@ -1,10 +1,10 @@
 <template>
-  <div ref="containerRef" class="circular-gallery-container relative w-full h-full overflow-hidden cursor-grab active:cursor-grabbing">
+  <div ref="containerRef" class="circular-gallery-container">
     <!-- Fallback for non-WebGL -->
     <div v-if="!webglSupported" class="w-full h-full overflow-y-auto p-4 md:p-8">
       <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 md:gap-6">
         <div v-for="(item, index) in displayItems" :key="index" class="rounded-lg overflow-hidden bg-gray-500/10 transition-transform hover:scale-[1.02]">
-          <img :src="item.image" alt="" loading="lazy" class="w-full h-[150px] md:h-[200px] object-cover block" />
+          <img :src="item.image" :alt="item.text || 'Gallery image'" loading="lazy" class="w-full h-[150px] md:h-[200px] object-cover block" />
         </div>
       </div>
     </div>

@@ -252,7 +252,6 @@ export const useProductStore = defineStore('products', () => {
     try {
       // Check cache first
       if (isCacheValid() && productsCache) {
-        console.log('[Products] Using cached products:', productsCache.length)
         products.value = productsCache
         totalCount.value = productsCache.length
         loading.value = false
@@ -265,17 +264,14 @@ export const useProductStore = defineStore('products', () => {
       let offset = 0
       const limit = 100
 
-      console.log('[Products] Fetching products via edge function...')
       while (true) {
         const result = await storefrontProducts.list({ limit, offset })
-        console.log(`[Products] Fetched batch at offset=${offset}: ${result.data?.length || 0} items`)
         if (!result.data || result.data.length === 0) break
         allProducts = allProducts.concat(result.data)
         if (result.data.length < limit) break
         offset += limit
       }
 
-      console.log('[Products] Total products fetched:', allProducts.length)
       products.value = allProducts
       totalCount.value = allProducts.length
 
@@ -285,7 +281,6 @@ export const useProductStore = defineStore('products', () => {
       invalidateRelatedCache()
     } catch (err) {
       error.value = err.message || t('stores.products.loadError')
-      console.error('[Products] fetchProducts error:', err)
     } finally {
       loading.value = false
     }
@@ -296,43 +291,35 @@ export const useProductStore = defineStore('products', () => {
     try {
       // Check cache first
       if (isCacheValid() && categoriesCache) {
-        console.log('[Products] Using cached categories:', categoriesCache.length)
         categories.value = categoriesCache
         return
       }
 
       // Use storefront edge function instead of direct DB access
-      console.log('[Products] Fetching categories via edge function...')
       const result = await storefrontProducts.categories()
       categories.value = result.data || []
-      console.log('[Products] Categories fetched:', categories.value.length)
 
       // Update cache
       categoriesCache = categories.value
       cacheTimestamp = Date.now()
     } catch (err) {
       error.value = err.message || t('stores.products.loadCategoriesError')
-      console.error('fetchCategories error:', err)
     }
   }
 
   async function fetchCollections() {
     try {
-      console.log('[Products] Fetching collections...')
       const { data, error: err } = await supabase
         .from('collections')
         .select('id, name, is_active, sort_order')
         .order('sort_order')
 
       if (err) {
-        console.warn('[Products] fetchCollections DB error:', err.message)
         collections.value = []
         return
       }
       collections.value = data || []
-      console.log('[Products] Collections fetched:', collections.value.length)
     } catch (err) {
-      console.warn('[Products] fetchCollections error:', err.message)
       collections.value = []
     }
   }
@@ -374,7 +361,6 @@ export const useProductStore = defineStore('products', () => {
       return data?.[0]
     } catch (err) {
       error.value = err.message || t('stores.products.addError')
-      console.error('addProduct error:', err)
       throw err
     }
   }
@@ -419,7 +405,6 @@ export const useProductStore = defineStore('products', () => {
       return data?.[0]
     } catch (err) {
       error.value = err.message || t('stores.products.updateError')
-      console.error('updateProduct error:', err)
       throw err
     }
   }
@@ -437,7 +422,6 @@ export const useProductStore = defineStore('products', () => {
       invalidateRelatedCache()
     } catch (err) {
       error.value = err.message || t('stores.products.deleteError')
-      console.error('deleteProduct error:', err)
       throw err
     }
   }
@@ -457,7 +441,6 @@ export const useProductStore = defineStore('products', () => {
       return data?.[0]
     } catch (err) {
       error.value = err.message || t('stores.products.addCategoryError')
-      console.error('addCategory error:', err)
       throw err
     }
   }
@@ -474,7 +457,6 @@ export const useProductStore = defineStore('products', () => {
       categories.value = categories.value.filter(c => c.id !== id)
     } catch (err) {
       error.value = err.message || t('stores.products.deleteCategoryError')
-      console.error('deleteCategory error:', err)
       throw err
     }
   }

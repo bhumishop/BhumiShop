@@ -73,22 +73,22 @@ const tooltipText = computed(() => {
 }
 
 .fulfillment-badge--uma_penca {
-  background: rgba(139, 92, 246, 0.12);
-  color: #7c3aed;
+  background: var(--accent-subtle);
+  color: var(--accent);
 }
 
 .fulfillment-badge--digital {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .fulfillment-badge--uiclap {
-  background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
+  background: var(--info-light);
+  color: var(--info);
 }
 
 .fulfillment-badge--third_party {
   background: rgba(107, 114, 128, 0.12);
-  color: #6b7280;
+  color: var(--text-muted);
 }
 </style>

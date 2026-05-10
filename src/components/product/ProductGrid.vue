@@ -231,7 +231,7 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
   .product-grid__masonry {
-    columns: 1;
+    columns: 2;
   }
 
   .product-grid__card-wrapper {
@@ -239,7 +239,7 @@ onUnmounted(() => {
   }
 
   .product-grid__skeleton {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: clamp(0.625rem, 2.5vw, 1rem);
   }
 

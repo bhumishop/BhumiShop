@@ -133,16 +133,12 @@ import ProductPixelCard from '../components/common/ProductPixelCard.vue'
 import BasePagination from '../components/common/BasePagination.vue'
 import FilterSidebar from '../components/common/FilterSidebar.vue'
 
-console.log('[ProductsView] Component script executing, route:', useRoute().path)
-
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
 const sortBy = ref('newest')
 const currentPage = ref(1)
 const filterSidebarRef = ref(null)
-
-console.log('[ProductsView] Component setup complete, route name:', route.name)
 
 // Computed for active filters count
 const hasActiveFilters = computed(() => {
@@ -188,7 +184,6 @@ function clearFilters() {
 // Sorted products
 const sortedProducts = computed(() => {
   const products = [...productStore.filteredProducts]
-  console.log('[ProductsView] sortedProducts: input count =', products.length, ', sortBy =', sortBy.value)
   switch (sortBy.value) {
     case 'price-asc':
       return products.sort((a, b) => (a.price || 0) - (b.price || 0))
@@ -217,7 +212,6 @@ function setPage(page) {
 // Cleanup route watcher on unmount
 let routeWatchCleanup = null
 onMounted(async () => {
-  console.log('[ProductsView] onMounted START - route:', route.path, 'name:', route.name)
   // Fetch products and categories together (both use edge functions)
   await Promise.all([
     productStore.fetchProducts(),
@@ -225,10 +219,6 @@ onMounted(async () => {
   ])
   // Fetch collections separately (uses direct Supabase, shouldn't block products)
   await productStore.fetchCollections()
-
-  console.log('[ProductsView] After fetch - products:', productStore.products.length, ', filtered:', productStore.filteredProducts.length, ', categories:', productStore.categories.length)
-  console.log('[ProductsView] loading:', productStore.loading, ', error:', productStore.error)
-  console.log('[ProductsView] sortedProducts:', sortedProducts.value.length)
 
   routeWatchCleanup = watch(() => route.query.category, (val) => {
     if (val) {
@@ -241,7 +231,6 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  console.log('[ProductsView] onUnmounted')
   if (routeWatchCleanup) routeWatchCleanup()
 })
 </script>

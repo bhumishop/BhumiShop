@@ -515,6 +515,16 @@ onUnmounted(() => {
   gap: 0.375rem;
 }
 
+.header__utils .lang-switcher {
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .header__utils .lang-switcher {
+    display: none;
+  }
+}
+
 /* User actions */
 .header__user-actions {
   display: flex;

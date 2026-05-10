@@ -345,7 +345,7 @@ defineExpose({ cep, results, selectedState })
 }
 
 .shipping-calculator__result-cost--free {
-  color: #10b981;
+  color: var(--success);
   font-family: var(--font-body);
 }
 

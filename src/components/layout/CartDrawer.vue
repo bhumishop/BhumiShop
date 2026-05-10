@@ -547,11 +547,11 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: clamp(0.625rem, 1.2vw, 0.75rem) clamp(1.25rem, 2.5vw, 1.5rem);
-  background: rgba(139, 92, 246, 0.08);
-  border-top: 0.0625rem solid rgba(139, 92, 246, 0.2);
-  border-bottom: 0.0625rem solid rgba(139, 92, 246, 0.2);
+  background: var(--accent-light);
+  border-top: 0.0625rem solid var(--accent-subtle);
+  border-bottom: 0.0625rem solid var(--accent-subtle);
   font-size: clamp(0.7rem, 1.2vw, 0.75rem);
-  color: #7c3aed;
+  color: var(--accent);
   flex-shrink: 0;
 }
 

@@ -308,18 +308,18 @@ function confirm() {
 }
 
 .provider-card__method--pix {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: var(--info-light);
+  color: var(--info);
 }
 
 .provider-card__method--card {
-  background: #fef3c7;
-  color: #b45309;
+  background: var(--warning-light);
+  color: var(--warning);
 }
 
 .provider-card__method--intl {
-  background: #ede9fe;
-  color: #7c3aed;
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
 .provider-card__flags {
