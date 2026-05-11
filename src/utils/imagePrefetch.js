@@ -92,6 +92,8 @@ export function createImagePrefetchObserver({ rootMargin = '200px' } = {}) {
   }
 }
 
+import { transformProductImage } from './imageTransform'
+
 /**
  * Prefetch product images from a list
  */
@@ -100,7 +102,7 @@ export function prefetchProductImages(products, maxCount = 12) {
 
   const imagesToPrefetch = products
     .slice(0, maxCount)
-    .map((p) => p.image)
+    .map((p) => transformProductImage(p.image))
     .filter(Boolean)
     .filter((img) => !img.startsWith('data:'))
 
