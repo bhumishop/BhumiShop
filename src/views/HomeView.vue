@@ -860,7 +860,8 @@ function updateGalleryOffset() {
   }
 
   .hero__content {
-    padding: clamp(0.75rem, 2vh, 1rem) 0;
+    padding: clamp(0rem, 1vh, 1rem) 0;
+    padding-top: clamp(3rem, 8vh, 4rem);
   }
 
   .hero__inner {
