@@ -21,7 +21,7 @@
       easing="ease-out"
       :extra-scale="1.1"
     >
-      <div class="app-content-wrapper">
+      <div class="app-content-wrapper paper-texture">
         <!-- Velvet texture overlay -->
         <div class="velvet-texture" aria-hidden="true"></div>
         <AppHeader />
