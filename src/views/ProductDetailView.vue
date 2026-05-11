@@ -9,50 +9,44 @@
       <span>{{ product.name }}</span>
     </nav>
 
-    <div class="product-detail__embedded-layout">
-      <!-- Embedded iframe -->
-      <div class="product-detail__embedded-iframe">
-        <div v-if="!iframeLoaded" class="product-detail__iframe-loading">
-          <div class="product-detail__loading-spinner">
-            <svg class="product-detail__spinner" width="40" height="40" viewBox="0 0 40 40">
-              <circle class="product-detail__spinner-track" cx="20" cy="20" r="16" fill="none" stroke-width="3"/>
-              <circle class="product-detail__spinner-path" cx="20" cy="20" r="16" fill="none" stroke-width="3"/>
-            </svg>
-            <p>Loading product preview...</p>
-          </div>
-        </div>
-        <iframe
-          :src="productUrl"
-          class="product-detail__iframe"
-          frameborder="0"
-          allowfullscreen
-          loading="lazy"
-          @load="iframeLoaded = true"
-        ></iframe>
-      </div>
+    <!-- External store link -->
+    <div class="product-detail__external-store-cta">
+      <a
+        :href="productUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="product-detail__external-link-large"
+      >
+        <span>{{ isUmaPenca ? 'Comprar na Uma Penca' : 'Comprar na UICLAP' }}</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+      </a>
+    </div>
 
-      <!-- Product info sidebar -->
-      <div class="product-detail__embedded-info">
-        <div class="product-detail__header">
-          <BaseBadge :variant="isUmaPenca ? 'accent' : 'accent'" size="sm">
-            {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
-          </BaseBadge>
-          <span class="product-detail__store-label">Sold by {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}</span>
-        </div>
-        <h1 class="product-detail__name">{{ product.name }}</h1>
-        <div class="product-detail__price-row">
-          <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
-        </div>
-        <p v-if="product.description" class="product-detail__desc">{{ truncatedDescription }}</p>
-        <a :href="productUrl" target="_blank" rel="noopener noreferrer" class="product-detail__external-link">
-          {{ $t('productDetail.viewOnExternalStore', 'View on external store') }}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-            <polyline points="15 3 21 3 21 9"/>
-            <line x1="10" y1="14" x2="21" y2="3"/>
-          </svg>
-        </a>
+    <!-- Product info -->
+    <div class="product-detail__embedded-info">
+      <div class="product-detail__header">
+        <BaseBadge :variant="isUmaPenca ? 'accent' : 'accent'" size="sm">
+          {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
+        </BaseBadge>
+        <span class="product-detail__store-label">Sold by {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}</span>
       </div>
+      <h1 class="product-detail__name">{{ product.name }}</h1>
+      <div class="product-detail__price-row">
+        <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
+      </div>
+      <p v-if="product.description" class="product-detail__desc">{{ truncatedDescription }}</p>
+      <a :href="productUrl" target="_blank" rel="noopener noreferrer" class="product-detail__external-link">
+        {{ $t('productDetail.viewOnExternalStore', 'View on external store') }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+      </a>
     </div>
 
     <!-- Other in-stock products below -->
@@ -820,9 +814,6 @@ function openRelatedProduct(item) {
   window.scrollTo({ top: 0, behavior: 'instant' })
 }
 
-// Track iframe loading state
-const iframeLoaded = ref(false)
-
 onMounted(async () => {
   // Fetch products and categories in parallel only if needed
   // These use edge function caching so they're fast on subsequent calls
@@ -1392,6 +1383,33 @@ async function addToCart() {
 .product-detail__external-link:hover {
   background: var(--accent-subtle-hover, rgba(139, 92, 246, 0.15));
   transform: translateY(-0.0625rem);
+}
+
+.product-detail__external-store-cta {
+  margin: clamp(1rem, 3vh, 2rem) 0;
+}
+
+.product-detail__external-link-large {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 28rem;
+  padding: clamp(1rem, 2vw, 1.25rem) clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  font-weight: 600;
+  color: white;
+  background: var(--accent);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.product-detail__external-link-large:hover {
+  background: var(--accent-hover, #7c3aed);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1rem rgba(139, 92, 246, 0.3);
 }
 
 /* Not found */
