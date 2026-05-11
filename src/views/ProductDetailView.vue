@@ -269,6 +269,7 @@
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../utils/brokenImages'
 import { useProductStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useToastStore } from '../stores/toast'
@@ -297,6 +298,9 @@ const imageError = ref(false)
 
 function handleImageError() {
   imageError.value = true
+  if (thirdPartyDisplayImage.value) {
+    markImageUrlAsBroken(thirdPartyDisplayImage.value)
+  }
 }
 
 const product = computed(() => productStore.getProductById(route.params.id))
@@ -779,6 +783,10 @@ const thirdPartyDisplayImage = computed(() => {
   // For t-shirts: replace 000_image with 001_image to show actual tshirt
   if (img.includes('000_image')) {
     img = img.replace('000_image', '001_image')
+  }
+  // Skip broken CDN URLs
+  if (img.startsWith('http') && isLikelyBrokenCdnUrl(img)) {
+    return ''
   }
   return img
 })
