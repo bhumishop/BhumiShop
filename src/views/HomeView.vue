@@ -841,7 +841,7 @@ function updateGalleryOffset() {
   display: flex;
   flex-direction: column;
   z-index: 1;
-  margin-top: clamp(3rem, 8vh, 6rem);
+  margin-top: clamp(1.5rem, 4vh, 3rem);
 }
 
 .circular-gallery-section .container {
