@@ -288,7 +288,7 @@ const galleryItems = computed(() => {
     if (!img || (!img.startsWith('data:') && !img.startsWith('http'))) {
       img = ''
     }
-    return { image: img }
+    return { image: img, url: `/produtos/${product.id}` }
   })
 })
 

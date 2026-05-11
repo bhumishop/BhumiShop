@@ -1,9 +1,9 @@
 <template>
-  <div ref="containerRef" class="circular-gallery-container">
+  <div ref="containerRef" class="circular-gallery-container" @click="handleClick">
     <!-- Fallback for non-WebGL -->
     <div v-if="!webglSupported" class="gallery-fallback">
       <div class="gallery-grid">
-        <div v-for="(item, index) in displayItems" :key="index" class="gallery-item">
+        <div v-for="(item, index) in displayItems" :key="index" class="gallery-item" :data-url="item.url" @click.stop="navigateTo(item.url)">
           <img :src="item.image" :alt="item.text || 'Gallery image'" loading="lazy" class="gallery-img" />
         </div>
       </div>
@@ -13,11 +13,12 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, useTemplateRef, ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform } from 'ogl';
 import { useGalleryStore } from '../../stores/gallery';
 
 interface CircularGalleryProps {
-  items?: { image: string; text?: string }[];
+  items?: { image: string; text?: string; url?: string }[];
   bend?: number;
   borderRadius?: number;
   scrollSpeed?: number;
@@ -34,6 +35,18 @@ const props = withDefaults(defineProps<CircularGalleryProps>(), {
 const containerRef = useTemplateRef<HTMLDivElement>('containerRef');
 const webglSupported = ref(true);
 const galleryStore = useGalleryStore();
+const router = useRouter();
+
+function navigateTo(url?: string) {
+  if (url) {
+    router.push(url)
+  }
+}
+
+function handleClick(event: MouseEvent | TouchEvent) {
+  // For WebGL mode, raycasting would be needed to determine which item was clicked
+  // For now, we rely on the fallback click handlers
+}
 let app: App | null = null;
 let hasInitialized = false;
 
@@ -52,7 +65,7 @@ const displayItems = computed(() => {
   if (!props.items || props.items.length === 0) {
     return []
   }
-  return props.items.map(item => ({ image: item.image }))
+  return props.items.map(item => ({ image: item.image, url: item.url }))
 });
 
 type GL = Renderer['gl'];
@@ -368,6 +381,7 @@ class App {
   boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void;
   boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void;
   boundOnTouchUp!: () => void;
+  boundOnClick!: (e: MouseEvent) => void;
 
   isDown: boolean = false;
   start: number = 0;
@@ -611,6 +625,7 @@ class App {
     this.boundOnTouchDown = this.onTouchDown.bind(this);
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
+    this.boundOnClick = this.onClick.bind(this);
 
     window.addEventListener('resize', this.boundOnResize);
 
@@ -622,6 +637,26 @@ class App {
     window.addEventListener('mouseup', this.boundOnTouchUp);
     window.addEventListener('touchmove', this.boundOnTouchMove, { passive: false });
     window.addEventListener('touchend', this.boundOnTouchUp);
+
+    // Click to navigate
+    this.container.addEventListener('click', this.boundOnClick);
+  }
+
+  onClick(e: MouseEvent) {
+    if (!this.medias || this.medias.length === 0) return
+    
+    // Calculate which item was clicked based on scroll position
+    const clickX = e.clientX - this.container.getBoundingClientRect().left
+    const containerWidth = this.container.clientWidth
+    const itemWidth = this.medias[0].width
+    const centerOffset = this.scroll.current + (clickX / containerWidth) * itemWidth
+    const itemIndex = Math.floor(Math.abs(centerOffset) / itemWidth) % (this.medias.length / 2)
+    
+    // Get the original item (not duplicated)
+    const originalIndex = itemIndex
+    if (props.items && props.items[originalIndex]?.url) {
+      router.push(props.items[originalIndex].url)
+    }
   }
 
   destroy() {
@@ -640,6 +675,7 @@ class App {
 
     this.container.removeEventListener('mousedown', this.boundOnTouchDown);
     this.container.removeEventListener('touchstart', this.boundOnTouchDown);
+    this.container.removeEventListener('click', this.boundOnClick);
 
     // Dispose media textures first
     if (this.medias) {
