@@ -13,11 +13,12 @@
     <div class="product-detail__third-party-layout">
       <div class="product-detail__image-wrapper">
         <img
-          v-if="displayImage"
-          :src="displayImage"
+          v-if="thirdPartyDisplayImage && !imageError"
+          :src="thirdPartyDisplayImage"
           :alt="product.name"
           class="product-detail__image"
           loading="lazy"
+          @error="handleImageError"
         />
         <div v-else class="product-detail__image-placeholder">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -292,6 +293,11 @@ const selectedSize = ref(null)
 const selectedColor = ref(null)
 const quantity = ref(1)
 const addingToCart = ref(false)
+const imageError = ref(false)
+
+function handleImageError() {
+  imageError.value = true
+}
 
 const product = computed(() => productStore.getProductById(route.params.id))
 const isLoading = computed(() => productStore.products.length === 0 && productStore.categories.length === 0)
@@ -755,6 +761,26 @@ const productUrl = computed(() => {
   if (!product.value) return ''
   // Use product_url field if available, fallback to third_party_product_url
   return product.value.product_url || product.value.third_party_product_url || ''
+})
+
+/** Display image for third-party products */
+const thirdPartyDisplayImage = computed(() => {
+  const p = product.value
+  if (!p) return ''
+  let img = p.image || ''
+  if (!img) return ''
+  // Transform old jsDelivr URLs to raw GitHub URLs
+  if (img.includes('cdn.jsdelivr.net/gh')) {
+    img = img.replace(
+      /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
+      'https://raw.githubusercontent.com/$1/$2/$3/'
+    )
+  }
+  // For t-shirts: replace 000_image with 001_image to show actual tshirt
+  if (img.includes('000_image')) {
+    img = img.replace('000_image', '001_image')
+  }
+  return img
 })
 
 /** Truncated description for the embedded sidebar */
