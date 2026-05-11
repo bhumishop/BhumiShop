@@ -9,44 +9,52 @@
       <span>{{ product.name }}</span>
     </nav>
 
-    <!-- External store link -->
-    <div class="product-detail__external-store-cta">
-      <a
-        :href="productUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="product-detail__external-link-large"
-      >
-        <span>{{ isUmaPenca ? 'Comprar na Uma Penca' : 'Comprar na UICLAP' }}</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-          <polyline points="15 3 21 3 21 9"/>
-          <line x1="10" y1="14" x2="21" y2="3"/>
-        </svg>
-      </a>
-    </div>
+    <!-- Product image -->
+    <div class="product-detail__third-party-layout">
+      <div class="product-detail__image-wrapper">
+        <img
+          v-if="displayImage"
+          :src="displayImage"
+          :alt="product.name"
+          class="product-detail__image"
+          loading="lazy"
+        />
+        <div v-else class="product-detail__image-placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+      </div>
 
-    <!-- Product info -->
-    <div class="product-detail__embedded-info">
-      <div class="product-detail__header">
-        <BaseBadge :variant="isUmaPenca ? 'accent' : 'accent'" size="sm">
-          {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
-        </BaseBadge>
-        <span class="product-detail__store-label">Sold by {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}</span>
+      <!-- Product info + button -->
+      <div class="product-detail__embedded-info">
+        <div class="product-detail__header">
+          <BaseBadge :variant="isUmaPenca ? 'accent' : 'success'" size="sm">
+            {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}
+          </BaseBadge>
+          <span class="product-detail__store-label">Sold by {{ isUmaPenca ? 'Uma Penca' : 'UICLAP' }}</span>
+        </div>
+        <h1 class="product-detail__name">{{ product.name }}</h1>
+        <div class="product-detail__price-row">
+          <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
+        </div>
+        <p v-if="product.description" class="product-detail__desc">{{ truncatedDescription }}</p>
+        <a
+          :href="productUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="product-detail__external-link-large"
+        >
+          <span>{{ isUmaPenca ? 'Comprar na Uma Penca' : 'Comprar na UICLAP' }}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
       </div>
-      <h1 class="product-detail__name">{{ product.name }}</h1>
-      <div class="product-detail__price-row">
-        <p class="product-detail__price">R$ {{ formatPrice(product.price) }}</p>
-      </div>
-      <p v-if="product.description" class="product-detail__desc">{{ truncatedDescription }}</p>
-      <a :href="productUrl" target="_blank" rel="noopener noreferrer" class="product-detail__external-link">
-        {{ $t('productDetail.viewOnExternalStore', 'View on external store') }}
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-          <polyline points="15 3 21 3 21 9"/>
-          <line x1="10" y1="14" x2="21" y2="3"/>
-        </svg>
-      </a>
     </div>
 
     <!-- Other in-stock products below -->
@@ -1275,12 +1283,44 @@ async function addToCart() {
   width: 100%;
 }
 
-/* ========== EMBEDDED PRODUCT PAGE (umapenca/uiclap) ========== */
-.product-detail__embedded-layout {
+/* ========== THIRD-PARTY PRODUCT PAGE (umapenca/uiclap) ========== */
+.product-detail__third-party-layout {
   display: grid;
-  grid-template-columns: 1fr clamp(18rem, 25vw, 20rem);
-  gap: clamp(1rem, 2vw, 1.5rem);
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: start;
+}
+
+@media (min-width: 768px) {
+  .product-detail__third-party-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+}
+
+.product-detail__image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-1);
+  border: 0.0625rem solid var(--border);
+}
+
+.product-detail__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail__image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
 }
 
 .product-detail__embedded-iframe {
