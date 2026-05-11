@@ -169,14 +169,8 @@ const collections = computed(() => productStore.collections.filter(c => c.is_act
 const filteredFeaturedProducts = computed(() => {
   const products = productStore.products
   if (!selectedCollection.value) {
-    // Show one product from each collection
-    const byCollection = new Map()
-    products.forEach(p => {
-      if (p.collection_id && !byCollection.has(p.collection_id)) {
-        byCollection.set(p.collection_id, p)
-      }
-    })
-    return Array.from(byCollection.values()).slice(0, 6)
+    // Show products from all collections (up to 10)
+    return products.slice(0, 10)
   }
   return products.filter(p => p.collection_id === selectedCollection.value).slice(0, 12)
 })
