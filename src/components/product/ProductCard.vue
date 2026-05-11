@@ -108,10 +108,15 @@ const isTall = computed(() => props.size === 'tall')
 /**
  * Get the correct display image. For t-shirts, product.image points to
  * a 000 FULLCOLOR swatch. Replace 000_image with 001_image.
+ * For mugs/canecas, keep 000_image (no transformation).
  */
 const displayImage = computed(() => {
   let img = props.product.image || ''
-  if (img && img.includes('000_image')) {
+  // Only transform for t-shirts, not mugs/canecas
+  const cat = (props.product.category || '').toLowerCase()
+  const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') || cat.includes('tshirt') || cat.includes('shirt')
+  const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
+  if (img && img.includes('000_image') && isTshirt && !isMug) {
     img = img.replace('000_image', '001_image')
   }
   return img

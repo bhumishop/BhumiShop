@@ -743,8 +743,11 @@ const relatedProducts = computed(() => {
 
     // Get the correct display image: for t-shirts, product.image points to
     // a 000 FULLCOLOR swatch. Replace 000_image with 001_image in the URL.
+    // Only transform for t-shirts, not mugs/canecas
     let displayImg = p.image || ''
-    if (displayImg && displayImg.includes('000_image')) {
+    const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') || cat.includes('tshirt') || cat.includes('shirt')
+    const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
+    if (displayImg && displayImg.includes('000_image') && isTshirt && !isMug) {
       displayImg = displayImg.replace('000_image', '001_image')
     }
 
@@ -780,8 +783,12 @@ const thirdPartyDisplayImage = computed(() => {
       'https://raw.githubusercontent.com/$1/$2/$3/'
     )
   }
+  // Only transform for t-shirts, not mugs/canecas
+  const cat = (p.category || '').toLowerCase()
+  const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') || cat.includes('tshirt') || cat.includes('shirt')
+  const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
   // For t-shirts: replace 000_image with 001_image to show actual tshirt
-  if (img.includes('000_image')) {
+  if (img.includes('000_image') && isTshirt && !isMug) {
     img = img.replace('000_image', '001_image')
   }
   // Skip broken CDN URLs
@@ -835,7 +842,10 @@ const inStockProducts = computed(() => {
     height += variation
 
     let displayImg = p.image || ''
-    if (displayImg && displayImg.includes('000_image')) {
+    const imgCat = (p.category || '').toLowerCase()
+    const imgIsTshirt = imgCat.includes('camiseta') || imgCat.includes('t-shirt') || imgCat.includes('tshirt') || imgCat.includes('shirt')
+    const imgIsMug = imgCat.includes('caneca') || imgCat.includes('mug') || imgCat.includes('copo')
+    if (displayImg && displayImg.includes('000_image') && imgIsTshirt && !imgIsMug) {
       displayImg = displayImg.replace('000_image', '001_image')
     }
 

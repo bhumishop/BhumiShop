@@ -184,9 +184,13 @@ const displayImage = computed(() => {
       'https://raw.githubusercontent.com/$1/$2/$3/'
     )
   }
+  // Only transform for t-shirts, NOT for mugs/canecas
+  const cat = (p.category || '').toLowerCase()
+  const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') || cat.includes('tshirt') || cat.includes('shirt')
+  const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
   // For t-shirts: replace 000_image with 001_image in the URL
   // This swaps the FULLCOLOR swatch for the actual tshirt photo
-  if (img.includes('000_image')) {
+  if (img.includes('000_image') && isTshirt && !isMug) {
     img = img.replace('000_image', '001_image')
   }
   return img

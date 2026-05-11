@@ -330,8 +330,12 @@ const galleryItems = computed(() => {
   if (products.length === 0) return []
   return products.map((product) => {
     let img = product.image || ''
+    // Only transform for t-shirts, not mugs/canecas
+    const cat = (product.category || '').toLowerCase()
+    const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') || cat.includes('tshirt') || cat.includes('shirt')
+    const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
     // For t-shirts: replace 000_image with 001_image
-    if (img.includes('000_image')) {
+    if (img.includes('000_image') && isTshirt && !isMug) {
       img = img.replace('000_image', '001_image')
     }
     // Only use placeholder if no valid image
