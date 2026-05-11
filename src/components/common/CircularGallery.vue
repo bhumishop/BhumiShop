@@ -385,6 +385,8 @@ class App {
 
   isDown: boolean = false;
   start: number = 0;
+  hasMoved: boolean = false;
+  moveThreshold: number = 5;
 
   // IntersectionObserver for visibility-based rendering
   observer: IntersectionObserver | null = null;
@@ -511,6 +513,7 @@ class App {
 
   onTouchDown(e: MouseEvent | TouchEvent) {
     this.isDown = true;
+    this.hasMoved = false;
     this.scroll.position = this.scroll.current;
     // Prevent page scroll while dragging gallery
     if ('touches' in e) {
@@ -527,6 +530,11 @@ class App {
     }
     const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const distance = (this.start - x) * (this.scrollSpeed * 0.025);
+    
+    if (Math.abs(this.start - x) > this.moveThreshold) {
+      this.hasMoved = true;
+    }
+    
     this.scroll.target = (this.scroll.position ?? 0) + distance;
 
     // Calculate velocity for momentum tracking
@@ -643,6 +651,7 @@ class App {
   }
 
   onClick(e: MouseEvent) {
+    if (this.hasMoved) return;
     if (!this.medias || this.medias.length === 0) return
     
     // Calculate which item was clicked based on scroll position

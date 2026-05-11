@@ -124,15 +124,21 @@ onUnmounted(() => {
 }
 
 .product-grid__masonry {
-  columns: 4;
-  column-gap: clamp(0.75rem, 2vw, 1.25rem);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  align-items: start;
 }
 
 .product-grid__card-wrapper {
-  break-inside: avoid;
-  margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
-  /* Ensure each card is its own stacking context */
-  isolation: isolate;
+  /* Ensure consistent card sizing */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-grid__card-wrapper > * {
+  flex: 1;
 }
 
 .product-grid__skeleton {
@@ -188,7 +194,7 @@ onUnmounted(() => {
 /* ===== Responsive ===== */
 @media (max-width: 1200px) {
   .product-grid__masonry {
-    columns: 3;
+    grid-template-columns: repeat(3, 1fr);
   }
   .product-grid__skeleton {
     grid-template-columns: repeat(3, 1fr);
@@ -197,7 +203,7 @@ onUnmounted(() => {
 
 @media (max-width: 900px) {
   .product-grid__masonry {
-    columns: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
   .product-grid__skeleton {
     grid-template-columns: repeat(2, 1fr);
@@ -206,12 +212,8 @@ onUnmounted(() => {
 
 @media (max-width: 640px) {
   .product-grid__masonry {
-    columns: 2;
-    column-gap: clamp(0.5rem, 2vw, 0.75rem);
-  }
-
-  .product-grid__card-wrapper {
-    margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
   }
 
   .product-grid__skeleton {
@@ -231,16 +233,13 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
   .product-grid__masonry {
-    columns: 2;
-  }
-
-  .product-grid__card-wrapper {
-    margin-bottom: clamp(0.625rem, 2.5vw, 1rem);
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
   }
 
   .product-grid__skeleton {
     grid-template-columns: repeat(2, 1fr);
-    gap: clamp(0.625rem, 2.5vw, 1rem);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
   }
 
   .product-grid__empty {
@@ -250,11 +249,7 @@ onUnmounted(() => {
 
 @media (max-width: 360px) {
   .product-grid__masonry {
-    column-gap: clamp(0.375rem, 1.5vw, 0.5rem);
-  }
-
-  .product-grid__card-wrapper {
-    margin-bottom: clamp(0.375rem, 1.5vw, 0.5rem);
+    gap: clamp(0.375rem, 1.5vw, 0.5rem);
   }
 
   .product-grid__skeleton {

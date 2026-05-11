@@ -460,6 +460,8 @@ onUnmounted(() => {
   will-change: transform;
   transform: translateZ(0);
   z-index: 0;
+  min-width: 0;
+  height: 100%;
 }
 
 .product-pixel-card:hover {
@@ -525,16 +527,19 @@ onUnmounted(() => {
   overflow: hidden;
   z-index: 2;
   background: var(--surface-2);
+  min-height: 0;
+  flex: 1;
 }
 
 /* ===== Visual Section (image + pixel animation) ===== */
 .product-pixel-card__visual {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   background: var(--surface-1);
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .product-pixel-card__pixel-canvas {
@@ -655,11 +660,14 @@ onUnmounted(() => {
 .product-pixel-card__info {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.375rem, 1.25vw, 0.5rem);
-  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.875rem, 2.5vw, 1.125rem) clamp(0.875rem, 2.5vw, 1.125rem);
+  gap: clamp(0.25rem, 0.8vw, 0.375rem);
+  padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.625rem, 2vw, 0.875rem) clamp(0.625rem, 2vw, 0.875rem);
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   position: relative;
   z-index: 2;
+  justify-content: space-between;
 }
 
 /* Header: category + artist */
@@ -744,26 +752,42 @@ onUnmounted(() => {
   justify-content: space-between;
   margin-top: auto;
   padding-top: clamp(0.125rem, 0.5vw, 0.25rem);
-  gap: clamp(0.375rem, 1vw, 0.625rem);
-  min-height: 0;
+  gap: clamp(0.25rem, 0.75vw, 0.5rem);
+  flex-shrink: 0;
 }
 
 .product-pixel-card__actions {
   display: flex;
   align-items: center;
-  gap: clamp(0.25rem, 1vw, 0.5rem);
+  gap: clamp(0.1875rem, 0.75vw, 0.375rem);
   flex-shrink: 0;
-  min-width: 0;
 }
 
-/* Price block - allow shrinking on very small screens */
 .product-pixel-card__price-block {
   display: flex;
   align-items: baseline;
-  gap: clamp(0.0625rem, 0.3vw, 0.125rem);
+  gap: clamp(0.0625rem, 0.25vw, 0.125rem);
   flex-shrink: 1;
   min-width: 0;
-  max-width: 60%;
+}
+
+.product-pixel-card__currency {
+  font-family: var(--font-mono);
+  font-size: clamp(0.5rem, 1.1vw, 0.6rem);
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.product-pixel-card__price {
+  font-family: var(--font-mono);
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transition: color 0.3s ease;
 }
 
 /* Small cart icon button */
@@ -811,21 +835,23 @@ onUnmounted(() => {
 .product-pixel-card__price-block {
   display: flex;
   align-items: baseline;
-  gap: clamp(0.0625rem, 0.3vw, 0.125rem);
-  flex-shrink: 0;
+  gap: clamp(0.0625rem, 0.25vw, 0.125rem);
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .product-pixel-card__currency {
   font-family: var(--font-mono);
-  font-size: clamp(0.55rem, 1.2vw, 0.65rem);
+  font-size: clamp(0.5rem, 1.1vw, 0.6rem);
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .product-pixel-card__price {
   font-family: var(--font-mono);
-  font-size: clamp(0.875rem, 2.5vw, 1.1rem);
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.03em;
@@ -839,28 +865,28 @@ onUnmounted(() => {
 
 /* ===== Add to Cart Button - Clean Modern ===== */
 .product-pixel-card__add {
-  --add-radius: clamp(0.5rem, 1.5vw, 0.625rem);
+  --add-radius: clamp(0.375rem, 1vw, 0.5rem);
 
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.3125rem, 1vw, 0.4375rem);
-  height: clamp(2rem, 4vw, 2.375rem);
-  padding: 0 clamp(0.75rem, 2vw, 1rem);
+  gap: clamp(0.1875rem, 0.75vw, 0.3125rem);
+  height: clamp(1.875rem, 4vw, 2.25rem);
+  padding: 0 clamp(0.5rem, 1.5vw, 0.75rem);
   color: var(--text-primary);
   border: none;
   border-radius: var(--add-radius);
-  font-size: clamp(0.6rem, 1.2vw, 0.675rem);
+  font-size: clamp(0.55rem, 1.2vw, 0.65rem);
   font-weight: 500;
   font-family: var(--font-sans);
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  overflow: hidden;
   background: var(--surface-3);
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 /* Subtle shine overlay */
@@ -924,86 +950,24 @@ onUnmounted(() => {
   }
 
   .product-pixel-card__info {
-    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(0.75rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1rem);
-    gap: clamp(0.3125rem, 1vw, 0.4375rem);
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.5rem, 1.5vw, 0.75rem);
+    gap: clamp(0.25rem, 0.75vw, 0.375rem);
   }
 
   .product-pixel-card__name {
-    font-size: clamp(0.7rem, 2vw, 0.825rem);
+    font-size: clamp(0.65rem, 1.8vw, 0.8rem);
   }
 
   .product-pixel-card__price {
-    font-size: clamp(0.8rem, 2vw, 1rem);
-  }
-
-  .product-pixel-card__add {
-    height: clamp(1.875rem, 4vw, 2.25rem);
-    padding: 0 clamp(0.625rem, 2vw, 0.875rem);
-    font-size: clamp(0.55rem, 1.5vw, 0.65rem);
-    --add-radius: clamp(0.4375rem, 1vw, 0.5625rem);
-  }
-
-  .product-pixel-card__cart {
-    width: clamp(1.875rem, 4vw, 2.25rem);
-    height: clamp(1.875rem, 4vw, 2.25rem);
-    --cart-radius: clamp(0.4375rem, 1vw, 0.5625rem);
-  }
-
-  .product-pixel-card__badges {
-    top: clamp(0.5rem, 1.5vw, 0.625rem);
-    left: clamp(0.5rem, 1.5vw, 0.625rem);
-  }
-
-  .product-pixel-card__badge {
-    padding: clamp(0.1875rem, 0.6vw, 0.25rem) clamp(0.375rem, 1.2vw, 0.5625rem);
-    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
-  }
-}
-
-@media (max-width: 640px) {
-  .product-pixel-card__info {
-    padding: clamp(0.625rem, 2vw, 0.875rem) clamp(0.625rem, 2vw, 0.875rem) clamp(0.625rem, 2vw, 0.875rem);
-    gap: clamp(0.25rem, 1vw, 0.375rem);
-  }
-
-  .product-pixel-card__header {
-    gap: clamp(0.25rem, 1vw, 0.375rem);
-    min-height: clamp(0.875rem, 2vw, 1rem);
-  }
-
-  .product-pixel-card__category {
-    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
-    padding: clamp(0.0625rem, 0.4vw, 0.125rem) clamp(0.25rem, 0.8vw, 0.375rem);
-  }
-
-  .product-pixel-card__artist {
-    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
-  }
-
-  .product-pixel-card__name {
-    font-size: clamp(0.65rem, 2vw, 0.775rem);
-    -webkit-line-clamp: 1;
-  }
-
-  .product-pixel-card__price {
-    font-size: clamp(0.75rem, 2vw, 0.95rem);
-  }
-
-  .product-pixel-card__currency {
-    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
   }
 
   .product-pixel-card__add {
     height: clamp(1.75rem, 4vw, 2.125rem);
-    padding: 0 clamp(0.5rem, 2vw, 0.75rem);
-    font-size: clamp(0.5rem, 1.2vw, 0.625rem);
+    padding: 0 clamp(0.375rem, 1.25vw, 0.625rem);
+    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
     --add-radius: clamp(0.375rem, 1vw, 0.5rem);
-    gap: clamp(0.25rem, 0.8vw, 0.375rem);
-  }
-
-  .product-pixel-card__add svg {
-    width: clamp(0.75rem, 2vw, 0.875rem);
-    height: clamp(0.75rem, 2vw, 0.875rem);
+    gap: clamp(0.125rem, 0.5vw, 0.25rem);
   }
 
   .product-pixel-card__cart {
@@ -1012,25 +976,89 @@ onUnmounted(() => {
     --cart-radius: clamp(0.375rem, 1vw, 0.5rem);
   }
 
-  .product-pixel-card__cart svg {
-    width: clamp(0.8125rem, 2vw, 0.9375rem);
-    height: clamp(0.8125rem, 2vw, 0.9375rem);
-  }
-
   .product-pixel-card__badges {
-    top: clamp(0.375rem, 1.5vw, 0.5rem);
-    left: clamp(0.375rem, 1.5vw, 0.5rem);
-    gap: clamp(0.1875rem, 0.6vw, 0.25rem);
+    top: clamp(0.375rem, 1vw, 0.5rem);
+    left: clamp(0.375rem, 1vw, 0.5rem);
   }
 
   .product-pixel-card__badge {
     padding: clamp(0.125rem, 0.5vw, 0.1875rem) clamp(0.25rem, 0.8vw, 0.4375rem);
-    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
+    font-size: clamp(0.45rem, 1vw, 0.55rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .product-pixel-card__info {
+    padding: clamp(0.375rem, 1.25vw, 0.625rem) clamp(0.375rem, 1.25vw, 0.625rem) clamp(0.375rem, 1.25vw, 0.625rem);
+    gap: clamp(0.1875rem, 0.75vw, 0.3125rem);
+  }
+
+  .product-pixel-card__header {
+    gap: clamp(0.1875rem, 0.75vw, 0.3125rem);
+    min-height: clamp(0.75rem, 1.75vw, 1rem);
+  }
+
+  .product-pixel-card__category {
+    font-size: clamp(0.4rem, 1vw, 0.5rem);
+    padding: clamp(0.0625rem, 0.3vw, 0.125rem) clamp(0.1875rem, 0.6vw, 0.3125rem);
+  }
+
+  .product-pixel-card__artist {
+    font-size: clamp(0.45rem, 1vw, 0.55rem);
+  }
+
+  .product-pixel-card__name {
+    font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+    -webkit-line-clamp: 2;
+    line-height: 1.3;
+  }
+
+  .product-pixel-card__price {
+    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+  }
+
+  .product-pixel-card__currency {
+    font-size: clamp(0.45rem, 1vw, 0.55rem);
+  }
+
+  .product-pixel-card__add {
+    height: clamp(1.625rem, 4vw, 2rem);
+    padding: 0 clamp(0.3125rem, 1vw, 0.5rem);
+    font-size: clamp(0.45rem, 1.1vw, 0.575rem);
+    --add-radius: clamp(0.3125rem, 0.75vw, 0.4375rem);
+    gap: clamp(0.125rem, 0.5vw, 0.1875rem);
+  }
+
+  .product-pixel-card__add svg {
+    width: clamp(0.6875rem, 1.75vw, 0.8125rem);
+    height: clamp(0.6875rem, 1.75vw, 0.8125rem);
+  }
+
+  .product-pixel-card__cart {
+    width: clamp(1.625rem, 4vw, 2rem);
+    height: clamp(1.625rem, 4vw, 2rem);
+    --cart-radius: clamp(0.3125rem, 0.75vw, 0.4375rem);
+  }
+
+  .product-pixel-card__cart svg {
+    width: clamp(0.6875rem, 1.75vw, 0.8125rem);
+    height: clamp(0.6875rem, 1.75vw, 0.8125rem);
+  }
+
+  .product-pixel-card__badges {
+    top: clamp(0.3125rem, 1vw, 0.4375rem);
+    left: clamp(0.3125rem, 1vw, 0.4375rem);
+    gap: clamp(0.125rem, 0.5vw, 0.1875rem);
+  }
+
+  .product-pixel-card__badge {
+    padding: clamp(0.0625rem, 0.4vw, 0.125rem) clamp(0.1875rem, 0.6vw, 0.3125rem);
+    font-size: clamp(0.4rem, 1vw, 0.5rem);
   }
 
   .product-pixel-card__badge-icon {
-    width: clamp(0.375rem, 1.5vw, 0.5rem);
-    height: clamp(0.375rem, 1.5vw, 0.5rem);
+    width: clamp(0.3125rem, 1.25vw, 0.4375rem);
+    height: clamp(0.3125rem, 1.25vw, 0.4375rem);
   }
 }
 
@@ -1040,34 +1068,42 @@ onUnmounted(() => {
   }
 
   .product-pixel-card__info {
-    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 0.75rem);
-    gap: clamp(0.1875rem, 0.8vw, 0.3125rem);
+    padding: clamp(0.3125rem, 1vw, 0.5rem) clamp(0.3125rem, 1vw, 0.5rem) clamp(0.3125rem, 1vw, 0.5rem);
+    gap: clamp(0.125rem, 0.5vw, 0.25rem);
   }
 
   .product-pixel-card__header {
-    min-height: clamp(0.75rem, 2vw, 0.875rem);
+    min-height: clamp(0.625rem, 1.5vw, 0.875rem);
   }
 
   .product-pixel-card__category {
-    font-size: clamp(0.425rem, 1.2vw, 0.525rem);
-    padding: clamp(0.0625rem, 0.4vw, 0.125rem) clamp(0.1875rem, 0.6vw, 0.3125rem);
+    font-size: clamp(0.375rem, 1vw, 0.475rem);
+    padding: clamp(0.0625rem, 0.3vw, 0.1rem) clamp(0.125rem, 0.5vw, 0.25rem);
   }
 
   .product-pixel-card__artist {
-    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
+    font-size: clamp(0.4rem, 1vw, 0.5rem);
   }
 
   .product-pixel-card__name {
-    font-size: clamp(0.6rem, 2vw, 0.725rem);
-    line-height: 1.3;
+    font-size: clamp(0.55rem, 1.8vw, 0.7rem);
+    line-height: 1.25;
   }
 
   .product-pixel-card__price {
-    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    font-size: clamp(0.6rem, 1.8vw, 0.8rem);
   }
 
   .product-pixel-card__currency {
-    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
+    font-size: clamp(0.4rem, 1vw, 0.5rem);
+  }
+
+  .product-pixel-card__footer {
+    gap: clamp(0.1875rem, 0.75vw, 0.375rem);
+  }
+
+  .product-pixel-card__actions {
+    gap: clamp(0.125rem, 0.5vw, 0.25rem);
   }
 
   /* Icon-only button on mobile */
@@ -1076,51 +1112,49 @@ onUnmounted(() => {
   }
 
   .product-pixel-card__add {
-    width: clamp(1.75rem, 8vw, 2.125rem);
-    height: clamp(1.75rem, 8vw, 2.125rem);
-    min-width: 1.75rem;
-    min-height: 1.75rem;
-    --add-radius: clamp(0.375rem, 1vw, 0.5rem);
+    width: clamp(1.625rem, 8vw, 2rem);
+    height: clamp(1.625rem, 8vw, 2rem);
+    min-width: 1.625rem;
+    min-height: 1.625rem;
+    --add-radius: clamp(0.3125rem, 0.75vw, 0.4375rem);
     padding: 0;
+    flex-shrink: 0;
   }
 
   .product-pixel-card__add svg {
-    width: clamp(0.75rem, 2.5vw, 0.9375rem);
-    height: clamp(0.75rem, 2.5vw, 0.9375rem);
+    width: clamp(0.625rem, 2vw, 0.8125rem);
+    height: clamp(0.625rem, 2vw, 0.8125rem);
   }
 
   .product-pixel-card__cart {
-    width: clamp(1.75rem, 8vw, 2.125rem);
-    height: clamp(1.75rem, 8vw, 2.125rem);
-    min-width: 1.75rem;
-    min-height: 1.75rem;
-    --cart-radius: clamp(0.375rem, 1vw, 0.5rem);
+    width: clamp(1.625rem, 8vw, 2rem);
+    height: clamp(1.625rem, 8vw, 2rem);
+    min-width: 1.625rem;
+    min-height: 1.625rem;
+    --cart-radius: clamp(0.3125rem, 0.75vw, 0.4375rem);
   }
 
   .product-pixel-card__cart svg {
-    width: clamp(0.75rem, 2.5vw, 0.9375rem);
-    height: clamp(0.75rem, 2.5vw, 0.9375rem);
-  }
-
-  .product-pixel-card__footer {
-    gap: clamp(0.25rem, 1vw, 0.5rem);
-  }
-
-  .product-pixel-card__actions {
-    gap: clamp(0.25rem, 0.75vw, 0.375rem);
+    width: clamp(0.625rem, 2vw, 0.8125rem);
+    height: clamp(0.625rem, 2vw, 0.8125rem);
   }
 
   .product-pixel-card__badges {
-    top: clamp(0.25rem, 1.5vw, 0.375rem);
-    left: clamp(0.25rem, 1.5vw, 0.375rem);
-    right: clamp(0.25rem, 1.5vw, 0.375rem);
-    max-width: calc(100% - clamp(0.5rem, 3vw, 0.75rem));
+    top: clamp(0.1875rem, 1vw, 0.3125rem);
+    left: clamp(0.1875rem, 1vw, 0.3125rem);
+    right: clamp(0.1875rem, 1vw, 0.3125rem);
+    max-width: calc(100% - clamp(0.375rem, 2vw, 0.5rem));
   }
 
   .product-pixel-card__badge {
-    padding: clamp(0.0625rem, 0.4vw, 0.125rem) clamp(0.25rem, 0.8vw, 0.375rem);
-    font-size: clamp(0.4rem, 1.2vw, 0.5rem);
-    gap: clamp(0.125rem, 0.5vw, 0.1875rem);
+    padding: clamp(0.0625rem, 0.3vw, 0.1rem) clamp(0.125rem, 0.5vw, 0.25rem);
+    font-size: clamp(0.375rem, 1vw, 0.475rem);
+    gap: clamp(0.0625rem, 0.4vw, 0.125rem);
+  }
+
+  .product-pixel-card__badge-icon {
+    width: clamp(0.25rem, 1vw, 0.375rem);
+    height: clamp(0.25rem, 1vw, 0.375rem);
   }
 }
 
@@ -1130,20 +1164,20 @@ onUnmounted(() => {
   }
 
   .product-pixel-card__info {
-    padding: clamp(0.375rem, 2vw, 0.625rem) clamp(0.375rem, 2vw, 0.625rem) clamp(0.375rem, 2vw, 0.625rem);
-    gap: clamp(0.125rem, 0.6vw, 0.25rem);
+    padding: clamp(0.25rem, 1vw, 0.5rem) clamp(0.25rem, 1vw, 0.5rem) clamp(0.25rem, 1vw, 0.5rem);
+    gap: clamp(0.125rem, 0.4vw, 0.2rem);
   }
 
   .product-pixel-card__name {
-    font-size: clamp(0.55rem, 2vw, 0.675rem);
+    font-size: clamp(0.5rem, 1.8vw, 0.65rem);
   }
 
   .product-pixel-card__price {
-    font-size: clamp(0.65rem, 2vw, 0.85rem);
+    font-size: clamp(0.55rem, 1.8vw, 0.75rem);
   }
 
   .product-pixel-card__currency {
-    font-size: clamp(0.45rem, 1.2vw, 0.55rem);
+    font-size: clamp(0.375rem, 1vw, 0.475rem);
   }
 
   .product-pixel-card__add {
@@ -1151,13 +1185,13 @@ onUnmounted(() => {
     height: clamp(1.5rem, 9vw, 1.875rem);
     min-width: 1.5rem;
     min-height: 1.5rem;
-    --add-radius: clamp(0.3125rem, 1vw, 0.4375rem);
+    --add-radius: clamp(0.25rem, 0.75vw, 0.375rem);
     padding: 0;
   }
 
   .product-pixel-card__add svg {
-    width: clamp(0.6875rem, 2.5vw, 0.8125rem);
-    height: clamp(0.6875rem, 2.5vw, 0.8125rem);
+    width: clamp(0.5625rem, 2vw, 0.6875rem);
+    height: clamp(0.5625rem, 2vw, 0.6875rem);
   }
 
   .product-pixel-card__cart {
@@ -1165,57 +1199,57 @@ onUnmounted(() => {
     height: clamp(1.5rem, 9vw, 1.875rem);
     min-width: 1.5rem;
     min-height: 1.5rem;
-    --cart-radius: clamp(0.3125rem, 1vw, 0.4375rem);
+    --cart-radius: clamp(0.25rem, 0.75vw, 0.375rem);
   }
 
   .product-pixel-card__cart svg {
-    width: clamp(0.6875rem, 2.5vw, 0.8125rem);
-    height: clamp(0.6875rem, 2.5vw, 0.8125rem);
+    width: clamp(0.5625rem, 2vw, 0.6875rem);
+    height: clamp(0.5625rem, 2vw, 0.6875rem);
   }
 
   .product-pixel-card__actions {
-    gap: clamp(0.1875rem, 0.5vw, 0.3125rem);
+    gap: clamp(0.125rem, 0.4vw, 0.2rem);
   }
 
   .product-pixel-card__footer {
-    gap: clamp(0.1875rem, 0.75vw, 0.375rem);
+    gap: clamp(0.125rem, 0.5vw, 0.25rem);
   }
 
   .product-pixel-card__badges {
-    top: clamp(0.1875rem, 1.5vw, 0.3125rem);
-    left: clamp(0.1875rem, 1.5vw, 0.3125rem);
-    right: clamp(0.1875rem, 1.5vw, 0.3125rem);
-    max-width: calc(100% - clamp(0.375rem, 3vw, 0.625rem));
+    top: clamp(0.125rem, 1vw, 0.25rem);
+    left: clamp(0.125rem, 1vw, 0.25rem);
+    right: clamp(0.125rem, 1vw, 0.25rem);
+    max-width: calc(100% - clamp(0.25rem, 2vw, 0.375rem));
   }
 
   .product-pixel-card__badge {
-    padding: clamp(0.0625rem, 0.3vw, 0.1rem) clamp(0.1875rem, 0.6vw, 0.3125rem);
-    font-size: clamp(0.375rem, 1.2vw, 0.475rem);
-    gap: clamp(0.0625rem, 0.4vw, 0.125rem);
+    padding: clamp(0.0625rem, 0.25vw, 0.1rem) clamp(0.125rem, 0.5vw, 0.25rem);
+    font-size: clamp(0.35rem, 1vw, 0.45rem);
+    gap: clamp(0.0625rem, 0.3vw, 0.1rem);
   }
 
   .product-pixel-card__badge-icon {
-    width: clamp(0.3125rem, 1.5vw, 0.4375rem);
-    height: clamp(0.3125rem, 1.5vw, 0.4375rem);
+    width: clamp(0.25rem, 1vw, 0.375rem);
+    height: clamp(0.25rem, 1vw, 0.375rem);
   }
 }
 
 @media (max-width: 320px) {
   .product-pixel-card__info {
-    padding: 0.375rem;
+    padding: 0.25rem;
     gap: 0.125rem;
   }
 
   .product-pixel-card__name {
-    font-size: 0.55rem;
+    font-size: 0.5rem;
   }
 
   .product-pixel-card__price {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
   }
 
   .product-pixel-card__currency {
-    font-size: 0.45rem;
+    font-size: 0.375rem;
   }
 
   .product-pixel-card__add {
@@ -1223,13 +1257,13 @@ onUnmounted(() => {
     height: 1.5rem;
     min-width: 1.5rem;
     min-height: 1.5rem;
-    --add-radius: 0.3125rem;
+    --add-radius: 0.25rem;
     padding: 0;
   }
 
   .product-pixel-card__add svg {
-    width: 0.6875rem;
-    height: 0.6875rem;
+    width: 0.5625rem;
+    height: 0.5625rem;
   }
 
   .product-pixel-card__cart {
@@ -1237,38 +1271,38 @@ onUnmounted(() => {
     height: 1.5rem;
     min-width: 1.5rem;
     min-height: 1.5rem;
-    --cart-radius: 0.3125rem;
+    --cart-radius: 0.25rem;
   }
 
   .product-pixel-card__cart svg {
-    width: 0.6875rem;
-    height: 0.6875rem;
+    width: 0.5625rem;
+    height: 0.5625rem;
   }
 
   .product-pixel-card__actions {
-    gap: 0.1875rem;
+    gap: 0.125rem;
   }
 
   .product-pixel-card__footer {
-    gap: 0.1875rem;
+    gap: 0.125rem;
   }
 
   .product-pixel-card__badges {
-    top: 0.1875rem;
-    left: 0.1875rem;
-    right: 0.1875rem;
-    max-width: calc(100% - 0.375rem);
+    top: 0.125rem;
+    left: 0.125rem;
+    right: 0.125rem;
+    max-width: calc(100% - 0.25rem);
   }
 
   .product-pixel-card__badge {
-    padding: 0.0625rem 0.1875rem;
-    font-size: 0.375rem;
+    padding: 0.0625rem 0.125rem;
+    font-size: 0.35rem;
     gap: 0.0625rem;
   }
 
   .product-pixel-card__badge-icon {
-    width: 0.3125rem;
-    height: 0.3125rem;
+    width: 0.25rem;
+    height: 0.25rem;
   }
 }
 </style>
