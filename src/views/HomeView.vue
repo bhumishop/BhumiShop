@@ -276,13 +276,17 @@ onUnmounted(() => {
 const featuredProducts = computed(() => productStore.products.slice(0, 12))
 
 const galleryItems = computed(() => {
-  return productStore.products.slice(0, 6).map((product, index) => {
-    let img = product.image && (product.image.startsWith('data:') || product.image.startsWith('http'))
-      ? product.image
-      : `https://picsum.photos/800/600?random=${index + 1}`
+  const products = productStore.products.slice(0, 6)
+  if (products.length === 0) return []
+  return products.map((product) => {
+    let img = product.image || ''
     // For t-shirts: replace 000_image with 001_image
-    if (img && img.includes('000_image')) {
+    if (img.includes('000_image')) {
       img = img.replace('000_image', '001_image')
+    }
+    // Only use placeholder if no valid image
+    if (!img || (!img.startsWith('data:') && !img.startsWith('http'))) {
+      img = ''
     }
     return { image: img }
   })

@@ -48,23 +48,11 @@ function isWebGLAvailable(): boolean {
 }
 
 const displayItems = computed(() => {
-  const defaultItems = [
-    { image: 'https://picsum.photos/seed/1/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/2/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/3/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/4/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/5/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/16/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/17/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/8/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/9/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/10/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/21/800/600?grayscale' },
-    { image: 'https://picsum.photos/seed/12/800/600?grayscale' }
-  ];
-  return props.items && props.items.length
-    ? props.items.map(item => ({ image: item.image }))
-    : defaultItems;
+  // Only use fallback items if no items prop is provided at all
+  if (!props.items || props.items.length === 0) {
+    return []
+  }
+  return props.items.map(item => ({ image: item.image }))
 });
 
 type GL = Renderer['gl'];
@@ -462,21 +450,14 @@ class App {
     bend: number = 1,
     borderRadius: number
   ) {
-    const defaultItems = [
-      { image: `https://picsum.photos/seed/1/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/2/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/3/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/4/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/5/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/16/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/17/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/8/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/9/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/10/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/21/800/600?grayscale` },
-      { image: `https://picsum.photos/seed/12/800/600?grayscale` }
-    ];
-    const galleryItems = items && items.length ? items : defaultItems;
+    // Don't create gallery if no items
+    if (!items || items.length === 0) {
+      this.mediasImages = []
+      this.medias = []
+      galleryStore.setItems([])
+      return
+    }
+    const galleryItems = items
     this.mediasImages = galleryItems.concat(galleryItems);
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
