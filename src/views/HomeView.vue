@@ -106,12 +106,36 @@
         <div class="featured__header">
           <h2 class="featured__title">{{ $t('home.highlights') }}</h2>
         </div>
+
+        <!-- Collection Selector -->
+        <div class="collection-selector">
+          <button
+            v-for="collection in collections"
+            :key="collection.id"
+            class="collection-selector__btn"
+            :class="{ 'collection-selector__btn--active': selectedCollection === collection.id }"
+            @click="selectedCollection = collection.id"
+          >
+            {{ collection.name }}
+          </button>
+        </div>
+
         <ProductGrid
-          :products="featuredProducts"
+          :products="filteredFeaturedProducts"
           :loading="productStore.loading"
           :current-page="1"
           :total-pages="1"
         />
+
+        <!-- See More Button -->
+        <div class="featured__see-more">
+          <button class="see-more-btn" @click="router.push('/produtos')">
+            <span>Ver todos os produtos</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -133,9 +157,29 @@ const router = useRouter()
 const productStore = useProductStore()
 const featuredRef = ref(null)
 const heroRef = ref(null)
+const selectedCollection = ref(null)
 let ctx = null
 let productAnim = null
 let isNavigating = false
+
+// Get collections from product store
+const collections = computed(() => productStore.collections.filter(c => c.is_active !== false))
+
+// Featured products filtered by selected collection
+const filteredFeaturedProducts = computed(() => {
+  const products = productStore.products
+  if (!selectedCollection.value) {
+    // Show one product from each collection
+    const byCollection = new Map()
+    products.forEach(p => {
+      if (p.collection_id && !byCollection.has(p.collection_id)) {
+        byCollection.set(p.collection_id, p)
+      }
+    })
+    return Array.from(byCollection.values()).slice(0, 6)
+  }
+  return products.filter(p => p.collection_id === selectedCollection.value).slice(0, 12)
+})
 
 // Hero mouse tracking - direct DOM manipulation to avoid Vue reactivity overhead
 let heroMouseRafId = 0
@@ -180,10 +224,16 @@ onMounted(async () => {
   if (productStore.products.length === 0) {
     await Promise.all([
       productStore.fetchProducts(),
-      productStore.fetchCategories()
+      productStore.fetchCategories(),
+      productStore.fetchCollections()
     ])
-  } else if (productStore.categories.length === 0) {
-    await productStore.fetchCategories()
+  } else {
+    if (productStore.categories.length === 0) {
+      await productStore.fetchCategories()
+    }
+    if (productStore.collections.length === 0) {
+      await productStore.fetchCollections()
+    }
   }
 
   // Cache cursor glow element reference
@@ -689,6 +739,98 @@ function updateGalleryOffset() {
   font-size: clamp(1.25rem, 3vw + 0.25rem, 1.5rem);
   font-weight: 700;
   color: var(--text-primary);
+}
+
+/* Collection Selector */
+.collection-selector {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+}
+
+.collection-selector__btn {
+  padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 0.0625rem solid var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-selector__btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover, #7c3aed) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.collection-selector__btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.collection-selector__btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-0.125rem);
+}
+
+.collection-selector__btn--active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover, #7c3aed) 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 0.25rem 1rem rgba(139, 92, 246, 0.3);
+}
+
+.collection-selector__btn--active:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.375rem 1.25rem rgba(139, 92, 246, 0.4);
+}
+
+/* See More Button */
+.featured__see-more {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.see-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(0.875rem, 1.3vw, 1rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border: 0.0625rem solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.see-more-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.5rem 1rem rgba(139, 92, 246, 0.15);
+}
+
+.see-more-btn svg {
+  transition: transform var(--transition-fast);
+}
+
+.see-more-btn:hover svg {
+  transform: translateX(0.25rem);
 }
 
 /* Circular Gallery Section */
