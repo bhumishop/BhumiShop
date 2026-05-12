@@ -13,7 +13,6 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const buildDir = process.argv[2] || path.join(__dirname, '..', 'dist')
-const publicDir = path.join(__dirname, '..', 'public')
 
 // Routes that need SPA fallback HTML
 // Note: Product detail pages (/produtos/slug) are handled by the 404.html redirect
