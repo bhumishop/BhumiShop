@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const buildDir = process.argv[2] || path.join(__dirname, '..', 'dist')
+const publicDir = path.join(__dirname, '..', 'public')
 
 // Routes that need SPA fallback HTML
 // Note: Product detail pages (/produtos/slug) are handled by the 404.html redirect
@@ -64,6 +65,14 @@ function generateSpaFallbacks() {
   
   console.log(`\n[spa-fallbacks] Done! Created ${created} fallback HTML files.`)
   console.log('[spa-fallbacks] Product detail pages (/produtos/:slug) use the 404.html redirect fallback.')
+  
+  // Copy .nojekyll if it exists in project root
+  const nojekyllSrc = path.join(__dirname, '..', '.nojekyll')
+  const nojekyllDest = path.join(buildDir, '.nojekyll')
+  if (fs.existsSync(nojekyllSrc)) {
+    fs.copyFileSync(nojekyllSrc, nojekyllDest)
+    console.log('[spa-fallbacks] Copied .nojekyll to dist/')
+  }
 }
 
 generateSpaFallbacks()
