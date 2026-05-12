@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BhumiShop - Loading...</title>
   <script>
-    // GitHub Pages SPA fallback - redirect to index.html while preserving path
-    // This handles both static routes and dynamic product slug URLs
     (function() {
       var path = window.location.pathname;
       var search = window.location.search;
@@ -17,40 +15,33 @@
         return;
       }
 
-      // Detect the base path from the URL structure
-      // For GitHub Pages: path like /BhumiShop/produtos -> base = /BhumiShop/
-      // For custom domain: path like /produtos -> base = /
+      // Detect the base path - for custom domain use /
       var pathParts = path.split('/').filter(Boolean);
       var base = '/';
 
-      // Known app routes - if the first segment is one of these, we're at root level
-      // Now includes 'produtos' to handle both /produtos and /produtos/slug URLs
+      // Known app routes - handle both static routes and dynamic slugs like /produtos/slug
       var appRoutes = ['produtos', 'carrinho', 'checkout', 'login', 'minhas-compras', 'perfil', 'admin', 'sobre-nos', 'contato', 'faq', 'privacidade', 'termos', 'trocas', 'envio'];
 
       if (pathParts.length > 0 && !appRoutes.includes(pathParts[0].toLowerCase())) {
         // First segment is not an app route - likely the repo name for GitHub Pages
         base = '/' + pathParts[0] + '/';
-        // Adjust pathParts for the actual route
         pathParts = pathParts.slice(1);
       }
 
-      // Calculate the relative path from the base
-      var relativePath = path.replace(base, '/');
-      if (!relativePath.startsWith('/')) {
-        relativePath = '/' + relativePath;
+      // Build the SPA path from remaining parts
+      var spaPath = '/' + pathParts.join('/');
+      
+      // Store path for SPA router to handle
+      if (spaPath !== '/') {
+        sessionStorage.setItem('spa-redirect-path', spaPath + search + hash);
       }
 
-      // Only redirect if we're not already at the base path
-      if (path !== base) {
-        // Store the full path (including query and hash) so index.html can use it
-        sessionStorage.setItem('spa-redirect-path', relativePath + search + hash);
-        // Redirect to index.html at the detected base
-        window.location.href = base + 'index.html';
-      }
+      // Redirect to index.html
+      window.location.replace(base + 'index.html');
     })();
   </script>
 </head>
 <body>
-  <p>Redirecting...</p>
+  <p>Loading...</p>
 </body>
 </html>
