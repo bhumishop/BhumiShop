@@ -19,7 +19,6 @@ export const useOrderStore = defineStore('orders', () => {
       orders.value = result.data || []
     } catch (err) {
       error.value = err.message || t('stores.orders.loadError')
-      console.error('fetchOrders error:', err)
     } finally {
       loading.value = false
     }
@@ -35,7 +34,6 @@ export const useOrderStore = defineStore('orders', () => {
       return result.data
     } catch (err) {
       error.value = err.message || t('stores.orders.loadOrderError')
-      console.error('fetchOrderByNumber error:', err)
       return null
     } finally {
       loading.value = false
@@ -71,14 +69,13 @@ export const useOrderStore = defineStore('orders', () => {
       })
 
       if (result.duplicate) {
-        console.warn('Duplicate order detected via idempotency key:', orderData.idempotencyKey)
+        // Duplicate order detected - returning existing order
       }
 
       currentOrder.value = result.data
       return result.data
     } catch (err) {
       error.value = err.message || t('stores.orders.createError')
-      console.error('createOrder error:', err)
       throw err
     } finally {
       loading.value = false
@@ -101,7 +98,6 @@ export const useOrderStore = defineStore('orders', () => {
 
       if (err) throw err
     } catch (err) {
-      console.error('updateOrderPaymentStatus error:', err)
       throw err
     }
   }

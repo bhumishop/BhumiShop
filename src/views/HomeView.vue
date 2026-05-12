@@ -145,6 +145,7 @@
 import { computed, onMounted, onUnmounted, ref, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductStore } from '../stores/products'
+import { generateSlug } from '../utils/slug'
 import { scrollReveal, scrollBatch, staggerGrid, createAnimationContext, refreshScrollTriggers } from '../utils/animations'
 import { prefetchProductImages } from '../utils/imagePrefetch'
 import ProductGrid from '../components/product/ProductGrid.vue'
@@ -336,7 +337,7 @@ const galleryItems = computed(() => {
     if (!img || (!img.startsWith('data:') && !img.startsWith('http'))) {
       img = ''
     }
-    return { image: img, url: `/produtos/${product.id}` }
+    return { image: img, url: `/produtos/${generateSlug(product.name, product.id)}` }
   })
 })
 

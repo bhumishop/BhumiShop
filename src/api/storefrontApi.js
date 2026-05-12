@@ -74,7 +74,6 @@ export const storefrontProducts = {
     const url = new URL(`${EDGE_FUNCTION_BASE}/storefront-products`)
     url.searchParams.set('limit', String(limit))
     url.searchParams.set('offset', String(offset))
-    console.log('[storefrontApi] Calling edge function:', url.toString())
     return fetchEdgeFunction('GET', url.toString())
   },
 
@@ -83,7 +82,6 @@ export const storefrontProducts = {
    * @returns {Promise<{data: Array}>}
    */
   categories() {
-    console.log('[storefrontApi] Calling edge function: storefront-products/categories')
     return fetchEdgeFunction('GET', 'storefront-products/categories')
   }
 }

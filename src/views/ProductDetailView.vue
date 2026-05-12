@@ -273,6 +273,7 @@ import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../utils/brokenImage
 import { useProductStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useToastStore } from '../stores/toast'
+import { findProductBySlug, generateSlug } from '../utils/slug'
 import ProductGallery from '../components/product/ProductGallery.vue'
 import ProductVariants from '../components/product/ProductVariants.vue'
 import ProductColorSwatches from '../components/product/ProductColorSwatches.vue'
@@ -303,7 +304,7 @@ function handleImageError() {
   }
 }
 
-const product = computed(() => productStore.getProductById(route.params.id))
+const product = computed(() => findProductBySlug(productStore.products, route.params.slug))
 const isLoading = computed(() => productStore.products.length === 0 && productStore.categories.length === 0)
 
 /**
@@ -717,7 +718,7 @@ const hasPhysicalSpecs = computed(() => {
 
 const relatedProducts = computed(() => {
   if (!product.value) return []
-  const related = productStore.getRelatedProducts(route.params.id, 12)
+  const related = productStore.getRelatedProducts(product.value.id, 12)
 
   // Define stable heights based on product category for consistent layout
   const categoryHeightMap = {
@@ -754,7 +755,7 @@ const relatedProducts = computed(() => {
     return {
       id: String(p.id),
       img: displayImg,
-      url: `/produtos/${p.id}`,
+      url: `/produtos/${generateSlug(p.name, p.id)}`,
       name: p.name || '',
       price: p.price || 0,
       height,
@@ -852,7 +853,7 @@ const inStockProducts = computed(() => {
     return {
       id: String(p.id),
       img: displayImg,
-      url: `/produtos/${p.id}`,
+      url: `/produtos/${generateSlug(p.name, p.id)}`,
       name: p.name || '',
       price: p.price || 0,
       height,
@@ -881,7 +882,7 @@ onMounted(async () => {
   }
 })
 
-watch(() => route.params.id, () => {
+watch(() => route.params.slug, () => {
   selectedSize.value = null
   selectedColor.value = null
   quantity.value = 1

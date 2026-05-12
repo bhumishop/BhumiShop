@@ -279,7 +279,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
       return order
     } catch (err) {
       error.value = err.message || t('stores.checkout.paymentError')
-      console.error('processPayment error:', err)
       throw err
     } finally {
       loading.value = false
@@ -313,13 +312,11 @@ export const useCheckoutStore = defineStore('checkout', () => {
           await orderStore.updateOrderPaymentStatus(orderId, 'paid', pixData.value.id)
           toast.success(t('stores.checkout.pixConfirmed'))
         } else {
-          // Fallback: try to find order by pix_key
-          console.warn('No currentOrder found during PIX confirmation')
+          // No currentOrder found during PIX confirmation
         }
       }
       return { status, confirmed: status === 'paid' }
     } catch (err) {
-      console.error('checkPixStatus error:', err)
       return { status: null, confirmed: false }
     }
   }

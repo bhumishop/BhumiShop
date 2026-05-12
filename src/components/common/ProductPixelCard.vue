@@ -16,7 +16,7 @@
       <canvas class="product-pixel-card__pixel-canvas" ref="canvasRef" />
 
       <!-- Content overlaid on the pixel canvas (inside image area only) -->
-      <div class="product-pixel-card__image-layer" @click="$router.push(`/produtos/${product.id}`)">
+      <div class="product-pixel-card__image-layer" @click="$router.push(`/produtos/${productSlug}`)">
         <img
           v-if="shouldShowImage"
           :src="displayImage"
@@ -99,6 +99,7 @@ import { useCartStore } from '../../stores/cart'
 import { useProductStore } from '../../stores/products'
 import { useToastStore } from '../../stores/toast'
 import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../../utils/brokenImages'
+import { generateSlug } from '../../utils/slug'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -111,6 +112,7 @@ const props = defineProps({
 const cartStore = useCartStore()
 const productStore = useProductStore()
 const toast = useToastStore()
+const productSlug = computed(() => generateSlug(props.product.name, props.product.id))
 
 // Pixel animation refs
 const pixelContainerRef = ref(null)
@@ -236,7 +238,7 @@ function handleSeeProduct() {
     }
     // Fallback: if no external URL set, go to local detail page
   }
-  router.push(`/produtos/${props.product.id}`)
+  router.push(`/produtos/${productSlug.value}`)
 }
 
 function addToCart() {

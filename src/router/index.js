@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useProductStore } from '../stores/products'
+import { findProductBySlug } from '../utils/slug'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,9 +17,20 @@ const router = createRouter({
       component: () => import('../views/ProductsView.vue')
     },
     {
-      path: '/produtos/:id',
+      path: '/produtos/:slug',
       name: 'product-detail',
-      component: () => import('../views/ProductDetailView.vue')
+      component: () => import('../views/ProductDetailView.vue'),
+      beforeEnter: async (to) => {
+        // Ensure products are loaded before resolving route
+        const productStore = useProductStore()
+        if (productStore.products.length === 0) {
+          await productStore.fetchProducts()
+        }
+        const product = findProductBySlug(productStore.products, to.params.slug)
+        if (!product) {
+          return { name: 'not-found', replace: true }
+        }
+      }
     },
     {
       path: '/carrinho',
@@ -107,19 +120,23 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore()
 
-  // Only initialize auth when actually needed (protected routes, guest routes, or admin)
-  // Skip auth check for purely public routes like home and products
-  const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest
+  // Handle OAuth callback (Supabase returns with hash params)
+  // Must check before guest/authenticated redirects to process the callback properly
+  const hasOAuthHash = to.hash && (to.hash.includes('access_token') || to.hash.includes('error'))
+
+  // Initialize auth for OAuth callbacks, protected routes, guest routes, or admin
+  const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest || hasOAuthHash
 
   if (needsAuthCheck && !authStore.initialized) {
     await authStore.initialize()
   }
 
-  // Handle OAuth callback (Supabase returns with hash params)
-  // Must check before guest/authenticated redirects to process the callback properly
-  if (to.hash && (to.hash.includes('access_token') || to.hash.includes('error'))) {
-    // Let the auth component handle the OAuth callback
-    return
+  // If this is an OAuth callback and user is now authenticated, redirect to home or redirect URL
+  if (hasOAuthHash && authStore.isLoggedIn) {
+    // Clear the hash from URL and redirect
+    const redirect = to.query.redirect || '/'
+    const target = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'
+    return { path: target, replace: true }
   }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {

@@ -49,11 +49,20 @@ export const useAuthStore = defineStore('auth', () => {
     saveLocation(null)
   }
 
-  // Helper to get the correct redirect URL accounting for base path
+  // Helper to get the correct redirect URL accounting for environment and base path
   function getRedirectUrl() {
     const baseUrl = import.meta.env.BASE_URL || '/'
-    // BASE_URL already includes trailing slash for subpath deployments
-    return `${window.location.origin}${baseUrl}login`
+    // Use production URL when not in dev mode, otherwise use localhost
+    const isDev = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
+    if (isDev) {
+      // Development: redirect to localhost
+      return `${window.location.origin}${baseUrl}login`
+    } else {
+      // Production: redirect to the production URL
+      const productionUrl = 'https://shop.bhumisparshaschool.org'
+      return `${productionUrl}${baseUrl}login`
+    }
   }
 
   async function initialize() {

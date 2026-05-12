@@ -51,7 +51,7 @@
       :class="{ 'flower-related__petal--outer': index >= 6 }"
     >
       <router-link
-        :to="`/produtos/${prod.id}`"
+        :to="`/produtos/${prod.slug}`"
         class="flower-related__petal-link"
         :title="prod.name"
       >
@@ -83,6 +83,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { generateSlug } from '../../utils/slug'
 
 const props = defineProps({
   currentProduct: { type: Object, required: true },
@@ -92,7 +93,12 @@ const props = defineProps({
 const flowerRoot = ref(null)
 const isBloomed = ref(false)
 
-const displayedProducts = computed(() => props.relatedProducts.slice(0, 8))
+const displayedProducts = computed(() => 
+  props.relatedProducts.slice(0, 8).map(p => ({
+    ...p,
+    slug: generateSlug(p.name, p.id)
+  }))
+)
 
 const currentProductImage = computed(() => {
   const img = props.currentProduct?.image

@@ -155,8 +155,8 @@ export const useCartStore = defineStore('cart', () => {
           weight: item.weight,
           image: item.image
         })))
-      } catch (err) {
-        console.warn('Cart sync to server failed (non-critical):', err.message)
+      } catch {
+        // Cart sync to server failed (non-critical)
       }
     }
   }
@@ -226,8 +226,8 @@ export const useCartStore = defineStore('cart', () => {
     // Clear server cart
     try {
       await storefrontCart.clear()
-    } catch (err) {
-      console.warn('Clear server cart failed (non-critical):', err.message)
+    } catch {
+      // Clear server cart failed (non-critical)
     }
   }
 
@@ -255,8 +255,8 @@ export const useCartStore = defineStore('cart', () => {
         saveCartToStorage(items.value) // Update localStorage backup
         return
       }
-    } catch (err) {
-      console.warn('Load server cart failed, using localStorage fallback:', err.message)
+    } catch {
+      // Load server cart failed, using localStorage fallback
     }
     // Fallback: already loaded from localStorage in ref initialization
   }

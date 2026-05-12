@@ -570,7 +570,26 @@ function goHome() {
 onMounted(async () => {
   // Wait for next tick to ensure component is fully mounted before navigating
   await nextTick()
-  
+
+  // Check if this is an OAuth callback - if so, wait for auth to be processed
+  const isOAuthCallback = window.location.hash && (
+    window.location.hash.includes('access_token') || 
+    window.location.hash.includes('error')
+  )
+
+  if (isOAuthCallback) {
+    // Wait for auth store to process the OAuth callback
+    if (!authStore.initialized) {
+      await authStore.initialize()
+    }
+    
+    // If authentication succeeded, redirect
+    if (authStore.isLoggedIn) {
+      goHome()
+      return
+    }
+  }
+
   if (authStore.isLoggedIn) {
     goHome()
     return

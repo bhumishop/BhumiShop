@@ -23,7 +23,7 @@
         class="product-card"
         ref="cardRef"
         :class="{ 'product-card--large': isLarge, 'product-card--tall': isTall }"
-        @click="$router.push(`/produtos/${product.id}`)"
+        @click="$router.push(`/produtos/${productSlug}`)"
       >
         <div class="product-card__image-wrap">
           <img
@@ -61,7 +61,7 @@
                 <path d="M16 10a4 4 0 01-8 0"/>
               </svg>
             </button>
-            <button class="product-card__quick-add" @click.stop="$router.push(`/produtos/${product.id}`)">
+            <button class="product-card__quick-add" @click.stop="$router.push(`/produtos/${productSlug}`)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/>
                 <path d="m21 21-4.35-4.35"/>
@@ -90,6 +90,7 @@ import { useI18n } from 'vue-i18n'
 import { useCartStore } from '../../stores/cart'
 import { useProductStore } from '../../stores/products'
 import { useToastStore } from '../../stores/toast'
+import { generateSlug } from '../../utils/slug'
 import Magnet from '../common/Magnet.vue'
 import BorderGlow from '../common/BorderGlow.vue'
 
@@ -104,6 +105,8 @@ const cardRef = ref(null)
 
 const isLarge = computed(() => props.size === 'large')
 const isTall = computed(() => props.size === 'tall')
+
+const productSlug = computed(() => generateSlug(props.product.name, props.product.id))
 
 /**
  * Get the correct display image. For t-shirts, product.image points to
