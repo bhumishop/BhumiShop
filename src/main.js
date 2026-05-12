@@ -7,6 +7,7 @@ import './assets/main.css'
 
 // Check for SPA redirect path BEFORE bootstrapping
 const spaRedirectPath = sessionStorage.getItem('spa-redirect-path')
+console.log('[SPA] Redirect path from sessionStorage:', spaRedirectPath)
 if (spaRedirectPath) {
   sessionStorage.removeItem('spa-redirect-path')
   // Use history.replaceState to change the URL before the router reads it
