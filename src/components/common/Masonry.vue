@@ -235,7 +235,8 @@ onMounted(() => {
   aspect-ratio: v-bind('props.items[0]?.aspectRatio || "1/1"');
 }
 
-.masonry-item__img {
+.masonry-item__image-wrap picture,
+.masonry-item__image-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -244,7 +245,8 @@ onMounted(() => {
   transition: transform 0.4s ease;
 }
 
-.masonry-item__card:hover .masonry-item__img {
+.masonry-item__card:hover .masonry-item__image-wrap picture,
+.masonry-item__card:hover .masonry-item__image-wrap img {
   transform: scale(1.05);
 }
 
@@ -371,7 +373,8 @@ onMounted(() => {
     animation: none;
   }
 
-  .masonry-item__img {
+  .masonry-item__image-wrap picture,
+  .masonry-item__image-wrap img {
     transition: none;
   }
 

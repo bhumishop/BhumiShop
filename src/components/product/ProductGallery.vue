@@ -172,6 +172,7 @@ defineExpose({ setActiveImage })
   border-color: var(--accent);
 }
 
+.gallery__thumb picture,
 .gallery__thumb img {
   width: 100%;
   height: 100%;

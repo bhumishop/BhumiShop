@@ -65,7 +65,6 @@ import {
   getOptimizedUrl,
   generateSrcset,
   generateSizes,
-  transformAndOptimize,
   isValidHttpUrl
 } from '../../utils/imageOptimizer'
 
