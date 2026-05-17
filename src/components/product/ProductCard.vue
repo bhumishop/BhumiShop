@@ -26,12 +26,14 @@
         @click="$router.push(`/produtos/${productSlug}`)"
       >
         <div class="product-card__image-wrap">
-          <img
+          <OptimizedImage
             v-if="displayImage && (displayImage.startsWith('data:') || displayImage.startsWith('http'))"
             :src="displayImage"
             :alt="product.name"
-            class="product-card__image"
+            :category="product.category"
+            layout="card"
             loading="lazy"
+            img-class="product-card__image"
           />
           <div v-else class="product-card__placeholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -93,6 +95,7 @@ import { useToastStore } from '../../stores/toast'
 import { generateSlug } from '../../utils/slug'
 import Magnet from '../common/Magnet.vue'
 import BorderGlow from '../common/BorderGlow.vue'
+import OptimizedImage from '../common/OptimizedImage.vue'
 
 const { t } = useI18n()
 

@@ -45,7 +45,14 @@
             :class="getItemClass(item)"
           >
             <div class="drawer__item-img">
-              <img v-if="item.image" :src="item.image" :alt="item.name" loading="lazy" />
+              <OptimizedImage
+                v-if="item.image"
+                :src="item.image"
+                :alt="item.name"
+                layout="thumbnail"
+                loading="lazy"
+                :show-placeholder="false"
+              />
               <div v-else class="drawer__item-placeholder">{{ item.name?.charAt(0) || '?' }}</div>
             </div>
             <div class="drawer__item-info">
@@ -118,6 +125,7 @@ import { gsap } from '../../utils/animations'
 import { useCartStore } from '../../stores/cart'
 import BaseButton from '../common/BaseButton.vue'
 import FulfillmentBadge from '../common/FulfillmentBadge.vue'
+import OptimizedImage from '../common/OptimizedImage.vue'
 
 const cartStore = useCartStore()
 const router = useRouter()

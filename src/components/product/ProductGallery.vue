@@ -1,11 +1,15 @@
 <template>
   <div class="gallery">
     <div class="gallery__main">
-      <img
+      <OptimizedImage
         v-if="currentImage && isValidImage(currentImage)"
         :src="currentImage"
         :alt="productName"
-        class="gallery__image"
+        layout="gallery"
+        loading="eager"
+        fetchpriority="high"
+        :show-placeholder="false"
+        img-class="gallery__image"
         @error="handleImageError"
       />
       <div v-else class="gallery__placeholder">
@@ -19,7 +23,15 @@
         :class="['gallery__thumb', { 'gallery__thumb--active': activeIndex === index }]"
         @click="activeIndex = index"
       >
-        <img v-if="img && isValidImage(img)" :src="img" :alt="`${productName} ${index + 1}`" @error="handleThumbError($event, index)" />
+        <OptimizedImage
+          v-if="img && isValidImage(img)"
+          :src="img"
+          :alt="`${productName} ${index + 1}`"
+          layout="thumbnail"
+          loading="lazy"
+          :show-placeholder="false"
+          @error="handleThumbError($event, index)"
+        />
         <span v-else class="gallery__thumb-placeholder">{{ index + 1 }}</span>
       </button>
     </div>
@@ -27,8 +39,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../../utils/brokenImages'
+import { prefetchGalleryImages } from '../../utils/imagePrefetch'
+import OptimizedImage from '../common/OptimizedImage.vue'
 
 const props = defineProps({
   images: { type: Array, default: () => [] },
@@ -80,6 +94,13 @@ watch(() => props.images, () => {
 watch(() => props.selectedColorImageIndex, (newIndex) => {
   if (newIndex !== null && newIndex >= 0 && newIndex < props.images.length) {
     activeIndex.value = newIndex
+  }
+})
+
+// Prefetch gallery images on mount
+onMounted(() => {
+  if (props.images && props.images.length > 0) {
+    prefetchGalleryImages(props.images, props.productName)
   }
 })
 

@@ -35,12 +35,12 @@
         >
           <!-- Image container -->
           <div class="masonry-item__image-wrap">
-            <img
+            <OptimizedImage
               :src="item.img"
               :alt="item.name || ''"
-              class="masonry-item__img"
+              layout="masonry"
               loading="lazy"
-              decoding="async"
+              :show-placeholder="true"
               @error="handleImageError(item.id, $event)"
             />
             <!-- Hover overlay -->
@@ -62,6 +62,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import OptimizedImage from './OptimizedImage.vue';
 
 export interface MasonryItem {
   id: string;

@@ -14,7 +14,14 @@
     <div v-if="cartStore.items.length > 0" class="cart-page__list">
       <div v-for="item in cartStore.items" :key="`${item.id}_${item.size || 'default'}`" class="cart-page__item">
         <div class="cart-page__item-img">
-          <img v-if="item.image && (item.image.startsWith('data:') || item.image.startsWith('http'))" :src="item.image" :alt="item.name" loading="lazy" />
+          <OptimizedImage
+            v-if="item.image && (item.image.startsWith('data:') || item.image.startsWith('http'))"
+            :src="item.image"
+            :alt="item.name"
+            layout="thumbnail"
+            loading="lazy"
+            :show-placeholder="false"
+          />
           <div v-else class="cart-page__item-placeholder">{{ item.name?.charAt(0) || '?' }}</div>
         </div>
         <div class="cart-page__item-info">
@@ -45,6 +52,7 @@
 <script setup>
 import { useCartStore } from '../stores/cart'
 import BaseButton from '../components/common/BaseButton.vue'
+import OptimizedImage from '../components/common/OptimizedImage.vue'
 
 const cartStore = useCartStore()
 

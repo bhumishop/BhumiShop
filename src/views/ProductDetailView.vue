@@ -12,12 +12,14 @@
     <!-- Product image -->
     <div class="product-detail__third-party-layout">
       <div class="product-detail__image-wrapper">
-        <img
+        <OptimizedImage
           v-if="thirdPartyDisplayImage && !imageError"
           :src="thirdPartyDisplayImage"
           :alt="product.name"
-          class="product-detail__image"
+          :category="product.category"
+          layout="gallery"
           loading="lazy"
+          :show-placeholder="true"
           @error="handleImageError"
         />
         <div v-else class="product-detail__image-placeholder">
@@ -277,6 +279,7 @@ import { findProductBySlug, generateSlug } from '../utils/slug'
 import ProductGallery from '../components/product/ProductGallery.vue'
 import ProductVariants from '../components/product/ProductVariants.vue'
 import ProductColorSwatches from '../components/product/ProductColorSwatches.vue'
+import OptimizedImage from '../components/common/OptimizedImage.vue'
 
 // Lazy load heavy components
 const ProductSizeTable = defineAsyncComponent(() => import('../components/product/ProductSizeTable.vue'))

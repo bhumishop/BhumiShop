@@ -17,12 +17,14 @@
 
       <!-- Content overlaid on the pixel canvas (inside image area only) -->
       <div class="product-pixel-card__image-layer" @click="$router.push(`/produtos/${productSlug}`)">
-        <img
+        <OptimizedImage
           v-if="shouldShowImage"
           :src="displayImage"
           :alt="product.name"
-          class="product-pixel-card__image"
+          :category="product.category"
+          layout="card"
           loading="lazy"
+          img-class="product-pixel-card__image"
           @error="handleImageError"
         />
         <div v-else class="product-pixel-card__placeholder">
@@ -100,6 +102,7 @@ import { useProductStore } from '../../stores/products'
 import { useToastStore } from '../../stores/toast'
 import { isLikelyBrokenCdnUrl, markImageUrlAsBroken } from '../../utils/brokenImages'
 import { generateSlug } from '../../utils/slug'
+import OptimizedImage from './OptimizedImage.vue'
 
 const { t } = useI18n()
 const router = useRouter()
