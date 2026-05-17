@@ -1,14 +1,6 @@
 <template>
   <picture>
-    <!-- AVIF source (best compression, newest browsers) - hidden when using direct URL fallback -->
-    <source
-      v-if="avifSrcset && !useDirectUrl"
-      :srcset="avifSrcset"
-      :sizes="sizesAttr"
-      type="image/avif"
-    />
-
-    <!-- WebP source (wide support) - hidden when using direct URL fallback -->
+    <!-- WebP source (modern browsers, primary format) -->
     <source
       v-if="webpSrcset && !useDirectUrl"
       :srcset="webpSrcset"
@@ -16,10 +8,18 @@
       type="image/webp"
     />
 
-    <!-- Fallback img with original/optimized URL -->
+    <!-- JPEG fallback (legacy browsers) -->
+    <source
+      v-if="jpegSrcset && !useDirectUrl"
+      :srcset="jpegSrcset"
+      :sizes="sizesAttr"
+      type="image/jpeg"
+    />
+
+    <!-- Fallback img with optimized or direct URL -->
     <img
       ref="imgRef"
-      :src="fallbackSrc"
+      :src="optimizedSrc"
       :alt="alt"
       :loading="loading"
       :decoding="decoding"
@@ -27,8 +27,8 @@
       :sizes="sizesAttr"
       :class="['optimized-image', imgClass]"
       :style="imgStyle"
-      @load="handleLoad"
-      @error="handleError"
+      @load="onLoad"
+      @error="onError"
     />
   </picture>
 
@@ -60,13 +60,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import {
-  getOptimizedUrl,
-  generateSrcset,
-  generateSizes,
-  isValidHttpUrl
-} from '../../utils/imageOptimizer'
+import { ref, computed } from 'vue'
+import { useImageOptimizer } from '../../composables/useImageOptimizer'
 
 const props = defineProps({
   /** Source image URL */
@@ -87,85 +82,45 @@ const props = defineProps({
   imgClass: { type: String, default: '' },
   /** Show blur-up placeholder */
   showPlaceholder: { type: Boolean, default: true },
-  /** Maximum width for optimization */
-  maxWidth: { type: Number, default: 1200 }
+  /** Target width for optimization */
+  width: { type: Number, default: 800 },
+  /** Target height for optimization (optional, enables x,y sizing) */
+  height: { type: Number, default: null },
+  /** Image quality 1-100 */
+  quality: { type: Number, default: 80 },
+  /** Fit mode: 'cover', 'contain', 'fill' */
+  fit: { type: String, default: 'cover' }
 })
 
 const emit = defineEmits(['load', 'error'])
 
 const imgRef = ref(null)
-const isLoaded = ref(false)
-const hasError = ref(false)
-const useDirectUrl = ref(false) // Fallback flag: when true, skip weserv.nl and use direct URL
 
-// Compute transformed and optimized URLs
-const webpSrcset = computed(() => {
-  if (!props.src) return ''
-
-  let url = props.src
-  // Apply URL transformation (jsDelivr -> GitHub, 000 -> 001 for t-shirts)
-  if (url.includes('cdn.jsdelivr.net') || url.includes('000_image')) {
-    // Use transformAndOptimize for URL transformation only (no weserv optimization here)
-    url = transformUrlOnly(url, props.category)
+// Use the image optimizer composable
+const {
+  optimizedSrc,
+  webpSrcset,
+  jpegSrcset,
+  sizesAttr,
+  isLoaded,
+  hasError,
+  useDirectUrl,
+  handleLoad,
+  handleImageError
+} = useImageOptimizer(
+  computed(() => props.src),
+  {
+    category: props.category,
+    layout: props.layout,
+    width: props.width,
+    height: props.height,
+    quality: props.quality,
+    fit: props.fit
   }
-
-  // When weserv.nl proxy fails, skip srcset and use direct URLs
-  if (useDirectUrl.value) return ''
-
-  if (!isValidHttpUrl(url)) return ''
-
-  return generateSrcset(url)
-})
-
-const avifSrcset = computed(() => {
-  if (!props.src) return ''
-
-  let url = props.src
-  if (url.includes('cdn.jsdelivr.net') || url.includes('000_image')) {
-    url = transformUrlOnly(url, props.category)
-  }
-
-  // When weserv.nl proxy fails, skip srcset and use direct URLs
-  if (useDirectUrl.value) return ''
-
-  if (!isValidHttpUrl(url)) return ''
-
-  // Generate AVIF srcset
-  const sizes = [200, 400, 600, 800, 1200].filter(w => w <= props.maxWidth)
-  return sizes
-    .map(width => {
-      const optimizedUrl = getOptimizedUrl(url, width, { output: 'avif' })
-      return `${optimizedUrl} ${width}w`
-    })
-    .join(', ')
-})
-
-const fallbackSrc = computed(() => {
-  if (!props.src) return ''
-
-  let url = props.src
-  if (url.includes('cdn.jsdelivr.net') || url.includes('000_image')) {
-    url = transformUrlOnly(url, props.category)
-  }
-
-  // When weserv.nl proxy fails, use the direct URL as fallback
-  if (useDirectUrl.value) {
-    return isValidHttpUrl(url) ? url : url
-  }
-
-  // For fallback, use the optimized URL at max width
-  if (isValidHttpUrl(url)) {
-    return getOptimizedUrl(url, props.maxWidth, { output: 'jpeg', quality: 85 })
-  }
-
-  return url
-})
-
-const sizesAttr = computed(() => generateSizes(props.layout))
+)
 
 const computedFetchPriority = computed(() => {
   if (props.fetchpriority !== 'auto') return props.fetchpriority
-  // Auto-detect: eager loading usually means high priority
   return props.loading === 'eager' ? 'high' : 'low'
 })
 
@@ -174,59 +129,16 @@ const imgStyle = computed(() => ({
   transition: 'opacity 0.3s ease'
 }))
 
-/**
- * Transform URL without applying weserv optimization
- * Only handles jsDelivr -> GitHub and 000 -> 001 for t-shirts
- */
-function transformUrlOnly(url, category) {
-  let transformed = url
-
-  if (transformed.includes('cdn.jsdelivr.net/gh')) {
-    transformed = transformed.replace(
-      /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\//,
-      'https://raw.githubusercontent.com/$1/$2/$3/'
-    )
-  }
-
-  const cat = (category || '').toLowerCase()
-  const isTshirt = cat.includes('camiseta') || cat.includes('t-shirt') ||
-                   cat.includes('tshirt') || cat.includes('shirt') ||
-                   cat.includes('vestuário') || cat.includes('wear')
-  const isMug = cat.includes('caneca') || cat.includes('mug') || cat.includes('copo')
-
-  if (transformed.includes('000_image') && isTshirt && !isMug) {
-    transformed = transformed.replace('000_image', '001_image')
-  }
-
-  return transformed
-}
-
-function handleLoad(event) {
-  isLoaded.value = true
+function onLoad(event) {
+  handleLoad(event)
   emit('load', event)
 }
 
-function handleError(event) {
-  // If we haven't tried the direct URL yet, retry with it
-  if (!useDirectUrl.value && props.src && props.src.includes('images.weserv.nl')) {
-    useDirectUrl.value = true
-    isLoaded.value = false
-    hasError.value = false
-    return
-  }
-
-  hasError.value = true
+function onError(event) {
+  handleImageError(event)
   emit('error', event)
 }
 
-// Reset state when src changes
-watch(() => props.src, () => {
-  isLoaded.value = false
-  hasError.value = false
-  useDirectUrl.value = false
-})
-
-// Expose method for external access
 defineExpose({
   imgRef,
   isLoaded,

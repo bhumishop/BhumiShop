@@ -6,6 +6,9 @@
  *
  * Uses images.weserv.nl as a free, no-API-key image optimization proxy
  * that supports WebP conversion, resizing, and caching via Cloudflare CDN.
+ *
+ * NOTE: AVIF output is disabled on this proxy instance.
+ * Supported savers: jpg, png, webp, tiff, gif, json, jxl
  */
 
 // Responsive image widths for srcset
@@ -33,6 +36,10 @@ export function isValidHttpUrl(url) {
  * @param {string} url - Original image URL
  * @param {number} width - Target width in pixels
  * @param {object} options - Additional options
+ * @param {number} [options.height] - Target height (optional, enables x,y sizing)
+ * @param {number} [options.quality=80] - Image quality 1-100
+ * @param {string} [options.output='webp'] - Output format: 'webp', 'jpg', 'png'
+ * @param {string} [options.fit='cover'] - Fit mode: 'cover', 'contain', 'fill'
  * @returns {string} - Optimized image URL
  */
 export function getOptimizedUrl(url, width = 800, options = {}) {
@@ -40,21 +47,22 @@ export function getOptimizedUrl(url, width = 800, options = {}) {
 
   const {
     quality = 80,
-    format = 'webp',
+    output = 'webp',
     fit = 'cover',
-    output = 'webp'
+    height = null
   } = options
 
-  // weserv.nl URL format: https://images.weserv.nl?url=<encoded>&w=<width>&q=<quality>&output=<format>&fit=<fit>
   const params = new URLSearchParams({
     url: url,
     w: String(width),
     q: String(quality),
     output: output,
-    fit: fit,
-    // Enable caching hints
-    'cache-status': 'true'
+    fit: fit
   })
+
+  if (height) {
+    params.set('h', String(height))
+  }
 
   return `https://images.weserv.nl/?${params.toString()}`
 }
@@ -65,17 +73,17 @@ export function getOptimizedUrl(url, width = 800, options = {}) {
  *
  * @param {string} url - Original image URL
  * @param {number[]} sizes - Array of widths to generate
+ * @param {object} options - Additional options passed to getOptimizedUrl
  * @returns {string} - srcset attribute value
  */
-export function generateSrcset(url, sizes = RESPONSIVE_SIZES) {
+export function generateSrcset(url, sizes = RESPONSIVE_SIZES, options = {}) {
   if (!isValidHttpUrl(url)) return ''
 
-  // Filter sizes to only include those smaller than or equal to max 1200
   const filteredSizes = sizes.filter(w => w <= 1200)
 
   return filteredSizes
     .map(width => {
-      const optimizedUrl = getOptimizedUrl(url, width)
+      const optimizedUrl = getOptimizedUrl(url, width, options)
       return `${optimizedUrl} ${width}w`
     })
     .join(', ')
@@ -91,19 +99,14 @@ export function generateSrcset(url, sizes = RESPONSIVE_SIZES) {
 export function generateSizes(layout = 'card') {
   switch (layout) {
     case 'card':
-      // Product cards: full width on mobile, ~50% on tablet, ~33% on desktop
       return '(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 33vw'
     case 'gallery':
-      // Gallery main image: mostly full width
       return '(max-width: 768px) 95vw, (max-width: 1200px) 80vw, 1200px'
     case 'thumbnail':
-      // Thumbnails: small fixed size
       return '(max-width: 640px) 15vw, 80px'
     case 'hero':
-      // Hero/banner: full width always
       return '100vw'
     case 'masonry':
-      // Masonry items: variable width
       return '(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw'
     default:
       return '100vw'
@@ -116,23 +119,14 @@ export function generateSizes(layout = 'card') {
  *
  * @param {string} url - Original image URL
  * @param {string} layout - Layout type: 'card', 'gallery', 'thumbnail', 'hero'
+ * @param {object} options - Additional options
  * @returns {string} - Optimized URL for single-src fallback
  */
-export function getImageForLayout(url, layout = 'card') {
+export function getImageForLayout(url, layout = 'card', options = {}) {
   if (!isValidHttpUrl(url)) return url
 
-  switch (layout) {
-    case 'thumbnail':
-      return getOptimizedUrl(url, 150)
-    case 'card':
-      return getOptimizedUrl(url, 600)
-    case 'gallery':
-      return getOptimizedUrl(url, 1200)
-    case 'hero':
-      return getOptimizedUrl(url, 1600)
-    default:
-      return getOptimizedUrl(url, 800)
-  }
+  const widthMap = { thumbnail: 150, card: 600, gallery: 1200, hero: 1600 }
+  return getOptimizedUrl(url, widthMap[layout] || 800, options)
 }
 
 /**
@@ -146,7 +140,6 @@ export function getImageForLayout(url, layout = 'card') {
 export function getPreloadAttributes(url, priority = 'high') {
   if (!isValidHttpUrl(url)) return { href: url, fetchpriority: priority }
 
-  // For preloading, use the largest size we'll need
   return {
     href: getOptimizedUrl(url, 1200),
     fetchpriority: priority
@@ -163,7 +156,7 @@ export function supportsWebP() {
   if (webpSupportCache !== null) return webpSupportCache
 
   if (typeof window === 'undefined') {
-    webpSupportCache = true // Assume support on server
+    webpSupportCache = true
     return webpSupportCache
   }
 
@@ -179,7 +172,8 @@ export function supportsWebP() {
 
 /**
  * Generate <picture> element sources for optimal format selection
- * Returns array of source objects for programmatic use
+ * Returns array of source configurations for WebP and JPEG fallbacks
+ * (AVIF is disabled on this proxy instance)
  *
  * @param {string} url - Original image URL
  * @param {object} options - Options
@@ -190,34 +184,25 @@ export function getPictureSources(url, options = {}) {
 
   const {
     sizes = RESPONSIVE_SIZES,
-    layout = 'card'
+    layout = 'card',
+    height = null,
+    fit = 'cover'
   } = options
 
-  const sources = []
-
-  // WebP source (modern browsers)
+  // WebP source (primary modern format)
   const webpSrcset = sizes
-    .map(width => `${getOptimizedUrl(url, width, { output: 'webp' })} ${width}w`)
+    .map(width => `${getOptimizedUrl(url, width, { output: 'webp', height, fit })} ${width}w`)
     .join(', ')
 
-  sources.push({
-    srcset: webpSrcset,
-    type: 'image/webp',
-    sizes: generateSizes(layout)
-  })
-
-  // AVIF source (even more modern, smaller files)
-  const avifSrcset = sizes
-    .map(width => `${getOptimizedUrl(url, width, { output: 'avif' })} ${width}w`)
+  // JPEG fallback (legacy browsers)
+  const jpegSrcset = sizes
+    .map(width => `${getOptimizedUrl(url, width, { output: 'jpg', height, fit })} ${width}w`)
     .join(', ')
 
-  sources.push({
-    srcset: avifSrcset,
-    type: 'image/avif',
-    sizes: generateSizes(layout)
-  })
-
-  return sources
+  return [
+    { srcset: webpSrcset, type: 'image/webp', sizes: generateSizes(layout) },
+    { srcset: jpegSrcset, type: 'image/jpeg', sizes: generateSizes(layout) }
+  ]
 }
 
 /**
@@ -227,9 +212,10 @@ export function getPictureSources(url, options = {}) {
  * @param {string} url - Original URL from database
  * @param {string} category - Product category (for t-shirt transformation)
  * @param {number} width - Target width
+ * @param {object} options - Additional options
  * @returns {string} - Final optimized URL
  */
-export function transformAndOptimize(url, category = '', width = 800) {
+export function transformAndOptimize(url, category = '', width = 800, options = {}) {
   let transformed = url
 
   // Transform jsDelivr URLs to raw GitHub
@@ -252,5 +238,5 @@ export function transformAndOptimize(url, category = '', width = 800) {
   }
 
   // Apply optimization
-  return getOptimizedUrl(transformed, width)
+  return getOptimizedUrl(transformed, width, options)
 }
