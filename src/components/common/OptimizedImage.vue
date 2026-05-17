@@ -1,16 +1,16 @@
 <template>
   <picture>
-    <!-- AVIF source (best compression, newest browsers) -->
+    <!-- AVIF source (best compression, newest browsers) - hidden when using direct URL fallback -->
     <source
-      v-if="avifSrcset"
+      v-if="avifSrcset && !useDirectUrl"
       :srcset="avifSrcset"
       :sizes="sizesAttr"
       type="image/avif"
     />
 
-    <!-- WebP source (wide support) -->
+    <!-- WebP source (wide support) - hidden when using direct URL fallback -->
     <source
-      v-if="webpSrcset"
+      v-if="webpSrcset && !useDirectUrl"
       :srcset="webpSrcset"
       :sizes="sizesAttr"
       type="image/webp"
@@ -96,6 +96,7 @@ const emit = defineEmits(['load', 'error'])
 const imgRef = ref(null)
 const isLoaded = ref(false)
 const hasError = ref(false)
+const useDirectUrl = ref(false) // Fallback flag: when true, skip weserv.nl and use direct URL
 
 // Compute transformed and optimized URLs
 const webpSrcset = computed(() => {
@@ -107,6 +108,9 @@ const webpSrcset = computed(() => {
     // Use transformAndOptimize for URL transformation only (no weserv optimization here)
     url = transformUrlOnly(url, props.category)
   }
+
+  // When weserv.nl proxy fails, skip srcset and use direct URLs
+  if (useDirectUrl.value) return ''
 
   if (!isValidHttpUrl(url)) return ''
 
@@ -120,6 +124,9 @@ const avifSrcset = computed(() => {
   if (url.includes('cdn.jsdelivr.net') || url.includes('000_image')) {
     url = transformUrlOnly(url, props.category)
   }
+
+  // When weserv.nl proxy fails, skip srcset and use direct URLs
+  if (useDirectUrl.value) return ''
 
   if (!isValidHttpUrl(url)) return ''
 
@@ -139,6 +146,11 @@ const fallbackSrc = computed(() => {
   let url = props.src
   if (url.includes('cdn.jsdelivr.net') || url.includes('000_image')) {
     url = transformUrlOnly(url, props.category)
+  }
+
+  // When weserv.nl proxy fails, use the direct URL as fallback
+  if (useDirectUrl.value) {
+    return isValidHttpUrl(url) ? url : url
   }
 
   // For fallback, use the optimized URL at max width
@@ -195,6 +207,14 @@ function handleLoad(event) {
 }
 
 function handleError(event) {
+  // If we haven't tried the direct URL yet, retry with it
+  if (!useDirectUrl.value && props.src && props.src.includes('images.weserv.nl')) {
+    useDirectUrl.value = true
+    isLoaded.value = false
+    hasError.value = false
+    return
+  }
+
   hasError.value = true
   emit('error', event)
 }
@@ -203,6 +223,7 @@ function handleError(event) {
 watch(() => props.src, () => {
   isLoaded.value = false
   hasError.value = false
+  useDirectUrl.value = false
 })
 
 // Expose method for external access

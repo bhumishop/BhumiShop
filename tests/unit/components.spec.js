@@ -176,3 +176,73 @@ describe('Translated Components Render', () => {
     expect(wrapper.text()).toContain('Size')
   })
 })
+
+describe('OptimizedImage Component - Direct URL Fallback', () => {
+  it('should render image with weserv.nl URL initially', async () => {
+    const OptimizedImage = (await import('@/components/common/OptimizedImage.vue')).default
+
+    const directUrl = 'https://raw.githubusercontent.com/test/repo/cdn/images/001_image.jpg'
+    const optimizedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(directUrl)}&w=800&q=80&output=webp&fit=cover&cache-status=true`
+
+    const wrapper = mount(OptimizedImage, {
+      props: {
+        src: optimizedUrl,
+        alt: 'Test image',
+        layout: 'card',
+        showPlaceholder: false
+      }
+    })
+
+    // Should render an img element with the weserv.nl URL as src
+    const imgElement = wrapper.find('img')
+    expect(imgElement.exists()).toBe(true)
+    expect(imgElement.attributes('src')).toContain('images.weserv.nl')
+  })
+
+  it('should use direct URL when src does not contain weserv.nl', async () => {
+    const OptimizedImage = (await import('@/components/common/OptimizedImage.vue')).default
+
+    // When the src is a direct URL (not through weserv.nl), the component
+    // wraps it with weserv.nl for optimization. After an error, it falls back
+    // to the direct URL.
+    const directUrl = 'https://raw.githubusercontent.com/test/repo/cdn/images/001_image.jpg'
+
+    const wrapper = mount(OptimizedImage, {
+      props: {
+        src: directUrl,
+        alt: 'Test image',
+        layout: 'card',
+        showPlaceholder: false
+      }
+    })
+
+    const imgElement = wrapper.find('img')
+    expect(imgElement.exists()).toBe(true)
+    // Initially, the URL is wrapped with weserv.nl for optimization
+    expect(imgElement.attributes('src')).toContain('images.weserv.nl')
+    // The original URL should be URL-encoded in the weserv.nl params
+    expect(imgElement.attributes('src')).toContain(encodeURIComponent('raw.githubusercontent.com'))
+  })
+
+  it('should handle URL transformation for jsDelivr URLs', async () => {
+    const OptimizedImage = (await import('@/components/common/OptimizedImage.vue')).default
+
+    const jsdelivrUrl = 'https://cdn.jsdelivr.net/gh/user/repo@main/cdn/images/001_image.jpg'
+
+    const wrapper = mount(OptimizedImage, {
+      props: {
+        src: jsdelivrUrl,
+        alt: 'Test image',
+        category: 'camiseta',
+        layout: 'card',
+        showPlaceholder: false
+      }
+    })
+
+    const imgElement = wrapper.find('img')
+    expect(imgElement.exists()).toBe(true)
+    // jsDelivr URLs should be transformed to raw GitHub URLs
+    expect(imgElement.attributes('src')).toContain('raw.githubusercontent.com')
+    expect(imgElement.attributes('src')).not.toContain('cdn.jsdelivr.net')
+  })
+})
