@@ -81,6 +81,15 @@ describe('Supabase fetch auth headers (OAuth callback regression)', () => {
   })
 })
 
+describe('PKCE flow configuration', () => {
+  it('uses the PKCE flow so OAuth callbacks arrive as ?code=', async () => {
+    const { supabase } = await loadClient()
+
+    expect(supabase.auth.flowType).toBe('pkce')
+    expect(supabase.auth.detectSessionInUrl).toBe(true)
+  })
+})
+
 describe('OAuth redirect URL', () => {
   it('builds the callback from the current origin and base path', async () => {
     vi.resetModules()
@@ -149,6 +158,87 @@ describe('404.html URL restore (SPA + OAuth hash)', () => {
 
     expect(window.location.origin + window.location.pathname).toBe('http://localhost:3000/')
     expect(mod.restoreStoredRedirect()).toBe(false)
+  })
+
+  it('restores a parked PKCE callback (?code=) before the app boots', async () => {
+    sessionStorage.setItem('spa-redirect-path', '/login?code=pkce-auth-code-123')
+
+    vi.resetModules()
+    const mod = await import('@/utils/restoreSpaRedirect')
+
+    expect(window.location.pathname).toBe('/login')
+    expect(window.location.search).toBe('?code=pkce-auth-code-123')
+    expect(sessionStorage.getItem('spa-redirect-path')).toBeNull()
+    expect(mod.restoreStoredRedirect()).toBe(false)
+
+    window.history.replaceState(null, '', '/')
+  })
+})
+
+describe('auth callback URL helpers (PKCE)', () => {
+  let helpers
+
+  beforeEach(async () => {
+    helpers = await import('@/utils/authCallback')
+    window.history.replaceState(null, '', '/')
+  })
+
+  describe('isAuthCallbackUrl', () => {
+    it.each([
+      '/login?code=pkce-auth-code-123',
+      '/login#access_token=abc&token_type=bearer',
+      '/login?error=access_denied&error_description=User+denied',
+      '/login#error=access_denied',
+      '/login?error_code=provider_email_needs_verification'
+    ])('detects callback URL %s', (href) => {
+      expect(helpers.isAuthCallbackUrl(href)).toBe(true)
+    })
+
+    it.each([
+      '/login',
+      '/login?redirect=%2Fcheckout',
+      '/produtos?utm_source=google',
+      '/'
+    ])('rejects non-callback URL %s', (href) => {
+      expect(helpers.isAuthCallbackUrl(href)).toBe(false)
+    })
+
+    it('works with absolute URLs too', () => {
+      expect(helpers.isAuthCallbackUrl('https://shop.example.org/login?code=abc')).toBe(true)
+    })
+  })
+
+  describe('readAuthCallbackError', () => {
+    it('parses an error from the hash', () => {
+      expect(helpers.readAuthCallbackError('/login#error=access_denied&error_description=User+denied'))
+        .toEqual({ error: 'access_denied', description: 'User denied' })
+    })
+
+    it('parses an error from the query string', () => {
+      expect(helpers.readAuthCallbackError('/login?error=access_denied&error_description=User+denied'))
+        .toEqual({ error: 'access_denied', description: 'User denied' })
+    })
+
+    it('falls back to error_code when no error is given', () => {
+      expect(helpers.readAuthCallbackError('/login?error_code=provider_email_needs_verification'))
+        .toEqual({ error: 'unknown_error', description: 'provider_email_needs_verification' })
+    })
+
+    it('returns null for a successful PKCE callback', () => {
+      expect(helpers.readAuthCallbackError('/login?code=abc')).toBeNull()
+    })
+  })
+
+  describe('clearAuthCallbackUrl', () => {
+    it('removes the code, error params and hash, keeping other params', () => {
+      window.history.replaceState(null, '', '/login?code=abc&error=access_denied&redirect=%2Fcheckout#access_token=stale')
+
+      helpers.clearAuthCallbackUrl()
+
+      expect(window.location.pathname).toBe('/login')
+      expect(window.location.search).toBe('?redirect=%2Fcheckout')
+      expect(window.location.hash).toBe('')
+    })
   })
 })
 

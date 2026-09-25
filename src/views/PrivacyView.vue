@@ -32,7 +32,7 @@
           <li>Sua foto de perfil (avatar), quando disponivel</li>
           <li>Seu identificador unico da conta Google (usado apenas para vincular sua sessao)</li>
         </ul>
-        <p>Solicitamos somente os escopos minimos necessarios: <strong>openid</strong>, <strong>email</strong>, <strong>profile</strong> e <strong>userinfo.email</strong>. Nao solicitamos, nao acessamos e nao armazenamos outros dados da sua conta Google (como seus contatos, drive, calendario, historico de navegacao ou qualquer outro servico do Google).</p>
+        <p>Solicitamos somente os escopos minimos necessarios: <strong>openid</strong>, <strong>email</strong> e <strong>profile</strong>. Nao solicitamos, nao acessamos e nao armazenamos outros dados da sua conta Google (como seus contatos, drive, calendario, historico de navegacao ou qualquer outro servico do Google).</p>
 
         <h3>2.3 Dados coletados automaticamente</h3>
         <ul>

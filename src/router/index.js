@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useProductStore } from '../stores/products'
 import { findProductBySlug } from '../utils/slug'
+import { isAuthCallbackUrl } from '../utils/authCallback'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -120,10 +121,10 @@ const router = createRouter({
 router.beforeEach(async (to, _from) => {
   const authStore = useAuthStore()
 
-  // Handle OAuth callback (Supabase implicit flow returns tokens/errors in the URL hash)
-  // Must check before guest/authenticated redirects to process the callback properly
-  const hash = to.hash || ''
-  const hasOAuthCallback = hash.includes('access_token=') || hash.includes('error=')
+  // Handle OAuth callback (PKCE: supabase-js exchanges ?code= on /login;
+  // errors arrive in the query or hash). Must check before guest/authenticated
+  // redirects to process the callback properly.
+  const hasOAuthCallback = isAuthCallbackUrl(to.fullPath)
 
   // Initialize auth for OAuth callbacks, protected routes, guest routes, or admin
   const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest || hasOAuthCallback

@@ -47,7 +47,9 @@ const customFetch = (url, options = {}) => {
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     detectSessionInUrl: true,
-    flowType: 'implicit'
+    // PKCE: supabase-js exchanges the ?code= on /login once, inside its
+    // memoized initialize(). Never call exchangeCodeForSession() manually.
+    flowType: 'pkce'
   },
   global: {
     fetch: customFetch

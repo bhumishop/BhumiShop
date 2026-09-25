@@ -205,7 +205,7 @@ export const useAuthStore = defineStore('auth', () => {
         provider: 'google',
         options: {
           redirectTo: getRedirectUrl(),
-          scopes: 'openid email profile https://www.googleapis.com/auth/userinfo.email',
+          scopes: 'openid email profile',
           queryParams: { prompt: 'select_account' }
         }
       })

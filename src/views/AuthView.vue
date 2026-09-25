@@ -244,6 +244,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
+import { isAuthCallbackUrl, readAuthCallbackError, clearAuthCallbackUrl } from '../utils/authCallback'
 import BaseButton from '../components/common/BaseButton.vue'
 import BaseInput from '../components/common/BaseInput.vue'
 import DarkVeil from '../components/common/DarkVeil.vue'
@@ -554,64 +555,26 @@ function goHome() {
   router.replace(target)
 }
 
-function readAuthCallbackError() {
-  const sources = [window.location.hash, window.location.search]
-  for (const source of sources) {
-    const params = new URLSearchParams(source.replace(/^[#?]/, ''))
-    if (params.get('error') || params.get('error_code')) {
-      return {
-        error: params.get('error') || 'unknown_error',
-        description: params.get('error_description') || params.get('error_code')
-      }
-    }
-  }
-  return null
-}
-
-function clearAuthCallbackParams() {
-  const url = new URL(window.location.href)
-  url.hash = ''
-  for (const key of ['error', 'error_description', 'error_code']) {
-    url.searchParams.delete(key)
-  }
-  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
-}
-
 onMounted(async () => {
   // Wait for next tick to ensure component is fully mounted before navigating
   await nextTick()
 
-  // Check if this is an OAuth callback - if so, wait for auth to be processed
-  const isOAuthCallback = readAuthCallbackError() !== null || (
-    window.location.hash && (
-      window.location.hash.includes('access_token=') ||
-      window.location.hash.includes('error=')
-    )
-  )
-
-  if (isOAuthCallback) {
-    // Wait for auth store to process the OAuth callback
+  // OAuth/PKCE callback. On success the router guard already redirected before
+  // this mounted, so reaching here with a callback URL means the exchange
+  // failed - show a single toast and clean the callback params from the URL.
+  if (isAuthCallbackUrl()) {
     if (!authStore.initialized) {
       await authStore.initialize()
     }
 
-    // If authentication succeeded, redirect
-    if (authStore.isLoggedIn) {
-      goHome()
-      return
+    if (!authStore.isLoggedIn) {
+      const authError = readAuthCallbackError()
+      if (authError) {
+        console.error('[BhumiShop] OAuth callback error:', authError.error, authError.description)
+      }
+      toast.error(t('auth.errors.loginFailed'))
+      clearAuthCallbackUrl()
     }
-
-    const authError = readAuthCallbackError()
-    if (authError) {
-      console.error('[BhumiShop] OAuth callback error:', authError.error, authError.description)
-    }
-    toast.error(t('auth.errors.loginFailed'))
-    clearAuthCallbackParams()
-  }
-
-  if (authStore.isLoggedIn) {
-    goHome()
-    return
   }
 
   // Restore saved location if any
