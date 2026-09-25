@@ -248,7 +248,7 @@ O projeto usa CSS com variáveis customizadas:
 
 1. **Filtro de categorias:** Usar `toString()` na comparação para evitar erros de tipo
 2. **Imagens:** Aceita tanto base64 quanto URLs (http/https)
-3. **Login Google:** Redirect URL hardcoded para produção
+3. ~~**Login Google:** Redirect URL hardcoded para produção~~ (corrigido: usa `window.location.origin` / `VITE_SITE_URL`)
 
 ---
 

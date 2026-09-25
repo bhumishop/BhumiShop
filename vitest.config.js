@@ -12,6 +12,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.js'],
     include: ['tests/**/*.spec.js'],
+    env: {
+      VITE_SUPABASE_URL: 'https://test-project.supabase.co',
+      VITE_SUPABASE_KEY: 'sb_publishable_test_key'
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

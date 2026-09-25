@@ -4,9 +4,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, useTemplateRef, type CSSProperties } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef, type CSSProperties } from 'vue';
 import { EffectComposer, RenderPass, EffectPass, BloomEffect, ChromaticAberrationEffect } from 'postprocessing';
 import * as THREE from 'three';
+import {
+  useDocumentVisibility,
+  useIntersectionObserver,
+  usePreferredReducedMotion
+} from '@vueuse/core';
 import { useGridScanStore } from '../../stores/gridscan';
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
@@ -403,6 +408,36 @@ const MAX_SCANS = 8;
 
 let cleanupAnimation: (() => void) | null = null;
 
+// A full-viewport three.js scene with a bloom + chromatic-aberration pass must
+// not keep rendering when nobody can see it.
+const inView = ref(false);
+const documentVisible = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const shouldAnimate = computed(
+  () => inView.value && documentVisible.value === 'visible' && reducedMotion.value !== 'reduce'
+);
+
+useIntersectionObserver(
+  containerRef,
+  (entries) => {
+    inView.value = entries[0]?.isIntersecting ?? false;
+  },
+  { rootMargin: '100px' }
+);
+
+// Installed by setupAnimation(); start/stop are safe no-ops around it.
+let loopControl: { start: () => void; stop: () => void } | null = null;
+
+watch(
+  shouldAnimate,
+  (value) => {
+    if (value) loopControl?.start();
+    else loopControl?.stop();
+  },
+  { immediate: true }
+);
+
 const srgbColor = (hex: string): THREE.Color => {
   const c = new THREE.Color(hex);
   return c.convertSRGBToLinear();
@@ -532,7 +567,9 @@ const setupAnimation = () => {
   };
 
   const onClick = async (): Promise<void> => {
-    const nowSec = performance.now() / 1000;
+    // Scan start times are compared against the iTime uniform, so they must
+    // use the same (pausable) clock, not wall time.
+    const nowSec = clock;
     if (props.scanOnClick) pushScan(nowSec);
     if (
       props.enableGyro &&
@@ -649,6 +686,9 @@ const setupAnimation = () => {
   // Animation loop
   let rafId: number | null = null;
   let last = performance.now();
+  // Pausable clock. iTime used to be `performance.now() / 1000`, which jumped
+  // forward by however long the loop happened to be paused.
+  let clock = 0;
 
   // Velocity references for smooth damp (mutable, no recalc)
   const tiltVelObj = { v: 0 };
@@ -695,10 +735,11 @@ const setupAnimation = () => {
     return target + (change + temp) * exp;
   };
 
-  const tick = (): void => {
+  const renderFrame = (): void => {
     const now = performance.now();
     const dt = Math.max(0, Math.min(0.1, (now - last) / 1000));
     last = now;
+    clock += dt;
 
     const s = THREE.MathUtils.clamp(gridScanStore.sensitivity, 0, 1);
     const skewScale = THREE.MathUtils.lerp(0.06, 0.2, s);
@@ -721,7 +762,7 @@ const setupAnimation = () => {
     uniforms.uTilt.value = tiltCurrent * tiltScale;
     uniforms.uYaw.value = THREE.MathUtils.clamp(yawCurrent * yawScale, -0.6, 0.6);
 
-    uniforms.iTime.value = now / 1000;
+    uniforms.iTime.value = clock;
 
     renderer.clear(true, true, true);
     if (composer) {
@@ -729,12 +770,39 @@ const setupAnimation = () => {
     } else {
       renderer.render(scene, camera);
     }
+  };
+
+  const tick = (): void => {
+    rafId = null;
+    if (!shouldAnimate.value) return; // paused - the watcher restarts it
+    renderFrame();
     rafId = requestAnimationFrame(tick);
   };
-  rafId = requestAnimationFrame(tick);
+
+  const start = (): void => {
+    if (rafId !== null) return;
+    // Re-baseline dt so resuming does not jump the animation forward.
+    last = performance.now();
+    rafId = requestAnimationFrame(tick);
+  };
+
+  const stop = (): void => {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  };
+
+  loopControl = { start, stop };
+
+  // One static frame so the hero is never blank while the loop is paused
+  // (reduced motion / off-screen at first paint).
+  renderFrame();
+  if (shouldAnimate.value) start();
 
   cleanupAnimation = (): void => {
-    if (rafId) cancelAnimationFrame(rafId);
+    stop();
+    loopControl = null;
     if (leaveTimer) clearTimeout(leaveTimer);
 
     container.removeEventListener('mousemove', onMouseMove);

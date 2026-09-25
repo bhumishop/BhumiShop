@@ -343,7 +343,8 @@
       "phoneRequired": "电话号码为必填项",
       "smsCode": "发送短信验证码出错",
       "processRequest": "处理请求出错",
-      "termsRequired": "请先接受条款和条件"
+      "termsRequired": "请先接受条款和条件",
+      "loginFailed": "登录失败，请重试。"
     },
     "toast": {
       "smsCodeSent": "短信验证码已发送！"

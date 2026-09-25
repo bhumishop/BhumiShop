@@ -172,8 +172,8 @@ async function retryFetch() {
   await Promise.all([
     productStore.fetchProducts(),
     productStore.fetchCategories(),
+    productStore.fetchCollections()
   ])
-  await productStore.fetchCollections()
 }
 
 function clearFilters() {
@@ -211,23 +211,26 @@ function setPage(page) {
 
 // Cleanup route watcher on unmount
 let routeWatchCleanup = null
-onMounted(async () => {
-  // Fetch products and categories together (both use edge functions)
-  await Promise.all([
+onMounted(() => {
+  // Register the route watcher *before* any await and make it immediate, so a
+  // `?category=` deep link is applied right away instead of racing the network
+  // requests (it was previously registered only after both fetches resolved).
+  routeWatchCleanup = watch(
+    () => route.query.category,
+    (val) => {
+      productStore.setActiveCategory(val || '')
+      currentPage.value = 1
+    },
+    { immediate: true }
+  )
+
+  // Products + categories hit the edge function, collections a direct Supabase
+  // query. Fire all three together instead of awaiting them one after another.
+  Promise.all([
     productStore.fetchProducts(),
     productStore.fetchCategories(),
+    productStore.fetchCollections()
   ])
-  // Fetch collections separately (uses direct Supabase, shouldn't block products)
-  await productStore.fetchCollections()
-
-  routeWatchCleanup = watch(() => route.query.category, (val) => {
-    if (val) {
-      productStore.setActiveCategory(val)
-    } else {
-      productStore.setActiveCategory('')
-    }
-    currentPage.value = 1
-  })
 })
 
 onUnmounted(() => {

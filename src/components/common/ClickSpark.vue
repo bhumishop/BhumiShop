@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, computed, useTemplateRef } from 'vue';
 
 interface Spark {
   x: number;
@@ -38,9 +38,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const containerRef = useTemplateRef<HTMLDivElement>('containerRef');
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef');
-const sparks = ref<Spark[]>([]);
-const startTimeRef = ref<number | null>(null);
-const animationId = ref<number | null>(null);
+
+// Plain array: nothing renders from it and a deep ref would be re-proxied
+// on every animation frame for no reason.
+let sparks: Spark[] = [];
+let animationId: number | null = null;
 
 const easeFunc = computed(() => {
   return (t: number) => {
@@ -57,6 +59,21 @@ const easeFunc = computed(() => {
   };
 });
 
+const stopLoop = () => {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+};
+
+// The rAF loop only runs while sparks are actually on screen; it idles at
+// zero cost between clicks instead of clearing the canvas 60x/second.
+const startLoop = () => {
+  if (animationId === null) {
+    animationId = requestAnimationFrame(draw);
+  }
+};
+
 const handleClick = (e: MouseEvent) => {
   const canvas = canvasRef.value;
   if (!canvas) return;
@@ -65,41 +82,28 @@ const handleClick = (e: MouseEvent) => {
   const y = e.clientY - rect.top;
 
   const now = performance.now();
-  const newSparks: Spark[] = Array.from({ length: props.sparkCount }, (_, i) => ({
-    x,
-    y,
-    angle: (2 * Math.PI * i) / props.sparkCount,
-    startTime: now
-  }));
+  for (let i = 0; i < props.sparkCount; i++) {
+    sparks.push({
+      x,
+      y,
+      angle: (2 * Math.PI * i) / props.sparkCount,
+      startTime: now
+    });
+  }
 
-  sparks.value.push(...newSparks);
+  startLoop();
 };
 
 const draw = (timestamp: number) => {
-  if (!startTimeRef.value) {
-    startTimeRef.value = timestamp;
-  }
+  animationId = null;
 
   const canvas = canvasRef.value;
-  if (!canvas) {
-    animationId.value = requestAnimationFrame(draw);
-    return;
-  }
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    animationId.value = requestAnimationFrame(draw);
-    return;
-  }
-
-  const currentSparks = sparks.value;
-  if (currentSparks.length === 0) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    animationId.value = requestAnimationFrame(draw);
-    return;
-  }
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (sparks.length === 0) return; // nothing left to animate - loop ends here
 
   const duration = props.duration;
   const radius = props.sparkRadius;
@@ -112,8 +116,8 @@ const draw = (timestamp: number) => {
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
 
-  for (let i = 0; i < currentSparks.length; i++) {
-    const spark = currentSparks[i];
+  for (let i = 0; i < sparks.length; i++) {
+    const spark = sparks[i];
     const elapsed = timestamp - spark.startTime;
     if (elapsed >= duration) continue;
 
@@ -137,8 +141,8 @@ const draw = (timestamp: number) => {
     remaining.push(spark);
   }
 
-  sparks.value = remaining;
-  animationId.value = requestAnimationFrame(draw);
+  sparks = remaining;
+  animationId = requestAnimationFrame(draw);
 };
 
 const resizeCanvas = () => {
@@ -170,8 +174,6 @@ onMounted(() => {
   resizeCanvas();
   resizeObserver = new ResizeObserver(() => resizeCanvas());
   resizeObserver.observe(parent);
-
-  animationId.value = requestAnimationFrame(draw);
 });
 
 onUnmounted(() => {
@@ -179,24 +181,9 @@ onUnmounted(() => {
     resizeObserver.disconnect();
     resizeObserver = null;
   }
-  if (animationId.value) {
-    cancelAnimationFrame(animationId.value);
-  }
+  stopLoop();
+  sparks = [];
 });
-
-watch(
-  [
-    () => props.sparkColor,
-    () => props.sparkSize,
-    () => props.sparkRadius,
-    () => props.sparkCount,
-    () => props.duration,
-    () => props.extraScale
-  ],
-  () => {
-    // No need to restart rAF - values are read directly in draw loop
-  }
-);
 </script>
 
 <style scoped>

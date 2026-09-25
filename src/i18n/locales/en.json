@@ -338,7 +338,8 @@
       "phoneRequired": "Phone is required",
       "smsCode": "Error sending SMS code",
       "processRequest": "Error processing request",
-      "termsRequired": "Please accept the terms and conditions first"
+      "termsRequired": "Please accept the terms and conditions first",
+      "loginFailed": "Sign-in failed. Please try again."
     },
     "toast": {
       "smsCodeSent": "SMS code sent!"

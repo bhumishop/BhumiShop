@@ -15,7 +15,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import {
+  useDocumentVisibility,
+  useEventListener,
+  useIntersectionObserver,
+  usePreferredReducedMotion
+} from '@vueuse/core';
 
 interface Props {
   glitchColors?: string[];
@@ -33,98 +39,56 @@ const props = withDefaults(defineProps<Props>(), {
   smooth: true
 });
 
+interface Letter {
+  char: string;
+  color: { r: number; g: number; b: number };
+  target: { r: number; g: number; b: number };
+  progress: number;
+  inTransition: boolean;
+}
+
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef');
-const animationRef = ref<number | null>(null);
-const letters = ref<
-  {
-    char: string;
-    color: string;
-    targetColor: string;
-    colorProgress: number;
-  }[]
->([]);
-const grid = ref({ columns: 0, rows: 0 });
-const context = ref<CanvasRenderingContext2D | null>(null);
-const lastGlitchTime = ref(Date.now());
+
+// Plain (non-reactive) state: this grid holds ~10k cells for a full-screen
+// backdrop and none of it is rendered by Vue. Wrapping it in a deep ref made
+// every mutation go through a Proxy and forced re-renders nobody consumed.
+let letters: Letter[] = [];
+let grid = { columns: 0, rows: 0 };
+let ctx: CanvasRenderingContext2D | null = null;
+let cssWidth = 0;
+let cssHeight = 0;
+let animationId: number | null = null;
+let lastGlitchTime = 0;
+let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+// Indices currently mid colour transition - only these get redrawn per frame
+// instead of re-filling every cell.
+let transitioning: number[] = [];
+
+const inView = ref(false);
+const documentVisible = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const shouldAnimate = computed(
+  () => inView.value && documentVisible.value === 'visible' && reducedMotion.value !== 'reduce'
+);
 
 const fontSize = 16;
 const charWidth = 10;
 const charHeight = 20;
 
 const lettersAndSymbols = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-  '!',
-  '@',
-  '#',
-  '$',
-  '&',
-  '*',
-  '(',
-  ')',
-  '-',
-  '_',
-  '+',
-  '=',
-  '/',
-  '[',
-  ']',
-  '{',
-  '}',
-  ';',
-  ':',
-  '<',
-  '>',
-  ',',
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9'
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '!', '@', '#', '$', '&', '*', '(', ')', '-', '_', '+', '=', '/',
+  '[', ']', '{', '}', ';', ':', '<', '>', ',',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 ];
 
-const getRandomChar = () => {
-  return lettersAndSymbols[Math.floor(Math.random() * lettersAndSymbols.length)];
-};
-
-const getRandomColor = () => {
-  return props.glitchColors[Math.floor(Math.random() * props.glitchColors.length)];
-};
+const getRandomChar = () => lettersAndSymbols[Math.floor(Math.random() * lettersAndSymbols.length)];
 
 const hexToRgb = (hex: string) => {
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, (m, r, g, b) => {
-    return r + r + g + g + b + b;
-  });
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
 
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -133,21 +97,10 @@ const hexToRgb = (hex: string) => {
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
       }
-    : null;
+    : { r: 0, g: 0, b: 0 };
 };
 
-const interpolateColor = (
-  start: { r: number; g: number; b: number },
-  end: { r: number; g: number; b: number },
-  factor: number
-) => {
-  const result = {
-    r: Math.round(start.r + (end.r - start.r) * factor),
-    g: Math.round(start.g + (end.g - start.g) * factor),
-    b: Math.round(start.b + (end.b - start.b) * factor)
-  };
-  return `rgb(${result.r}, ${result.g}, ${result.b})`;
-};
+const getRandomColor = () => hexToRgb(props.glitchColors[Math.floor(Math.random() * props.glitchColors.length)]);
 
 const calculateGrid = (width: number, height: number) => {
   const columns = Math.ceil(width / charWidth);
@@ -156,14 +109,19 @@ const calculateGrid = (width: number, height: number) => {
 };
 
 const initializeLetters = (columns: number, rows: number) => {
-  grid.value = { columns, rows };
+  grid = { columns, rows };
   const totalLetters = columns * rows;
-  letters.value = Array.from({ length: totalLetters }, () => ({
-    char: getRandomChar(),
-    color: getRandomColor(),
-    targetColor: getRandomColor(),
-    colorProgress: 1
-  }));
+  transitioning = [];
+  letters = Array.from({ length: totalLetters }, () => {
+    const color = getRandomColor();
+    return {
+      char: getRandomChar(),
+      color: { ...color },
+      target: getRandomColor(),
+      progress: 1,
+      inTransition: false
+    };
+  });
 };
 
 const resizeCanvas = () => {
@@ -186,8 +144,13 @@ const resizeCanvas = () => {
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
 
-  if (context.value) {
-    context.value.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Cache the CSS box: measuring it with getBoundingClientRect() on every
+  // frame forced a synchronous layout read 60x/second.
+  cssWidth = width;
+  cssHeight = height;
+
+  if (ctx) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   const { columns, rows } = calculateGrid(width, height);
@@ -195,113 +158,170 @@ const resizeCanvas = () => {
   drawLetters();
 };
 
+const drawLetter = (index: number) => {
+  if (!ctx) return;
+  const letter = letters[index];
+  if (!letter) return;
+  const x = (index % grid.columns) * charWidth;
+  const y = Math.floor(index / grid.columns) * charHeight;
+  ctx.clearRect(x, y, charWidth, charHeight);
+  ctx.fillStyle = `rgb(${letter.color.r}, ${letter.color.g}, ${letter.color.b})`;
+  ctx.fillText(letter.char, x, y);
+};
+
+// Full repaint - only needed on init/resize. Steady-state updates redraw the
+// handful of cells that actually changed.
 const drawLetters = () => {
-  if (!context.value || letters.value.length === 0) return;
-  const ctx = context.value;
-  const { width, height } = canvasRef.value!.getBoundingClientRect();
-  ctx.clearRect(0, 0, width, height);
+  if (!ctx || letters.length === 0) return;
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
   ctx.font = `${fontSize}px monospace`;
   ctx.textBaseline = 'top';
 
-  letters.value.forEach((letter, index) => {
-    const x = (index % grid.value.columns) * charWidth;
-    const y = Math.floor(index / grid.value.columns) * charHeight;
-    ctx.fillStyle = letter.color;
+  for (let index = 0; index < letters.length; index++) {
+    const letter = letters[index];
+    const x = (index % grid.columns) * charWidth;
+    const y = Math.floor(index / grid.columns) * charHeight;
+    ctx.fillStyle = `rgb(${letter.color.r}, ${letter.color.g}, ${letter.color.b})`;
     ctx.fillText(letter.char, x, y);
-  });
+  }
 };
 
-const updateLetters = () => {
-  if (!letters.value || letters.value.length === 0) return;
+const updateLetters = (): number[] => {
+  if (letters.length === 0) return [];
 
   // Reduced from 5% to 2% for better performance
-  const updateCount = Math.max(1, Math.floor(letters.value.length * 0.02));
+  const updateCount = Math.max(1, Math.floor(letters.length * 0.02));
+  const changed: number[] = [];
 
   for (let i = 0; i < updateCount; i++) {
-    const index = Math.floor(Math.random() * letters.value.length);
-    if (!letters.value[index]) continue;
+    const index = Math.floor(Math.random() * letters.length);
+    const letter = letters[index];
+    if (!letter) continue;
 
-    letters.value[index].char = getRandomChar();
-    letters.value[index].targetColor = getRandomColor();
+    letter.char = getRandomChar();
+    letter.target = getRandomColor();
 
     if (!props.smooth) {
-      letters.value[index].color = letters.value[index].targetColor;
-      letters.value[index].colorProgress = 1;
+      letter.color = { ...letter.target };
+      letter.progress = 1;
+      if (letter.inTransition) {
+        letter.inTransition = false;
+        transitioning = transitioning.filter((idx) => idx !== index);
+      }
+    } else if (!letter.inTransition) {
+      letter.inTransition = true;
+      letter.progress = 0;
+      transitioning.push(index);
     } else {
-      letters.value[index].colorProgress = 0;
+      letter.progress = 0;
     }
+
+    changed.push(index);
   }
+
+  return changed;
 };
 
 const handleSmoothTransitions = () => {
-  let needsRedraw = false;
-  const len = letters.value.length;
-  for (let i = 0; i < len; i++) {
-    const letter = letters.value[i];
-    if (letter.colorProgress < 1) {
-      letter.colorProgress += 0.05;
-      if (letter.colorProgress > 1) letter.colorProgress = 1;
+  if (transitioning.length === 0) return;
 
-      const startRgb = hexToRgb(letter.color);
-      const endRgb = hexToRgb(letter.targetColor);
-      if (startRgb && endRgb) {
-        letter.color = interpolateColor(startRgb, endRgb, letter.colorProgress);
-        needsRedraw = true;
-      }
+  const stillTransitioning: number[] = [];
+
+  for (let i = 0; i < transitioning.length; i++) {
+    const index = transitioning[i];
+    const letter = letters[index];
+    if (!letter) continue;
+
+    letter.progress = Math.min(1, letter.progress + 0.05);
+    const f = letter.progress;
+    letter.color.r = Math.round(letter.color.r + (letter.target.r - letter.color.r) * f);
+    letter.color.g = Math.round(letter.color.g + (letter.target.g - letter.color.g) * f);
+    letter.color.b = Math.round(letter.color.b + (letter.target.b - letter.color.b) * f);
+
+    drawLetter(index);
+
+    if (letter.progress < 1) {
+      stillTransitioning.push(index);
+    } else {
+      letter.inTransition = false;
     }
   }
 
-  if (needsRedraw) {
-    drawLetters();
-  }
+  transitioning = stillTransitioning;
 };
 
 const animate = () => {
+  animationId = null;
+  if (!ctx || !shouldAnimate.value) return; // paused - the watcher restarts it
+
+  ctx.font = `${fontSize}px monospace`;
+  ctx.textBaseline = 'top';
+
   const now = Date.now();
-  if (now - lastGlitchTime.value >= props.glitchSpeed) {
-    updateLetters();
-    drawLetters();
-    lastGlitchTime.value = now;
+  if (now - lastGlitchTime >= props.glitchSpeed) {
+    lastGlitchTime = now;
+    const changed = updateLetters();
+    for (let i = 0; i < changed.length; i++) drawLetter(changed[i]);
   }
 
   if (props.smooth) {
     handleSmoothTransitions();
   }
 
-  animationRef.value = requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
 };
 
-let resizeTimeout: ReturnType<typeof setTimeout>;
+const startLoop = () => {
+  if (animationId !== null) return;
+  animationId = requestAnimationFrame(animate);
+};
+
+const stopLoop = () => {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+};
 
 const handleResize = () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(resizeCanvas, 150);
 };
 
+useEventListener('resize', handleResize, { passive: true });
+
+useIntersectionObserver(
+  canvasRef,
+  (entries) => {
+    inView.value = entries[0]?.isIntersecting ?? false;
+  },
+  { rootMargin: '100px' }
+);
+
+watch(shouldAnimate, (value) => {
+  if (value) startLoop();
+  else stopLoop();
+}, { immediate: true });
+
+watch([() => props.glitchSpeed, () => props.smooth], () => {
+  lastGlitchTime = 0;
+});
+
 onMounted(() => {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  context.value = canvas.getContext('2d');
+  ctx = canvas.getContext('2d');
   resizeCanvas();
-  animate();
-
-  window.addEventListener('resize', handleResize, { passive: true });
+  if (shouldAnimate.value) startLoop();
 });
 
 onUnmounted(() => {
-  if (animationRef.value) {
-    cancelAnimationFrame(animationRef.value);
-  }
-  window.removeEventListener('resize', handleResize);
+  stopLoop();
   clearTimeout(resizeTimeout);
-});
-
-watch([() => props.glitchSpeed, () => props.smooth], () => {
-  if (animationRef.value) {
-    cancelAnimationFrame(animationRef.value);
-  }
-  animate();
+  letters = [];
+  transitioning = [];
+  ctx = null;
 });
 </script>
 

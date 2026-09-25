@@ -498,8 +498,9 @@ async function handleGoogleLogin() {
     return
   }
   try {
-    await authStore.signInWithGoogle()
+    await authStore.signInWithGoogle(route.query.redirect)
   } catch (err) {
+    console.error('[BhumiShop] Google sign-in error:', err)
     toast.error(t('auth.errors.processRequest'))
   }
 }
@@ -510,8 +511,9 @@ async function handleWechatLogin() {
     return
   }
   try {
-    await authStore.signInWithWechat()
+    await authStore.signInWithWechat(route.query.redirect)
   } catch (err) {
+    console.error('[BhumiShop] WeChat sign-in error:', err)
     toast.error(t('auth.errors.wechatLogin'))
   }
 }
@@ -560,11 +562,37 @@ function onAuthComplete() {
 }
 
 function goHome() {
-  const redirect = route.query.redirect || '/'
+  const savedRedirect = authStore.consumePostLoginRedirect()
+  const rawRedirect = route.query.redirect || savedRedirect || '/'
   // Only allow relative paths starting with /
-  const target = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'
+  const target = typeof rawRedirect === 'string' && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+    ? rawRedirect
+    : '/'
   // Use replace to avoid adding extra history entry when redirecting from login
   router.replace(target)
+}
+
+function readAuthCallbackError() {
+  const sources = [window.location.hash, window.location.search]
+  for (const source of sources) {
+    const params = new URLSearchParams(source.replace(/^[#?]/, ''))
+    if (params.get('error') || params.get('error_code')) {
+      return {
+        error: params.get('error') || 'unknown_error',
+        description: params.get('error_description') || params.get('error_code')
+      }
+    }
+  }
+  return null
+}
+
+function clearAuthCallbackParams() {
+  const url = new URL(window.location.href)
+  url.hash = ''
+  for (const key of ['error', 'error_description', 'error_code']) {
+    url.searchParams.delete(key)
+  }
+  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
 }
 
 onMounted(async () => {
@@ -572,9 +600,11 @@ onMounted(async () => {
   await nextTick()
 
   // Check if this is an OAuth callback - if so, wait for auth to be processed
-  const isOAuthCallback = window.location.hash && (
-    window.location.hash.includes('access_token') || 
-    window.location.hash.includes('error')
+  const isOAuthCallback = readAuthCallbackError() !== null || (
+    window.location.hash && (
+      window.location.hash.includes('access_token=') ||
+      window.location.hash.includes('error=')
+    )
   )
 
   if (isOAuthCallback) {
@@ -582,12 +612,19 @@ onMounted(async () => {
     if (!authStore.initialized) {
       await authStore.initialize()
     }
-    
+
     // If authentication succeeded, redirect
     if (authStore.isLoggedIn) {
       goHome()
       return
     }
+
+    const authError = readAuthCallbackError()
+    if (authError) {
+      console.error('[BhumiShop] OAuth callback error:', authError.error, authError.description)
+    }
+    toast.error(t('auth.errors.loginFailed'))
+    clearAuthCallbackParams()
   }
 
   if (authStore.isLoggedIn) {

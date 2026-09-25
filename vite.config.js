@@ -29,20 +29,28 @@ export default defineConfig(({ mode }) => {
       // Optimize chunk splitting for better caching
       rollupOptions: {
         output: {
+          // Split per library, not per "domain". Bundling ogl together with
+          // three/postprocessing meant the entry graph (App -> AppFooter ->
+          // DarkVeil, which imports ogl) had to download the whole 600 kB
+          // 3D chunk on first paint, even though three.js is only used by the
+          // lazily-imported GridScan/CircularGallery. Same story for motion-v,
+          // which is only used by the Auth route stepper.
           manualChunks: {
             'vue-vendor': ['vue', 'vue-router', 'pinia'],
+            'vueuse-vendor': ['@vueuse/core', '@vueuse/shared'],
             'i18n-vendor': ['vue-i18n'],
-            'animation-vendor': ['gsap', 'motion-v'],
-            '3d-vendor': ['three', 'ogl', 'postprocessing']
+            'gsap-vendor': ['gsap'],
+            'motion-vendor': ['motion-v'],
+            'ogl-vendor': ['ogl'],
+            'three-vendor': ['three', 'postprocessing'],
+            'supabase-vendor': ['@supabase/supabase-js']
           }
         }
       },
       // Enable source maps for debugging (disable in production if not needed)
       sourcemap: false,
-      // Minify with terser for better compression
-      minify: 'esbuild',
-      // Asset size limit warning (500KB)
-      chunkSizeWarningLimit: 500
+      // Minify with esbuild for speed (set to 'terser' if raw byte size wins)
+      minify: 'esbuild'
     }
   }
 })

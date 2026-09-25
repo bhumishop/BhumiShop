@@ -87,19 +87,34 @@ export const i18n = createI18n({
 // Set initial messages (will be loaded asynchronously)
 i18n.global.setLocaleMessage(i18n.global.locale.value, {})
 
-// Export setup function for use in main.js
-export async function setupI18n() {
-  const locale = i18n.global.locale.value
-  const messages = await loadLocaleMessages(locale)
-  i18n.global.setLocaleMessage(locale, messages)
+// Resolves once the active locale (and the fallback) messages are in place.
+// main.js mounts the app without awaiting them; the Preloader covers the
+// screen until this settles, so first paint is not gated on a locale round
+// trip (or two) anymore.
+export let i18nReady = Promise.resolve()
 
-  // Load fallback locale too
+// Export setup function for use in main.js
+export function setupI18n() {
+  const locale = i18n.global.locale.value
+
+  // Active and fallback locales load in parallel instead of back to back.
+  const loads = [
+    loadLocaleMessages(locale).then(messages => {
+      i18n.global.setLocaleMessage(locale, messages)
+    })
+  ]
+
   if (locale !== defaultLocale) {
-    const fallbackMessages = await loadLocaleMessages(defaultLocale)
-    i18n.global.setLocaleMessage(defaultLocale, fallbackMessages)
+    loads.push(
+      loadLocaleMessages(defaultLocale).then(messages => {
+        i18n.global.setLocaleMessage(defaultLocale, messages)
+      })
+    )
   }
 
-  return i18n
+  i18nReady = Promise.all(loads).then(() => undefined)
+
+  return i18nReady.then(() => i18n)
 }
 
 // Export function to change locale

@@ -117,6 +117,20 @@ O **BHUMI SHOP** é uma solução completa de e-commerce desenvolvida com **Vue.
 - **Client ID:** (obtenha em Google Cloud Console)
 - **Client Secret:** (obtenha em Google Cloud Console)
 
+Checklist de configuração (Google Cloud Console + Supabase Dashboard):
+
+1. **Google Cloud Console > OAuth Client ID (Web application):**
+   - *Authorized JavaScript origins:* `https://shop.bhumisparshaschool.org` e `http://localhost:5173`
+   - *Authorized redirect URIs:* `https://<project-ref>.supabase.co/auth/v1/callback`
+2. **Google Cloud Console > Data Access (Scopes):** `openid`, `userinfo.email`, `userinfo.profile`
+3. **Supabase Dashboard > Authentication > Providers > Google:** informe Client ID e Client Secret
+4. **Supabase Dashboard > Authentication > URL Configuration > Redirect URLs:** inclua exatamente
+   `https://shop.bhumisparshaschool.org/login` e `http://localhost:5173/login` (o app monta o
+   `redirectTo` a partir de `window.location.origin` + `VITE_BASE_URL` + `login`; `VITE_SITE_URL`
+   pode fixar a origem). Se a URL não estiver na lista, o Supabase rejeita o login com
+   `error=access_denied` e o app exibe "Sign-in failed".
+5. **Site URL:** `https://shop.bhumisparshaschool.org`
+
 ---
 
 ## ⚙️ Instalação Local

@@ -1,22 +1,21 @@
+// Must stay the first import: restores the URL (OAuth tokens included) saved by
+// public/404.html before the Supabase client is created and scans the URL.
+import './utils/restoreSpaRedirect'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
-import { setupI18n } from './i18n'
+import { i18n, setupI18n } from './i18n'
 import './assets/main.css'
 
-// Check for SPA redirect path BEFORE bootstrapping
-const spaRedirectPath = sessionStorage.getItem('spa-redirect-path')
-if (spaRedirectPath) {
-  sessionStorage.removeItem('spa-redirect-path')
-}
-
-async function bootstrap() {
+function bootstrap() {
   const app = createApp(App)
   const pinia = createPinia()
 
-  // Setup i18n with async locale loading
-  const i18n = await setupI18n()
+  // Start loading the locale messages but do NOT await them before mounting:
+  // the Preloader keeps the screen covered until `i18nReady` settles, so first
+  // paint is no longer blocked on 1-2 dynamic JSON imports.
+  setupI18n()
 
   app.use(pinia)
   app.use(i18n)
@@ -30,15 +29,6 @@ async function bootstrap() {
   }
 
   app.mount('#app')
-
-  // After app is mounted, handle redirect if needed
-  if (spaRedirectPath) {
-    await router.isReady()
-    const currentPath = router.currentRoute.value.path
-    if (currentPath !== spaRedirectPath && currentPath !== '/') {
-      await router.replace(spaRedirectPath)
-    }
-  }
 }
 
 bootstrap()

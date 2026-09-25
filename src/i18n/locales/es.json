@@ -343,7 +343,8 @@
       "phoneRequired": "El telefono es obligatorio",
       "smsCode": "Error al enviar codigo SMS",
       "processRequest": "Error al procesar solicitud",
-      "termsRequired": "Debes aceptar los terminos y condiciones primero"
+      "termsRequired": "Debes aceptar los terminos y condiciones primero",
+      "loginFailed": "Error al iniciar sesión. Inténtalo de nuevo."
     },
     "toast": {
       "smsCodeSent": "¡Codigo SMS enviado!"

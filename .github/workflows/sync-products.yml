@@ -1,0 +1,180 @@
+name: Sync Products to Supabase
+
+on:
+  schedule:
+    # Every hour, on the hour (GitHub may queue/delay scheduled runs)
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      store:
+        description: 'Store to sync'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - prataprint
+          - uiclap
+          - bhumisprint
+      full:
+        description: 'Force full re-sync (ignore change detection)'
+        required: false
+        type: boolean
+        default: false
+      upload_images:
+        description: 'Upload product images to Supabase Storage'
+        required: false
+        type: boolean
+        default: true
+      sync_to_db:
+        description: 'Write products to Supabase'
+        required: false
+        type: boolean
+        default: true
+  push:
+    branches: [master]
+    paths:
+      - 'scripts/scrapers/**'
+      - '.github/workflows/sync-products.yml'
+
+permissions:
+  contents: read
+
+# Never run two syncs at once; queued runs wait instead of being cancelled
+concurrency:
+  group: sync-products
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Scrape stores → Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SYNC_TRIGGERED_BY: github-actions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Supabase secrets
+        run: |
+          missing=0
+          [ -n "$SUPABASE_URL" ] || { echo "::error::Missing secret SUPABASE_URL"; missing=1; }
+          [ -n "$SUPABASE_SERVICE_ROLE_KEY" ] || { echo "::error::Missing secret SUPABASE_SERVICE_ROLE_KEY"; missing=1; }
+          [ "$missing" -eq 0 ] || exit 1
+          echo "Supabase project: ${SUPABASE_URL}"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: scripts/scrapers/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/scrapers/requirements.txt
+
+      - name: Resolve inputs
+        id: cfg
+        run: |
+          STORE="all"; FULL=""; UPLOAD="--upload-images"; SYNC="--sync-to-db"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            STORE="${{ inputs.store }}"
+            [ "${{ inputs.full }}" = "true" ] && FULL="--full"
+            [ "${{ inputs.upload_images }}" = "true" ] || UPLOAD=""
+            [ "${{ inputs.sync_to_db }}" = "true" ] || SYNC=""
+          fi
+          echo "store=$STORE" >> "$GITHUB_OUTPUT"
+          echo "full=$FULL" >> "$GITHUB_OUTPUT"
+          echo "upload=$UPLOAD" >> "$GITHUB_OUTPUT"
+          echo "sync=$SYNC" >> "$GITHUB_OUTPUT"
+
+      - name: Run scrapers
+        run: |
+          chmod +x scripts/scrapers/sync.sh
+          ARGS="${{ steps.cfg.outputs.full }} ${{ steps.cfg.outputs.sync }} ${{ steps.cfg.outputs.upload }}"
+          echo "store=${{ steps.cfg.outputs.store }} args=$ARGS"
+          scripts/scrapers/sync.sh "${{ steps.cfg.outputs.store }}" $ARGS
+
+      - name: Verify products reached Supabase
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, urllib.request
+
+          base = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1"
+          key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+          hdrs = {"apikey": key, "Authorization": f"Bearer {key}"}
+
+          def count(source=None):
+              q = "products?select=id&is_active=eq.true"
+              if source:
+                  q += f"&third_party_source=eq.{source}"
+              req = urllib.request.Request(f"{base}/{q}", headers=hdrs)
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return len(json.load(r))
+
+          expectations = {"prataprint": 1, "uiclap": 1}
+          failed = False
+          for source, minimum in expectations.items():
+              try:
+                  total = count(source)
+              except Exception as exc:  # noqa: BLE001
+                  print(f"[FAIL] {source}: {exc}")
+                  failed = True
+                  continue
+              status = "PASS" if total >= minimum else "FAIL"
+              if total < minimum:
+                  failed = True
+              print(f"  [{status}] {source}: {total} active products (min {minimum})")
+
+          try:
+              print(f"  [INFO] total active products: {count()}")
+          except Exception as exc:  # noqa: BLE001
+              print(f"  [WARN] could not count total products: {exc}")
+
+          # bhumisprint stays pending until its upstream URL is fixed
+          try:
+              b = count("bhumisprint")
+              print(f"  [INFO] bhumisprint (pending): {b} active products")
+          except Exception:
+              pass
+
+          sys.exit(1 if failed else 0)
+          PY
+
+      - name: Verify storefront edge function serves products
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, urllib.request
+
+          url = os.environ["SUPABASE_URL"].rstrip("/") + "/functions/v1/storefront-products?limit=100"
+          req = urllib.request.Request(url, headers={
+              "apikey": os.environ["SUPABASE_SERVICE_ROLE_KEY"],
+              "Authorization": f"Bearer {os.environ['SUPABASE_SERVICE_ROLE_KEY']}",
+          })
+          try:
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  body = json.load(r)
+          except Exception as exc:  # noqa: BLE001
+              print(f"[FAIL] storefront-products error: {exc}")
+              sys.exit(1)
+
+          total = body.get("count", 0)
+          returned = len(body.get("data", []))
+          ok = total > 0 and returned > 0
+          print(f"  [{'PASS' if ok else 'FAIL'}] storefront-products: count={total} returned={returned}")
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Upload products.json artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: products-${{ github.run_id }}
+          path: scripts/scrapers/*/output/products.json
+          if-no-files-found: ignore
+          retention-days: 14

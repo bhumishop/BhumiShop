@@ -343,7 +343,8 @@
       "phoneRequired": "電話番号は必須です",
       "smsCode": "SMSコード送信エラー",
       "processRequest": "リクエスト処理エラー",
-      "termsRequired": "利用規約に同意してください"
+      "termsRequired": "利用規約に同意してください",
+      "loginFailed": "サインインに失敗しました。もう一度お試しください।"
     },
     "toast": {
       "smsCodeSent": "SMSコードを送信しました！"

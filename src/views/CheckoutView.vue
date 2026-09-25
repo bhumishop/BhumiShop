@@ -416,10 +416,36 @@ const errors = reactive({
   cep: ''
 })
 
-// Sync customer info to store on change
-watch(customerInfo, (info) => {
-  checkoutStore.setCustomerInfo(info)
-}, { deep: true })
+// Sync customer info to store on change.
+// The form is 14 fields long: pushing a freshly normalised copy into the store
+// on every keystroke caused a store write + reactive fan-out per character.
+// The write is now coalesced, and flushed synchronously right before anything
+// that actually reads `checkoutStore.customerInfo` (see below).
+let customerInfoTimer = null
+
+function pushCustomerInfo() {
+  if (customerInfoTimer) clearTimeout(customerInfoTimer)
+  customerInfoTimer = setTimeout(() => {
+    customerInfoTimer = null
+    checkoutStore.setCustomerInfo(customerInfo)
+  }, 200)
+}
+
+function flushCustomerInfo() {
+  if (customerInfoTimer) {
+    clearTimeout(customerInfoTimer)
+    customerInfoTimer = null
+  }
+  checkoutStore.setCustomerInfo(customerInfo)
+}
+
+watch(customerInfo, pushCustomerInfo, { deep: true })
+
+/** Flush the form into the store, then recalculate shipping. */
+function recalculateShipping() {
+  flushCustomerInfo()
+  checkoutStore.calculateShippingCost()
+}
 
 // Address guessing game handlers
 function onAddressResolved(data) {
@@ -436,10 +462,10 @@ function onAddressResolved(data) {
   if (customerInfo.country === 'BR') {
     const digits = customerInfo.postalCode.replace(/\D/g, '')
     if (digits.length === 8) {
-      checkoutStore.calculateShippingCost()
+      recalculateShipping()
     }
   } else if (customerInfo.postalCode.trim().length > 0) {
-    checkoutStore.calculateShippingCost()
+    recalculateShipping()
   }
 }
 
@@ -457,10 +483,10 @@ function onAddressUpdated(data) {
   if (customerInfo.country === 'BR') {
     const digits = customerInfo.postalCode.replace(/\D/g, '')
     if (digits.length === 8) {
-      checkoutStore.calculateShippingCost()
+      recalculateShipping()
     }
   } else if (customerInfo.postalCode.trim().length > 0) {
-    checkoutStore.calculateShippingCost()
+    recalculateShipping()
   }
 }
 
@@ -472,10 +498,10 @@ watch(() => customerInfo.postalCode, (newCep) => {
     if (customerInfo.country === 'BR') {
       const digits = (newCep || '').replace(/\D/g, '')
       if (digits.length === 8) {
-        checkoutStore.calculateShippingCost()
+        recalculateShipping()
       }
     } else if ((newCep || '').trim().length > 0) {
-      checkoutStore.calculateShippingCost()
+      recalculateShipping()
     }
   }, 500)
 })
@@ -534,8 +560,7 @@ function goToShippingStep() {
 
   if (errors.name || errors.email || errors.phone || errors.cep) return
 
-  checkoutStore.setCustomerInfo(customerInfo)
-  checkoutStore.calculateShippingCost()
+  recalculateShipping()
 
   // If has Uma Penca items, show provider popup on step 3
   checkoutStore.nextStep()
@@ -754,6 +779,8 @@ function handleBillingRedirect() {
 }
 
 onUnmounted(async () => {
+  // Don't lose the last keystrokes if the user leaves within the debounce window
+  if (customerInfoTimer) flushCustomerInfo()
   if (pixPollingTimer) clearInterval(pixPollingTimer)
   if (shippingDebounceTimer) clearTimeout(shippingDebounceTimer)
   // Clean up MercadoPago bricks

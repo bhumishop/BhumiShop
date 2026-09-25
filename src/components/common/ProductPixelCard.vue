@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { computed, ref, shallowRef, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useCartStore } from '../../stores/cart'
@@ -120,7 +120,9 @@ const productSlug = computed(() => generateSlug(props.product.name, props.produc
 // Pixel animation refs
 const pixelContainerRef = ref(null)
 const canvasRef = ref(null)
-const pixelsRef = ref([])
+// shallowRef: the grid holds thousands of Pixel objects and nothing renders
+// them through Vue - a deep ref would proxy every one of them.
+const pixelsRef = shallowRef([])
 const animationRef = ref(null)
 const timePreviousRef = ref(performance.now())
 const reducedMotion = ref(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -348,12 +350,13 @@ function getEffectiveSpeed(value, reduced) {
 }
 
 const initPixels = () => {
-  if (!pixelContainerRef.value || !canvasRef.value) return
+  if (!pixelContainerRef.value || !canvasRef.value) return false
 
   const rect = pixelContainerRef.value.getBoundingClientRect()
   const width = Math.floor(rect.width)
   const height = Math.floor(rect.height)
   const ctx = canvasRef.value.getContext('2d')
+  if (!ctx) return false
 
   canvasRef.value.width = width
   canvasRef.value.height = height
@@ -371,11 +374,21 @@ const initPixels = () => {
       const dy = y - height / 2
       const distance = reducedMotion.value ? 0 : Math.sqrt(dx * dx + dy * dy)
       const delay = distance
-      if (!ctx) return
       pxs.push(new Pixel(canvasRef.value, ctx, x, y, color, getEffectiveSpeed(PIXEL_CONFIG.speed, reducedMotion.value), delay))
     }
   }
   pixelsRef.value = pxs
+  return true
+}
+
+// A grid of 6px cells over a whole card is thousands of objects. Building it
+// on mount meant paying that cost (and re-paying it on every catalog refetch)
+// for cards the user may never hover. Build it on first interaction instead.
+let pixelsBuilt = false
+
+const ensurePixels = () => {
+  if (pixelsBuilt) return
+  if (initPixels()) pixelsBuilt = true
 }
 
 const doAnimate = (fnName) => {
@@ -402,10 +415,12 @@ const doAnimate = (fnName) => {
   }
   if (allIdle && animationRef.value) {
     cancelAnimationFrame(animationRef.value)
+    animationRef.value = null
   }
 }
 
 const handleAnimation = (name) => {
+  ensurePixels()
   if (animationRef.value !== null) {
     cancelAnimationFrame(animationRef.value)
   }
@@ -418,13 +433,15 @@ const onMouseLeave = () => handleAnimation('disappear')
 let resizeObserver = null
 let resizeDebounceTimer = null
 
-watch(() => props.product, () => {
-  initPixels()
+// Keyed on the id: a catalog refetch replaces the product object identity and
+// used to rebuild every card's pixel grid for data that had not changed.
+watch(() => props.product?.id, () => {
+  if (pixelsBuilt) initPixels()
 }, { flush: 'post' })
 
 onMounted(() => {
-  initPixels()
   resizeObserver = new ResizeObserver(() => {
+    if (!pixelsBuilt) return
     if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer)
     resizeDebounceTimer = setTimeout(() => {
       initPixels()

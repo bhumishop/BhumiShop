@@ -4,12 +4,7 @@
     <Preloader />
 
     <!-- Noise overlay - global subtle texture -->
-    <Noise
-      :pattern-size="250"
-      :pattern-scale-x="1"
-      :pattern-scale-y="1"
-      :pattern-alpha="5"
-    />
+    <Noise :pattern-alpha="5" />
 
     <!-- Click spark effect -->
     <ClickSpark
@@ -122,6 +117,17 @@ watch(() => route.path, async (newPath, oldPath) => {
     clearTimeout(routeWatchDebounce)
   }
 
+  // Kill the previous page's ScrollTriggers *now*, before the new view mounts.
+  // This watcher runs pre-patch; doing it inside the debounced callback below
+  // was ~100ms too late and destroyed the ScrollTriggers the incoming view had
+  // just created, leaving its scroll reveals stuck in their "from" state.
+  try {
+    revertGlobalAnimations()
+    initGlobalAnimations()
+  } catch (e) {
+    // Silent fail - animations may not be initialized
+  }
+
   // Update SEO immediately (lightweight)
   updateRouteSEO()
 
@@ -131,8 +137,6 @@ watch(() => route.path, async (newPath, oldPath) => {
     await nextTick()
 
     try {
-      revertGlobalAnimations()
-      initGlobalAnimations()
       refreshScrollTriggers(100)
     } catch (e) {
       // Silent fail - animations may not be initialized

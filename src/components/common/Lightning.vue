@@ -3,7 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import {
+  useDocumentVisibility,
+  useIntersectionObserver,
+  usePreferredReducedMotion
+} from '@vueuse/core';
 
 interface LightningProps {
   hue?: number;
@@ -22,10 +27,32 @@ const props = withDefaults(defineProps<LightningProps>(), {
 });
 
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef');
-let animationId = 0;
+let animationId: number | null = null;
 let gl: WebGLRenderingContext | null = null;
 let program: WebGLProgram | null = null;
-let startTime = 0;
+// Pausable animation clock: advances only while the loop is running, so
+// resuming after a pause does not jump the shader forward in time.
+let elapsed = 0;
+let lastFrameTime = 0;
+let removeResizeListener: (() => void) | null = null;
+
+// The lightning shader runs a 10-octave fbm per fragment over a full-page
+// canvas - it must not keep rendering when nobody can see it.
+const inView = ref(false);
+const documentVisible = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const shouldAnimate = computed(
+  () => inView.value && documentVisible.value === 'visible' && reducedMotion.value !== 'reduce'
+);
+
+useIntersectionObserver(
+  canvasRef,
+  (entries) => {
+    inView.value = entries[0]?.isIntersecting ?? false;
+  },
+  { rootMargin: '100px' }
+);
 
 // Cached uniform locations
 let locResolution: WebGLUniformLocation | null = null;
@@ -179,6 +206,10 @@ const initWebGL = () => {
 
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
+  removeResizeListener = () => {
+    window.removeEventListener('resize', resizeCanvas);
+    removeResizeListener = null;
+  };
 
   gl = canvas.getContext('webgl');
   if (!gl) {
@@ -219,15 +250,15 @@ const initWebGL = () => {
   gl.enableVertexAttribArray(aPosition);
   gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
 
-  startTime = performance.now();
-  render();
-
-  return () => {
-    window.removeEventListener('resize', resizeCanvas);
-  };
+  elapsed = 0;
+  lastFrameTime = performance.now();
+  // One static frame so the backdrop is never blank while the loop is paused
+  // (reduced motion / off-screen on first paint).
+  drawFrame();
+  if (shouldAnimate.value) startLoop();
 };
 
-const render = () => {
+const drawFrame = () => {
   if (!gl || !program || !canvasRef.value) return;
 
   const canvas = canvasRef.value;
@@ -243,8 +274,11 @@ const render = () => {
   gl.viewport(0, 0, canvas.width, canvas.height);
 
   const currentTime = performance.now();
+  elapsed += (currentTime - lastFrameTime) / 1000.0;
+  lastFrameTime = currentTime;
+
   gl.uniform2f(locResolution, canvas.width, canvas.height);
-  gl.uniform1f(locTime, (currentTime - startTime) / 1000.0);
+  gl.uniform1f(locTime, elapsed);
   gl.uniform1f(locHue, props.hue);
   gl.uniform1f(locXOffset, props.xOffset);
   gl.uniform1f(locSpeed, props.speed);
@@ -252,7 +286,26 @@ const render = () => {
   gl.uniform1f(locSize, props.size);
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
-  animationId = requestAnimationFrame(render);
+};
+
+const tick = () => {
+  animationId = null;
+  if (!shouldAnimate.value) return; // paused - the watcher restarts it
+  drawFrame();
+  animationId = requestAnimationFrame(tick);
+};
+
+const startLoop = () => {
+  if (animationId !== null || !gl || !program) return;
+  lastFrameTime = performance.now();
+  animationId = requestAnimationFrame(tick);
+};
+
+const stopLoop = () => {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
 };
 
 onMounted(() => {
@@ -260,9 +313,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (animationId) {
-    cancelAnimationFrame(animationId);
-  }
+  stopLoop();
+  if (removeResizeListener) removeResizeListener();
   // Clean up WebGL resources
   if (gl && program) {
     gl.deleteProgram(program);
@@ -278,12 +330,10 @@ onUnmounted(() => {
   locSize = null;
 });
 
-watch(
-  () => [props.hue, props.xOffset, props.speed, props.intensity, props.size],
-  () => {
-    // Uniforms are read directly in render loop - no restart needed
-  }
-);
+watch(shouldAnimate, (value) => {
+  if (value) startLoop();
+  else stopLoop();
+}, { immediate: true });
 </script>
 
 <style scoped>

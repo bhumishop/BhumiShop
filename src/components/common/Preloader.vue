@@ -51,36 +51,96 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { usePreferredReducedMotion } from '@vueuse/core'
+import { i18nReady } from '../../i18n'
 
 const visible = ref(true)
 const exiting = ref(false)
-const MIN_ANIMATION_TIME = 2500
 
-onMounted(() => {
-  // Wait for minimum animation time
-  const minTimer = setTimeout(() => {
-    // Check if page is fully loaded
-    if (document.readyState === 'complete') {
-      hide()
-    } else {
-      window.addEventListener('load', hide, { once: true })
-      // Fallback: hide after 2 more seconds
-      setTimeout(hide, 2000)
-    }
-  }, MIN_ANIMATION_TIME)
+// First paint used to be held behind a hard 2.5s (5s worst case) on every
+// single load. Now: play once per session, keep a short floor so the entry
+// animation still reads, and only leave once the app can actually show
+// translated content (main.js mounts without awaiting the locale files).
+const MIN_ANIMATION_TIME = 600
+const HARD_CAP = 4000
+const EXIT_DURATION = 500
+const SEEN_KEY = 'bhumi-preloader-seen'
 
-  // Absolute fallback: hide after 5s no matter what
-  setTimeout(hide, 5000)
-})
+const reducedMotion = usePreferredReducedMotion()
+
+const timers = []
+let loadListener = null
+
+function schedule(fn, ms) {
+  timers.push(setTimeout(fn, ms))
+}
 
 function hide() {
   if (exiting.value) return
   exiting.value = true
-  setTimeout(() => {
+  schedule(() => {
     visible.value = false
-  }, 500)
+  }, EXIT_DURATION)
 }
+
+function windowLoaded() {
+  if (document.readyState === 'complete') return Promise.resolve()
+  return new Promise(resolve => {
+    loadListener = () => {
+      loadListener = null
+      resolve()
+    }
+    window.addEventListener('load', loadListener, { once: true })
+  })
+}
+
+function readSession(key) {
+  try {
+    return sessionStorage.getItem(key)
+  } catch {
+    return null // private mode / storage disabled
+  }
+}
+
+function writeSession(key, value) {
+  try {
+    sessionStorage.setItem(key, value)
+  } catch {
+    // ignore
+  }
+}
+
+onMounted(() => {
+  const alreadySeen = readSession(SEEN_KEY) === '1'
+
+  if (alreadySeen || reducedMotion.value === 'reduce') {
+    visible.value = false
+    return
+  }
+  writeSession(SEEN_KEY, '1')
+
+  const startedAt = performance.now()
+
+  const finish = () => {
+    const wait = Math.max(0, MIN_ANIMATION_TIME - (performance.now() - startedAt))
+    schedule(hide, wait)
+  }
+
+  Promise.all([i18nReady, windowLoaded()]).then(finish).catch(finish)
+
+  // Absolute fallback: never trap the user behind the splash screen.
+  schedule(hide, HARD_CAP)
+})
+
+onBeforeUnmount(() => {
+  if (loadListener) {
+    window.removeEventListener('load', loadListener)
+    loadListener = null
+  }
+  timers.forEach(clearTimeout)
+  timers.length = 0
+})
 </script>
 
 <style scoped>

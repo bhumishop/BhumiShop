@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, shallowRef, computed } from 'vue'
 import { supabase } from '../supabase'
 import { storefrontProducts } from '../api/storefrontApi'
 import { t } from '../utils/storeI18n'
@@ -10,7 +10,22 @@ const PAGE_SIZE = 20
 const CACHE_TTL = 5 * 60 * 1000
 let productsCache = null
 let categoriesCache = null
+let collectionsCache = null
+let collectionsCacheTimestamp = 0
 let cacheTimestamp = 0
+
+/**
+ * Normalize a category id/string for comparison.
+ * Products may have category='camiseta' while categories table has id='camisetas'.
+ * Kept byte-for-byte equivalent to the original chained `.replace()` calls but
+ * allocation-free: it runs once per product inside a hot computed.
+ */
+function normalizeCategoryValue(value) {
+  let out = String(value).toLowerCase()
+  if (out.endsWith('s')) out = out.slice(0, -1) // /s$/
+  if (out.endsWith('es')) out = out.slice(0, -1) // /es$/ -> 'e'
+  return out
+}
 
 /**
  * Normalize category matching to handle singular/plural inconsistencies.
@@ -18,10 +33,7 @@ let cacheTimestamp = 0
  */
 function normalizeCategoryMatch(productCat, categoryId) {
   if (productCat === categoryId) return true
-  const normalize = (s) => String(s).toLowerCase()
-    .replace(/s$/, '')
-    .replace(/es$/, 'e')
-  return normalize(productCat) === normalize(categoryId)
+  return normalizeCategoryValue(productCat) === normalizeCategoryValue(categoryId)
 }
 
 /**
@@ -37,13 +49,18 @@ function isCacheValid() {
 function clearCache() {
   productsCache = null
   categoriesCache = null
+  collectionsCache = null
   cacheTimestamp = 0
 }
 
 export const useProductStore = defineStore('products', () => {
-  const products = ref([])
-  const categories = ref([])
-  const collections = ref([])
+  // `shallowRef` on purpose: the catalog is a large immutable-per-fetch list of
+  // plain objects. Deep refs would recursively proxy every product (and every
+  // image URL, swatch array, ...) and re-walk them on each reactive read.
+  // All writes below replace the array instead of mutating it in place.
+  const products = shallowRef([])
+  const categories = shallowRef([])
+  const collections = shallowRef([])
   const loading = ref(false)
   const error = ref(null)
   const searchQuery = ref('')
@@ -190,18 +207,23 @@ export const useProductStore = defineStore('products', () => {
 
   /** Categories that have at least one active, non-archived product, with product count */
   const categoriesWithProducts = computed(() => {
+    // Bucket category ids by their normalized form first, so each product only
+    // needs one lookup instead of a comparison against every category.
+    const idsByNormalized = new Map()
+    categories.value.forEach(c => {
+      const key = normalizeCategoryValue(c.id)
+      const bucket = idsByNormalized.get(key)
+      if (bucket) bucket.push(c.id)
+      else idsByNormalized.set(key, [c.id])
+    })
+
     const counts = {}
-    products.value
-      .filter(p => p.is_active !== false && p.is_archived !== true && p.category)
-      .forEach(p => {
-        // Normalize to match category IDs (try both singular and plural)
-        const cat = p.category
-        categories.value.forEach(c => {
-          if (normalizeCategoryMatch(cat, c.id)) {
-            counts[c.id] = (counts[c.id] || 0) + 1
-          }
-        })
-      })
+    products.value.forEach(p => {
+      if (p.is_active === false || p.is_archived === true || !p.category) return
+      const ids = idsByNormalized.get(normalizeCategoryValue(p.category))
+      if (!ids) return
+      ids.forEach(id => { counts[id] = (counts[id] || 0) + 1 })
+    })
 
     return categories.value
       .filter(c => c.is_active !== false && counts[c.id] > 0)
@@ -219,16 +241,11 @@ export const useProductStore = defineStore('products', () => {
   /** Collections that have at least one active, non-archived product, with product count */
   const collectionsWithProducts = computed(() => {
     const counts = {}
-    products.value
-      .filter(p => p.is_active !== false && p.is_archived !== true && p.collection_id)
-      .forEach(p => {
-        const collId = p.collection_id
-        collections.value.forEach(c => {
-          if (c.id === collId) {
-            counts[c.id] = (counts[c.id] || 0) + 1
-          }
-        })
-      })
+    products.value.forEach(p => {
+      if (p.is_active === false || p.is_archived === true) return
+      if (!p.collection_id) return
+      counts[p.collection_id] = (counts[p.collection_id] || 0) + 1
+    })
 
     return collections.value
       .filter(c => c.is_active !== false && counts[c.id] > 0)
@@ -307,21 +324,39 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
-  async function fetchCollections() {
-    try {
-      const { data, error: err } = await supabase
-        .from('collections')
-        .select('id, name, is_active, sort_order')
-        .order('sort_order')
+  let collectionsInFlight = null
 
-      if (err) {
-        collections.value = []
-        return
-      }
-      collections.value = data || []
-    } catch (err) {
-      collections.value = []
+  async function fetchCollections() {
+    // Collections are static admin data: cache for 5 minutes and de-duplicate
+    // concurrent callers (Home and Products both request them on mount).
+    if (collectionsCache && (Date.now() - collectionsCacheTimestamp) < CACHE_TTL) {
+      collections.value = collectionsCache
+      return
     }
+    if (collectionsInFlight) return collectionsInFlight
+
+    collectionsInFlight = (async () => {
+      try {
+        const { data, error: err } = await supabase
+          .from('collections')
+          .select('id, name, is_active, sort_order')
+          .order('sort_order')
+
+        if (err) {
+          collections.value = []
+          return
+        }
+        collections.value = data || []
+        collectionsCache = collections.value
+        collectionsCacheTimestamp = Date.now()
+      } catch (err) {
+        collections.value = []
+      }
+    })().finally(() => {
+      collectionsInFlight = null
+    })
+
+    return collectionsInFlight
   }
 
   async function addProduct(product) {
@@ -354,7 +389,7 @@ export const useProductStore = defineStore('products', () => {
 
       if (err) throw err
       if (data && data[0]) {
-        products.value.unshift(data[0])
+        products.value = [data[0], ...products.value]
         clearCache()
         invalidateRelatedCache()
       }
@@ -398,7 +433,9 @@ export const useProductStore = defineStore('products', () => {
       if (data && data[0]) {
         const index = products.value.findIndex(p => p.id === id)
         if (index !== -1) {
-          products.value[index] = data[0]
+          const next = [...products.value]
+          next[index] = data[0]
+          products.value = next
           invalidateRelatedCache()
         }
       }
@@ -436,7 +473,7 @@ export const useProductStore = defineStore('products', () => {
 
       if (err) throw err
       if (data && data[0]) {
-        categories.value.push(data[0])
+        categories.value = [...categories.value, data[0]]
       }
       return data?.[0]
     } catch (err) {

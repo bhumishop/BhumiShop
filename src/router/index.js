@@ -120,23 +120,29 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore()
 
-  // Handle OAuth callback (Supabase returns with hash params)
+  // Handle OAuth callback (Supabase implicit flow returns tokens/errors in the URL hash)
   // Must check before guest/authenticated redirects to process the callback properly
-  const hasOAuthHash = to.hash && (to.hash.includes('access_token') || to.hash.includes('error'))
+  const hash = to.hash || ''
+  const hasOAuthCallback = hash.includes('access_token=') || hash.includes('error=')
 
   // Initialize auth for OAuth callbacks, protected routes, guest routes, or admin
-  const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest || hasOAuthHash
+  const needsAuthCheck = to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guest || hasOAuthCallback
 
   if (needsAuthCheck && !authStore.initialized) {
     await authStore.initialize()
   }
 
-  // If this is an OAuth callback and user is now authenticated, redirect to home or redirect URL
-  if (hasOAuthHash && authStore.isLoggedIn) {
-    // Clear the hash from URL and redirect
-    const redirect = to.query.redirect || '/'
-    const target = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/'
-    return { path: target, replace: true }
+  const resolvePostLoginTarget = () => {
+    const savedRedirect = authStore.consumePostLoginRedirect()
+    const rawRedirect = to.query.redirect || savedRedirect || '/'
+    return typeof rawRedirect === 'string' && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+      ? rawRedirect
+      : '/'
+  }
+
+  // If this is an OAuth callback and user is now authenticated, redirect to the saved/redirect URL
+  if (hasOAuthCallback && authStore.isLoggedIn) {
+    return { path: resolvePostLoginTarget(), replace: true }
   }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
@@ -151,7 +157,7 @@ router.beforeEach(async (to, from) => {
   }
 
   if (to.meta.guest && authStore.isLoggedIn) {
-    return { name: 'home', replace: true }
+    return { path: resolvePostLoginTarget(), replace: true }
   }
 })
 

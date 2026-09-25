@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useSlots, useTemplateRef, watch } from 'vue';
+import {
+  useDocumentVisibility,
+  useIntersectionObserver,
+  usePreferredReducedMotion
+} from '@vueuse/core';
 
 interface FuzzyTextProps {
   fontSize?: number | string;
@@ -46,15 +51,60 @@ const props = withDefaults(defineProps<FuzzyTextProps>(), {
 const canvasRef = useTemplateRef<HTMLCanvasElement & { cleanupFuzzyText?: () => void }>('canvasRef');
 const slots = useSlots();
 
-let animationFrameId: number;
-let glitchTimeoutId: ReturnType<typeof setTimeout>;
-let glitchEndTimeoutId: ReturnType<typeof setTimeout>;
-let clickTimeoutId: ReturnType<typeof setTimeout>;
-let cancelled = false;
+// Teardown is registered at setup scope. It used to be registered inside the
+// async `init()` (after `await document.fonts.load(...)`), where Vue no longer
+// had an active instance - so the rAF loop, the glitch timeout chain and the
+// canvas listeners survived unmount and kept running after leaving the route.
+let generation = 0;
+let stopCurrentRun: (() => void) | null = null;
+let resumeRun: (() => void) | null = null;
+let animationFrameId: number | null = null;
+let animating = false;
+
+const inView = ref(false);
+const documentVisible = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const shouldAnimate = computed(
+  () => inView.value && documentVisible.value === 'visible' && reducedMotion.value !== 'reduce'
+);
+
+useIntersectionObserver(
+  canvasRef,
+  (entries) => {
+    inView.value = entries[0]?.isIntersecting ?? false;
+  },
+  { rootMargin: '100px' }
+);
+
+const cancelFrame = () => {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+};
+
+const teardown = () => {
+  generation++;
+  cancelFrame();
+  if (stopCurrentRun) {
+    stopCurrentRun();
+    stopCurrentRun = null;
+  }
+  resumeRun = null;
+};
 
 const text = computed(() => (slots.default?.() ?? []).map(v => v.children).join(''));
 
 const init = async () => {
+  const gen = ++generation;
+  cancelFrame();
+  if (stopCurrentRun) {
+    stopCurrentRun();
+    stopCurrentRun = null;
+  }
+  resumeRun = null;
+
   const canvas = canvasRef.value;
   if (!canvas) return;
 
@@ -74,7 +124,7 @@ const init = async () => {
     await document.fonts.ready;
   }
 
-  if (cancelled) return;
+  if (gen !== generation) return;
 
   let numericFontSize: number;
   if (typeof props.fontSize === 'number') {
@@ -142,8 +192,12 @@ const init = async () => {
   let lastFrameTime = 0;
   const frameDuration = 1000 / props.fps;
 
+  let glitchTimeoutId: ReturnType<typeof setTimeout> | undefined;
+  let glitchEndTimeoutId: ReturnType<typeof setTimeout> | undefined;
+  let clickTimeoutId: ReturnType<typeof setTimeout> | undefined;
+
   const startGlitch = () => {
-    if (!props.glitchMode || cancelled) return;
+    if (!props.glitchMode || gen !== generation) return;
     glitchTimeoutId = setTimeout(() => {
       isGlitching = true;
       glitchEndTimeoutId = setTimeout(() => {
@@ -155,15 +209,10 @@ const init = async () => {
 
   if (props.glitchMode) startGlitch();
 
-  const run = (ts: number) => {
-    if (cancelled) return;
-
-    if (ts - lastFrameTime < frameDuration) {
-      animationFrameId = requestAnimationFrame(run);
-      return;
-    }
-
+  const drawFrame = (ts: number) => {
+    if (ts - lastFrameTime < frameDuration) return;
     lastFrameTime = ts;
+
     ctx.clearRect(-marginX, -marginY, offscreen.width + marginX * 2, offscreen.height + marginY * 2);
 
     targetIntensity = isClicking || isGlitching ? 1 : isHovering ? props.hoverIntensity : props.baseIntensity;
@@ -186,11 +235,24 @@ const init = async () => {
 
       ctx.drawImage(offscreen, 0, y, offscreen.width, 1, dx, y + dy, offscreen.width, 1);
     }
+  };
 
+  const run = (ts: number) => {
+    animationFrameId = null;
+    if (gen !== generation || !animating) return;
+    drawFrame(ts);
     animationFrameId = requestAnimationFrame(run);
   };
 
-  animationFrameId = requestAnimationFrame(run);
+  const startRun = () => {
+    if (gen !== generation || animationFrameId !== null) return;
+    animationFrameId = requestAnimationFrame(run);
+  };
+
+  // Static first paint so the text is visible even when the loop is paused
+  // (reduced motion / off-screen / background tab).
+  drawFrame(performance.now());
+  lastFrameTime = 0;
 
   const rectCheck = (x: number, y: number) =>
     x >= marginX && x <= marginX + offscreen.width && y >= marginY && y <= marginY + offscreen.height;
@@ -219,26 +281,33 @@ const init = async () => {
     canvas.addEventListener('click', click);
   }
 
-  onBeforeUnmount(() => {
-    cancelled = true;
-    cancelAnimationFrame(animationFrameId);
+  stopCurrentRun = () => {
+    cancelFrame();
     clearTimeout(glitchTimeoutId);
     clearTimeout(glitchEndTimeoutId);
     clearTimeout(clickTimeoutId);
     canvas.removeEventListener('mousemove', mouseMove);
     canvas.removeEventListener('mouseleave', mouseLeave);
     canvas.removeEventListener('click', click);
-  });
+  };
+
+  resumeRun = startRun;
+  if (animating) startRun();
 };
 
 onMounted(init);
+onBeforeUnmount(teardown);
+
+// Pause the effect whenever it cannot be seen: off-screen, background tab or
+// the user prefers reduced motion.
+watch(shouldAnimate, (value) => {
+  animating = value;
+  if (value) resumeRun?.();
+}, { immediate: true });
 
 watch(
   () => ({ ...props, text: text.value }),
   () => {
-    cancelled = true;
-    cancelAnimationFrame(animationFrameId);
-    cancelled = false;
     init();
   }
 );

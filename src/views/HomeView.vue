@@ -146,7 +146,7 @@ import { computed, onMounted, onUnmounted, ref, defineAsyncComponent } from 'vue
 import { useRouter } from 'vue-router'
 import { useProductStore } from '../stores/products'
 import { generateSlug } from '../utils/slug'
-import { scrollReveal, scrollBatch, staggerGrid, createAnimationContext, refreshScrollTriggers } from '../utils/animations'
+import { scrollReveal, staggerGrid, createAnimationContext, refreshScrollTriggers } from '../utils/animations'
 import { prefetchProductImages } from '../utils/imagePrefetch'
 import ProductGrid from '../components/product/ProductGrid.vue'
 
@@ -157,7 +157,6 @@ const GridScan = defineAsyncComponent(() => import('../components/common/GridSca
 const router = useRouter()
 const productStore = useProductStore()
 const featuredRef = ref(null)
-const heroRef = ref(null)
 const selectedCollection = ref(null)
 let ctx = null
 let productAnim = null
@@ -239,8 +238,20 @@ onMounted(async () => {
   // Update gallery offset after DOM is ready
   updateGalleryOffset()
 
-  // Prefetch product images after initial render
-  prefetchProductImages(productStore.products, 12)
+  // Prefetch product images, but only once the browser is idle: firing 12
+  // proxied image requests straight after mount competed with the hero and
+  // other critical resources.
+  if (typeof requestIdleCallback === 'function') {
+    prefetchIdleHandle = requestIdleCallback(() => {
+      prefetchIdleHandle = null
+      prefetchProductImages(productStore.products, 12)
+    }, { timeout: 4000 })
+  } else {
+    prefetchTimer = setTimeout(() => {
+      prefetchTimer = null
+      prefetchProductImages(productStore.products, 12)
+    }, 500)
+  }
 
   ctx = createAnimationContext()
 
@@ -304,21 +315,36 @@ onMounted(async () => {
     }
   })
 
-  window.addEventListener('load', () => refreshScrollTriggers(), { once: true })
+  // If `load` already fired (common when the route is revisited), the listener
+  // would never run - refresh immediately instead.
+  if (document.readyState === 'complete') {
+    refreshScrollTriggers()
+  } else {
+    window.addEventListener('load', () => refreshScrollTriggers(), { once: true })
+  }
 })
+
+let prefetchIdleHandle = null
+let prefetchTimer = null
 
 onUnmounted(() => {
   isNavigating = true
   if (ctx) ctx.revert()
   if (productAnim) productAnim.kill()
   if (heroMouseRafId) cancelAnimationFrame(heroMouseRafId)
+  if (prefetchIdleHandle !== null && typeof cancelIdleCallback === 'function') {
+    cancelIdleCallback(prefetchIdleHandle)
+    prefetchIdleHandle = null
+  }
+  if (prefetchTimer !== null) {
+    clearTimeout(prefetchTimer)
+    prefetchTimer = null
+  }
   cursorGlowElement = null
   ctx = null
   productAnim = null
   heroMouseRafId = 0
 })
-
-const featuredProducts = computed(() => productStore.products.slice(0, 12))
 
 const galleryItems = computed(() => {
   const products = productStore.products.slice(0, 6)

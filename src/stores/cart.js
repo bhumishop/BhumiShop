@@ -140,25 +140,44 @@ export const useCartStore = defineStore('cart', () => {
 
   /**
    * Sync local cart to server via edge function.
-   * Called after mutations to ensure server-side persistence.
+   *
+   * Every mutation used to POST the whole cart immediately, so tapping "+"
+   * repeatedly flooded the edge function with identical payloads that could
+   * land out of order. The burst is now debounced and the requests are
+   * serialised, so the newest snapshot is always the one that wins.
    */
-  async function _syncToServer() {
-    if (synced.value && items.value.length > 0) {
+  const _syncChain = { promise: Promise.resolve() }
+  let _syncTimer = null
+
+  function _pushCartSnapshot() {
+    if (!synced.value || items.value.length === 0) return
+
+    const snapshot = items.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      size: item.size,
+      fulfillment_type: item.fulfillment_type,
+      weight: item.weight,
+      image: item.image
+    }))
+
+    _syncChain.promise = _syncChain.promise.then(async () => {
       try {
-        await storefrontCart.set(items.value.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          fulfillment_type: item.fulfillment_type,
-          weight: item.weight,
-          image: item.image
-        })))
+        await storefrontCart.set(snapshot)
       } catch {
         // Cart sync to server failed (non-critical)
       }
-    }
+    })
+  }
+
+  function _syncToServer() {
+    if (_syncTimer) clearTimeout(_syncTimer)
+    _syncTimer = setTimeout(() => {
+      _syncTimer = null
+      _pushCartSnapshot()
+    }, 500)
   }
 
   function addItem(product) {

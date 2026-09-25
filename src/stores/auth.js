@@ -4,6 +4,43 @@ import { supabase } from '../supabase'
 import { storefrontAuth } from '../api/storefrontApi'
 
 const LOCATION_STORAGE_KEY = 'bhumi_user_location'
+const POST_LOGIN_REDIRECT_KEY = 'bhumi_post_login_redirect'
+
+function sanitizeInternalPath(path) {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : null
+}
+
+export function stashPostLoginRedirect(path) {
+  try {
+    const target = sanitizeInternalPath(path)
+    if (target) {
+      sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, target)
+    } else {
+      sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY)
+    }
+  } catch {
+    // Silently fail
+  }
+}
+
+export function consumePostLoginRedirect() {
+  try {
+    const target = sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY)
+    if (target) {
+      sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY)
+    }
+    return sanitizeInternalPath(target)
+  } catch {
+    return null
+  }
+}
+
+export function getRedirectUrl() {
+  const baseUrl = import.meta.env.BASE_URL || '/'
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
+  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+  return `${siteUrl.replace(/\/+$/, '')}${normalizedBase}login`
+}
 
 function loadSavedLocation() {
   try {
@@ -49,53 +86,42 @@ export const useAuthStore = defineStore('auth', () => {
     saveLocation(null)
   }
 
-  // Helper to get the correct redirect URL accounting for environment and base path
-  function getRedirectUrl() {
-    const baseUrl = import.meta.env.BASE_URL || '/'
-    // Use production URL when not in dev mode, otherwise use localhost
-    const isDev = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-
-    if (isDev) {
-      // Development: redirect to localhost
-      return `${window.location.origin}${baseUrl}login`
-    } else {
-      // Production: redirect to the production URL
-      const productionUrl = 'https://shop.bhumisparshaschool.org'
-      return `${productionUrl}${baseUrl}login`
-    }
-  }
+  let initPromise = null
 
   async function initialize() {
     if (initialized.value) return
-
-    loading.value = true
-    try {
-      // Check if we have an OAuth callback in the URL hash
-      const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) throw error
-      if (session) {
-        user.value = session.user
-        await _checkAdminRole()
-      }
-    } catch (err) {
-      console.error('Auth init error:', err)
-    } finally {
-      loading.value = false
-      initialized.value = true
-    }
-
-    // Only setup subscription once
-    if (!authSubscription) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        user.value = session?.user || null
-        if (session?.user) {
-          await _checkAdminRole()
-        } else {
-          adminRole.value = false
+    if (!initPromise) {
+      initPromise = (async () => {
+        loading.value = true
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession()
+          if (error) throw error
+          if (session) {
+            user.value = session.user
+            await _checkAdminRole()
+          }
+        } catch (err) {
+          console.error('Auth init error:', err)
+        } finally {
+          loading.value = false
+          initialized.value = true
         }
-      })
-      authSubscription = subscription
+
+        // Only setup subscription once
+        if (!authSubscription) {
+          const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            user.value = session?.user || null
+            if (session?.user) {
+              await _checkAdminRole()
+            } else {
+              adminRole.value = false
+            }
+          })
+          authSubscription = subscription
+        }
+      })()
     }
+    await initPromise
   }
 
   function cleanup() {
@@ -171,13 +197,16 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function signInWithGoogle() {
+  async function signInWithGoogle(redirectPath) {
+    stashPostLoginRedirect(redirectPath)
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: getRedirectUrl()
+          redirectTo: getRedirectUrl(),
+          scopes: 'openid email profile https://www.googleapis.com/auth/userinfo.email',
+          queryParams: { prompt: 'select_account' }
         }
       })
       if (error) throw error
@@ -187,7 +216,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function signInWithWechat() {
+  async function signInWithWechat(redirectPath) {
+    stashPostLoginRedirect(redirectPath)
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -222,6 +252,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
+    stashPostLoginRedirect(null)
     user.value = null
     adminRole.value = false
   }
@@ -268,6 +299,8 @@ export const useAuthStore = defineStore('auth', () => {
     signInWithPhone,
     signOut,
     updateProfile,
-    cleanup
+    cleanup,
+    stashPostLoginRedirect,
+    consumePostLoginRedirect
   }
 })

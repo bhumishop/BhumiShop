@@ -268,6 +268,23 @@ const borderShadow = computed(() => {
       borderRadius: props.borderRadius + 'px',
       transform: 'translate3d(0, 0, 0.01px)',
       boxShadow: borderShadow,
+      transition0,0,0,0.1) 0 16px 32px, rgba(0,0,0,0.1) 0 32px 64px'
+    : 'none';
+});
+</script>
+
+<template>
+  <div
+    ref="cardRef"
+    @pointermove="handlePointerMove"
+    @pointerenter="isHovered = true"
+    @pointerleave="isHovered = false"
+    :class="`relative grid isolate border border-white/15 ${props.className}`"
+    :style="{
+      background: props.backgroundColor,
+      borderRadius: props.borderRadius + 'px',
+      transform: 'translate3d(0, 0, 0.01px)',
+      boxShadow: borderShadow,
       transition: 'box-shadow 0.3s ease-in-out'
     }"
   >

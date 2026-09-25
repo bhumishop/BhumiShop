@@ -309,7 +309,7 @@ O projeto usa o mesmo design system do painel admin:
 
 1. **Filtro de categorias:** Usar `toString()` na comparação
 2. **Imagens:** Aceita base64 e URLs http/https
-3. **Login Google:** Redirect URL hardcoded para produção
+3. ~~**Login Google:** Redirect URL hardcoded para produção~~ (corrigido: usa `window.location.origin` / `VITE_SITE_URL`)
 
 ---
 

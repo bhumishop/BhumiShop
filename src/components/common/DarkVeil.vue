@@ -3,8 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef } from 'vue';
 import { Renderer, Program, Mesh, Triangle, Vec2 } from 'ogl';
+import {
+  useEventListener,
+  useIntersectionObserver,
+  useDocumentVisibility,
+  usePreferredReducedMotion
+} from '@vueuse/core';
 
 interface DarkVeilProps {
   hueShift?: number;
@@ -23,7 +29,9 @@ const props = withDefaults(defineProps<DarkVeilProps>(), {
   speed: 0.5,
   scanlineFrequency: 0,
   warpAmount: 0,
-  resolutionScale: 1
+  // The CPPN shader is expensive per fragment; the footer/hero backdrops are
+  // soft gradients so half-resolution is visually indistinguishable.
+  resolutionScale: 0.5
 });
 
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef');
@@ -100,24 +108,28 @@ void main(){
 }
 `;
 
+// ---- Instance-scoped GL state ----
+// These used to live at module scope: mounting a second DarkVeil (footer +
+// view hero) overwrote the first instance's renderer/frame, so cleanup could
+// only ever cancel one rAF loop and the orphaned loop kept rendering forever.
 let renderer: Renderer | null = null;
 let program: Program | null = null;
 let mesh: Mesh | null = null;
+let geometry: Triangle | null = null;
 let frame: number | null = null;
-let start: number = 0;
 let resizeTimeout: number | null = null;
 
-const cleanup = () => {
-  if (frame) {
-    cancelAnimationFrame(frame);
-    frame = null;
-  }
-  if (resizeTimeout) {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = null;
-  }
-  window.removeEventListener('resize', resize);
-};
+// Animation clock that survives pauses (tab hidden / scrolled out of view).
+let elapsedOffset = 0;
+let segmentStart = 0;
+
+const inView = ref(false);
+const documentVisible = useDocumentVisibility();
+const reducedMotion = usePreferredReducedMotion();
+
+const shouldAnimate = computed(
+  () => inView.value && documentVisible.value === 'visible' && reducedMotion.value !== 'reduce'
+);
 
 const resize = () => {
   if (resizeTimeout) clearTimeout(resizeTimeout);
@@ -133,17 +145,72 @@ const resize = () => {
   }, 100);
 };
 
-const loop = () => {
+useEventListener('resize', resize);
+
+// Only animate while actually on screen (targets the canvas once it mounts).
+useIntersectionObserver(
+  canvasRef,
+  (entries) => {
+    inView.value = entries[0]?.isIntersecting ?? false;
+  },
+  { rootMargin: '100px' }
+);
+
+const renderFrame = () => {
   if (!program || !renderer || !mesh) return;
 
-  program.uniforms.uTime.value = ((performance.now() - start) / 1000) * props.speed;
+  const time = ((elapsedOffset + (performance.now() - segmentStart)) / 1000) * props.speed;
+  program.uniforms.uTime.value = time;
   program.uniforms.uHueShift.value = props.hueShift;
   program.uniforms.uNoise.value = props.noiseIntensity;
   program.uniforms.uScan.value = props.scanlineIntensity;
   program.uniforms.uScanFreq.value = props.scanlineFrequency;
   program.uniforms.uWarp.value = props.warpAmount;
   renderer.render({ scene: mesh });
+};
+
+const stopLoop = () => {
+  if (frame === null) return;
+  elapsedOffset += performance.now() - segmentStart;
+  cancelAnimationFrame(frame);
+  frame = null;
+};
+
+const loop = () => {
+  renderFrame();
   frame = requestAnimationFrame(loop);
+};
+
+const startLoop = () => {
+  if (frame !== null || !renderer || !mesh) return;
+  segmentStart = performance.now();
+  loop();
+};
+
+watch(
+  shouldAnimate,
+  (run) => {
+    if (run) startLoop();
+    else stopLoop();
+  },
+  { immediate: true }
+);
+
+const destroy = () => {
+  stopLoop();
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = null;
+  }
+  // ogl has no explicit dispose(); dropping the context releases the program,
+  // buffers and the GPU-side renderer for this instance.
+  mesh = null;
+  geometry = null;
+  program = null;
+  if (renderer) {
+    renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
+    renderer = null;
+  }
 };
 
 onMounted(() => {
@@ -159,7 +226,7 @@ onMounted(() => {
   });
 
   const gl = renderer.gl;
-  const geometry = new Triangle(gl);
+  geometry = new Triangle(gl);
 
   program = new Program(gl, {
     vertex,
@@ -177,15 +244,16 @@ onMounted(() => {
 
   mesh = new Mesh(gl, { geometry, program });
 
-  window.addEventListener('resize', resize);
   resize();
 
-  start = performance.now();
-  loop();
+  // Static first paint so the backdrop is never blank before the loop starts.
+  elapsedOffset = 0;
+  segmentStart = performance.now();
+  renderFrame();
 });
 
 onUnmounted(() => {
-  cleanup();
+  destroy();
 });
 
 watch(
