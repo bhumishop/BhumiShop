@@ -83,8 +83,7 @@
       <section>
         <h2>Contato</h2>
         <p>Para solicitar troca ou devolucao:</p>
-        <p><strong>E-mail:</strong> contact-email-placeholder<br>
-        <strong>WhatsApp:</strong> whatsapp-number-placeholder<br>
+        <p><strong>E-mail:</strong> bhumishop.adm@gmail.com<br>
         <strong>Horario:</strong> Segunda a Sexta, 9h as 18h</p>
       </section>
     </div>

@@ -3,13 +3,14 @@
     <div class="terms-page__header">
       <h1>Termos de Servico</h1>
       <p class="subtitle">Leia atentamente antes de utilizar nossos servicos</p>
-      <p class="last-updated">Ultima atualizacao: Abril de 2026</p>
+      <p class="last-updated">Ultima atualizacao: Setembro de 2026</p>
     </div>
 
     <div class="terms-page__content">
       <section>
         <h2>1. Aceitacao dos Termos</h2>
         <p>Ao acessar e utilizar o site da Bhumisparsha School ("BhumiShop"), voce concorda com estes Termos de Servico. Se nao concordar com algum termo, nao utilize nossos servicos.</p>
+        <p>Estes Termos devem ser lidos em conjunto com a nossa <router-link to="/privacidade">Politica de Privacidade</router-link>, que descreve como tratamos seus dados pessoais, incluindo os dados obtidos pelo login com Google.</p>
       </section>
 
       <section>
@@ -23,7 +24,14 @@
       </section>
 
       <section>
-        <h2>3. Produtos e Servicos</h2>
+        <h2>3. Conta e Autenticacao</h2>
+        <p>Para acessar certas funcionalidades (como "Meus Pedidos"), voce pode criar uma conta utilizando seu e-mail ou usando o recurso "Continuar com Google".</p>
+        <p>Ao usar o "Continuar com Google", voce autoriza que recebamos do Google apenas o seu endereco de e-mail, nome exibido e foto de perfil, conforme detalhado na <router-link to="/privacidade">Politica de Privacidade</router-link>. Voce e responsavel por manter a confidencialidade de sua sessao e por todas as atividades realizadas em sua conta. Nos podemos suspender ou encerrar contas que violem estes Termos ou que apresentem suspeita de fraude.</p>
+        <p>Voce pode revogar o acesso do BhumiShop a sua conta Google a qualquer momento em <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">https://myaccount.google.com/permissions</a>, e pode excluir sua conta em nosso site solicitando pelo e-mail de contato indicado na secao 16.</p>
+      </section>
+
+      <section>
+        <h2>4. Produtos e Servicos</h2>
         <p>Oferecemos produtos proprios e de parceiros:</p>
         <ul>
           <li><strong>Produtos proprios:</strong> Camisetas, posters, acessorios produzidos por nos</li>
@@ -33,7 +41,7 @@
       </section>
 
       <section>
-        <h2>4. Precos e Pagamento</h2>
+        <h2>5. Precos e Pagamento</h2>
         <p>Todos os precos estao em Reais (BRL) e incluem impostos quando aplicavel. Aceitamos:</p>
         <ul>
           <li>PIX (via AbacatePay ou MercadoPago)</li>
@@ -44,7 +52,7 @@
       </section>
 
       <section>
-        <h2>5. Entrega</h2>
+        <h2>6. Entrega</h2>
         <p>Os prazos de entrega variam conforme:</p>
         <ul>
           <li>Tipo de produto (proprio ou parceiro)</li>
@@ -55,19 +63,19 @@
       </section>
 
       <section>
-        <h2>6. Direito de Arrependimento</h2>
+        <h2>7. Direito de Arrependimento</h2>
         <p>Em conformidade com o Art. 49 do Codigo de Defesa do Consumidor, voce tem o prazo de 7 (sete) dias corridos, a contar da data de recebimento do produto, para desistir da compra, sem necessidade de justificativa.</p>
         <p>Para exercer este direito, entre em contato conosco e devolva o produto em sua embalagem original.</p>
       </section>
 
       <section>
-        <h2>7. Trocas e Devolucoes</h2>
+        <h2>8. Trocas e Devolucoes</h2>
         <p><strong>Produto com defeito:</strong> Voce tem ate 30 dias (produtos nao duraveis) ou 90 dias (produtos duraveis) para solicitar troca ou devolucao.</p>
-        <p><strong>Troca por tamanho:</strong> Aceitamos troca por tamanho diferente, desde que o produto esteja sem uso e na embalagem original. O frete de devoluacao e por conta do comprador.</p>
+        <p><strong>Troca por tamanho:</strong> Aceitamos troca por tamanho diferente, desde que o produto esteja sem uso e na embalagem original. O frete de devolucao e por conta do comprador.</p>
       </section>
 
       <section>
-        <h2>8. Garantia</h2>
+        <h2>9. Garantia</h2>
         <p>Todos os produtos possuem garantia legal contra defeitos de fabricacao. A garantia nao cobre:</p>
         <ul>
           <li>Desgaste natural pelo uso</li>
@@ -77,31 +85,51 @@
       </section>
 
       <section>
-        <h2>9. Limitacao de Responsabilidade</h2>
+        <h2>10. Limitacao de Responsabilidade</h2>
         <p>Nos responsabilizamos pelos produtos que vendemos diretamente. Para produtos de parceiros (UmaPenca, UICLAP), atuamos como intermediarios e auxiliaremos na resolucao de eventuais problemas.</p>
         <p>Nao nos responsabilizamos por danos indiretos, lucros cessantes ou danos emergentes.</p>
+        <p><strong>Isencao de garantias:</strong> O site e os servicos sao fornecidos "no estado em que se encontram", sem garantias expressas ou implicitas de disponibilidade ininterrupta, ausencia de erros ou compatibilidade com todos os navegadores e dispositivos. Nao garantimos que o site estara livre de interrupcoes, erros ou elementos nocivos.</p>
+        <p>Na maxima medida permitida pela lei aplicavel, nossa responsabilidade total perante voce fica limitada ao valor efetivamente pago por voce pelos produtos ou servicos objeto da reclamacao nos 12 (doze) meses anteriores ao evento que deu origem a reclamacao.</p>
       </section>
 
       <section>
-        <h2>10. Propriedade Intelectual</h2>
+        <h2>11. Propriedade Intelectual</h2>
         <p>Todos os conteudos do site (textos, imagens, logos, designs) sao de propriedade da Bhumisparsha School ou de seus licenciantes. E proibida a reproducao sem autorizacao previa.</p>
       </section>
 
       <section>
-        <h2>11. Rescisao</h2>
+        <h2>12. Servicos de Autenticacao de Terceiros e APIs do Google</h2>
+        <p>O login "Continuar com Google" e fornecido por meio de servicos de autenticacao de terceiros (Supabase) que utilizam as APIs do Google. Ao usar esse recurso, voce concorda que:</p>
+        <ul>
+          <li>O uso das APIs do Google por nosso aplicativo esta sujeito aos <a href="https://developers.google.com/terms" target="_blank" rel="noopener noreferrer">Termos de Servico das APIs do Google</a> e a <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">Politica de Dados do Usuario dos Servicos de API do Google</a>, que incorporamos por referencia a estes Termos;</li>
+          <li>Solicitamos apenas os escopos minimos necessarios (openid, email, profile) e usamos esses dados apenas para autenticacao e para melhorar funcionalidades visiveis deste aplicativo;</li>
+          <li>Nao vendemos, nao transferimos e nao usamos dados do Google para publicidade, para determinar credito ou para emprestimos, em conformidade com as exigencias de "Uso Limitado" (Limited Use) do Google;</li>
+          <li>Google nao endossa nem e responsavel pelo BhumiShop, seus produtos ou seus servicos;</li>
+          <li>Voce nao utilizara o login do Google para violar direitos de terceiros nem as politicas do Google.</li>
+        </ul>
+        <p>Se o acesso as APIs do Google for revogado, suspenso ou alterado, podemos desativar temporariamente o login com Google ate que a situacao seja regularizada; seus dados de conta ja cadastrados permanecem disponiveis por login com e-mail e senha.</p>
+      </section>
+
+      <section>
+        <h2>13. Links de Terceiros</h2>
+        <p>O site pode conter links para sites de terceiros (parceiros, transportadoras, gateways de pagamento). Esses sites possuem suas proprias politicas de privacidade e termos de uso, e nos nao nos responsabilizamos pelo conteudo ou praticas deles. Recomendamos a leitura das politicas de cada site visitado.</p>
+      </section>
+
+      <section>
+        <h2>14. Rescisao</h2>
         <p>Podemos suspender ou encerrar seu acesso ao site em caso de violacao destes termos, sem previo aviso.</p>
       </section>
 
       <section>
-        <h2>12. Lei Aplicavel</h2>
-        <p>Estes termos sao regidos pela legislacao brasileira. Questoes nao resolvidas serao submetidas ao foro da comarca correspondente.</p>
+        <h2>15. Alteracoes nestes Termos</h2>
+        <p>Podemos atualizar estes Termos periodicamente. Alteracoes significativas serao comunicadas por aviso no site ou por e-mail. O uso continuado do site apos as alteracoes constitui aceitacao dos novos Termos.</p>
       </section>
 
       <section>
-        <h2>13. Contato</h2>
+        <h2>16. Lei Aplicavel e Contato</h2>
+        <p>Estes termos sao regidos pela legislacao brasileira. Questoes nao resolvidas serao submetidas ao foro da comarca correspondente.</p>
         <p>Para duvidas sobre estes termos:</p>
-        <p><strong>E-mail:</strong> contact-email-placeholder<br>
-        <strong>WhatsApp:</strong> whatsapp-number-placeholder</p>
+        <p><strong>E-mail:</strong> bhumishop.adm@gmail.com</p>
       </section>
     </div>
   </div>
@@ -191,6 +219,16 @@
   line-height: 1.7;
   color: var(--text-secondary);
   margin-bottom: 0.375rem;
+}
+
+.terms-page__content a {
+  color: var(--accent);
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+.terms-page__content a:hover {
+  color: var(--accent-light, var(--accent));
 }
 
 @media (max-width: 640px) {

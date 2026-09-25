@@ -95,8 +95,7 @@
       <section>
         <h2>9. Contato</h2>
         <p>Para duvidas sobre envio:</p>
-        <p><strong>E-mail:</strong> contact-email-placeholder<br>
-        <strong>WhatsApp:</strong> whatsapp-number-placeholder</p>
+        <p><strong>E-mail:</strong> bhumishop.adm@gmail.com</p>
       </section>
     </div>
   </div>
