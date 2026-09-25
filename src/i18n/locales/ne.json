@@ -321,18 +321,10 @@
     "searchLocation": "आफ्नो सहर वा ठेगाना खोज्नुहोस्...",
     "searching": "खोज्दै...",
     "changeLocation": "परिवर्तन",
-    "validation": {
-      "phoneRequired": "फोन नम्बर आवश्यक छ"
-    },
     "divider": "वा",
     "wechat": "WeChat बाट जारी राख्नुहोस्",
     "google": "Google बाट जारी राख्नुहोस्",
-    "sms": "SMS बाट लगइन",
-    "phone": "फोन",
-    "phonePlaceholder": "+55 11 99999-9999",
-    "sendSmsCode": "SMS कोड पठाउनुहोस्",
-    "codeSent": "कोड पठाइयो! आफ्नो फोन जाँच गर्नुहोस्।",
-    "smsCodeSent": "SMS कोड पठाइयो!",
+    "comingSoon": "छिटो नै आउँदैछ...",
     "errors": {
       "geoNotSupported": "तपाईंको ब्राउजरले भू-स्थान समर्थन गर्दैन",
       "geoPermissionDenied": "स्थान अनुमति अस्वीकृत गरियो। कृपया स्थान पहुँच सक्रिय गर्नुहोस्।",
@@ -340,14 +332,9 @@
       "geoUnknown": "तपाईंको स्थान पत्ता लगाउन सकिएन। कृपया फेरि प्रयास गर्नुहोस्।",
       "geoLookupFailed": "ठेगाना खोज्न असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।",
       "wechatLogin": "WeChat लगइनमा त्रुटि",
-      "phoneRequired": "फोन नम्बर आवश्यक छ",
-      "smsCode": "SMS कोड पठाउन त्रुटि",
       "processRequest": "अनुरोध प्रशोधनमा त्रुटि",
       "termsRequired": "कृपया पहिले नियम र सर्तहरू स्वीकार गर्नुहोस्",
       "loginFailed": "साइन-इन असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।"
-    },
-    "toast": {
-      "smsCodeSent": "SMS कोड पठाइयो!"
     },
     "welcome": "स्वागत छ!",
     "welcomeMessage": "तपाईं अब Bhumi Shop अन्वेषण गर्न तयार हुनुहुन्छ।"

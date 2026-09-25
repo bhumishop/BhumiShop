@@ -46,12 +46,6 @@ User authentication page with multiple login/registration methods.
    - Button: "Continue with Google"
    - OAuth authentication
 
-3. **SMS Login**
-   - Button: "Login with SMS"
-   - Phone field: "+55 11 99999-9999"
-   - "Send SMS code" button
-   - Success message: "Code sent! Check your phone."
-
 ---
 
 ## Form Validation
@@ -95,8 +89,6 @@ If already logged in, redirect from `/login` to home
 
 ## Error Handling
 - "Error logging in with WeChat"
-- "Phone is required"
-- "Error sending SMS code"
 - "Error processing request"
 
 ---

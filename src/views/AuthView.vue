@@ -74,35 +74,10 @@
                 {{ $t('auth.google') }}
               </BaseButton>
 
-              <BaseButton variant="secondary" full :disabled="!acceptedTerms" @click="handleWechatLogin" class="auth-social-btn">
+              <BaseButton variant="secondary" full disabled @click="handleWechatLogin" class="auth-social-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.438 1.703-1.407 3.882-1.986 6.3-1.626-.424-3.592-4.311-6.397-8.843-6.397zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.046c.133 0 .241-.11.241-.245 0-.06-.023-.118-.038-.177l-.326-1.233a.492.492 0 0 1 .177-.554C23.028 18.572 24 16.89 24 14.916c0-3.257-3.095-6.034-7.062-6.058zM14.87 13.3c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982z"/></svg>
-                {{ $t('auth.wechat') }}
+                {{ $t('auth.wechat') }} ({{ $t('auth.comingSoon') }})
               </BaseButton>
-
-              <BaseButton variant="secondary" full :disabled="!acceptedTerms" @click="togglePhoneForm" class="auth-social-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                {{ $t('auth.sms') }}
-              </BaseButton>
-            </div>
-
-            <!-- Phone OTP form -->
-            <div v-if="showPhoneForm" class="auth-phone-form">
-              <form class="auth-form" @submit.prevent="handlePhoneSubmit">
-                <BaseInput
-                  v-model="phoneForm.phone"
-                  :label="$t('auth.phone')"
-                  type="tel"
-                  :placeholder="$t('auth.phonePlaceholder')"
-                  required
-                  :error="errors.phone"
-                />
-                <BaseButton variant="primary" full :loading="authStore.loading" type="submit">
-                  {{ $t('auth.sendSmsCode') }}
-                </BaseButton>
-                <div v-if="phoneSuccess" class="auth-form__success">
-                  {{ $t('auth.codeSent') }}
-                </div>
-              </form>
             </div>
           </div>
 
@@ -239,14 +214,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
 import { isAuthCallbackUrl, readAuthCallbackError, clearAuthCallbackUrl } from '../utils/authCallback'
 import BaseButton from '../components/common/BaseButton.vue'
-import BaseInput from '../components/common/BaseInput.vue'
 import DarkVeil from '../components/common/DarkVeil.vue'
 import LetterGlitch from '../components/common/LetterGlitch.vue'
 import Stepper from '../components/common/Stepper.vue'
@@ -259,17 +233,6 @@ const { t } = useI18n()
 
 const stepperRef = ref(null)
 const acceptedTerms = ref(false)
-const showPhoneForm = ref(false)
-const phoneSuccess = ref(false)
-
-// Phone form
-const phoneForm = reactive({
-  phone: ''
-})
-
-const errors = reactive({
-  phone: ''
-})
 
 // Location state
 const locationQuery = ref('')
@@ -465,14 +428,6 @@ watch(acceptedTerms, () => {
   }
 })
 
-function togglePhoneForm() {
-  showPhoneForm.value = !showPhoneForm.value
-  if (!showPhoneForm.value) {
-    phoneSuccess.value = false
-    errors.phone = ''
-  }
-}
-
 // ---- Form handlers ----
 
 async function handleGoogleLogin() {
@@ -501,29 +456,7 @@ async function handleWechatLogin() {
   }
 }
 
-async function handlePhoneSubmit() {
-  errors.phone = ''
-  if (!acceptedTerms.value) {
-    toast.error(t('auth.errors.termsRequired'))
-    return
-  }
-  if (!phoneForm.phone.trim()) {
-    errors.phone = t('auth.errors.phoneRequired')
-    return
-  }
-
-  try {
-    await authStore.signInWithPhone(phoneForm.phone)
-    phoneSuccess.value = true
-    toast.success(t('auth.toast.smsCodeSent'))
-  } catch (err) {
-    errors.phone = err.message || t('auth.errors.smsCode')
-  }
-}
-
 function onStepChange(step) {
-  showPhoneForm.value = false
-
   if (step === 1) {
     // Login step
     if (acceptedTerms.value && stepperRef.value) {
@@ -1045,30 +978,12 @@ onMounted(async () => {
 }
 
 /* Forms */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
 .auth-form__error {
   padding: 0.625rem 0.875rem;
   background: var(--danger-light);
   color: var(--danger);
   border-radius: var(--radius-md);
   font-size: 0.825rem;
-}
-
-.auth-form__success {
-  padding: 0.625rem 0.875rem;
-  background: var(--success-light);
-  color: var(--success);
-  border-radius: var(--radius-md);
-  font-size: 0.825rem;
-}
-
-.auth-phone-form {
-  margin-top: 1rem;
 }
 
 /* Divider */

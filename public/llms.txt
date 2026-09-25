@@ -26,7 +26,7 @@ BhumiShop is the official virtual store of Bhumisparsha School, offering unique 
 ### Authenticated Pages
 | Route | Name | Description |
 |-------|------|-------------|
-| `/login` | Login/Auth | User authentication with email/password, WeChat, Google, and SMS login |
+| `/login` | Login/Auth | User authentication with WeChat and Google login |
 | `/checkout` | Checkout | Multi-step checkout: Cart Summary, Contact Info, Shipping & Payment, Confirmation |
 | `/minhas-compras` | My Orders | Order history with status tracking (pending, processing, shipped, delivered, cancelled) |
 | `/perfil` | Profile | User profile management and account settings |
@@ -61,7 +61,6 @@ BhumiShop is the official virtual store of Bhumisparsha School, offering unique 
 ### User Authentication
 - Email/Password authentication via Supabase
 - Social login: WeChat, Google
-- SMS-based authentication
 - Role-based access (user, admin)
 
 ### Internationalization

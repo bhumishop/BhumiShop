@@ -39,7 +39,6 @@ Loja virtual completa para comercialização de produtos da comunidade Bhumi. De
 ### 👤 Conta do Cliente
 - Cadastro email/senha
 - Login WeChat (微信登录)
-- Login por SMS
 - Meus pedidos
 - Acompanhamento de status
 
@@ -173,7 +172,6 @@ src/
 
 - **Email/Senha:** Cadastro tradicional
 - **WeChat (微信登录):** Login rápido com conta WeChat
-- **SMS:** Login por código SMS no telefone
 
 ---
 

@@ -225,9 +225,9 @@ describe('Nested Translation Keys', () => {
     expect(i18n.global.t('checkout.steps.confirmation')).toBe('Confirmation')
   })
 
-  it('should access auth validation messages', () => {
+  it('should access auth coming soon label', () => {
     i18n.global.locale.value = 'en'
-    expect(i18n.global.t('auth.validation.phoneRequired')).toBe('Phone is required')
+    expect(i18n.global.t('auth.comingSoon')).toBe('Coming soon...')
   })
 
   it('should access admin toast messages', () => {

@@ -319,18 +319,10 @@
     "searchLocation": "搜索您的城市或地址...",
     "searching": "搜索中...",
     "changeLocation": "更改",
-    "validation": {
-      "phoneRequired": "电话号码为必填项"
-    },
     "divider": "或",
     "wechat": "使用微信继续",
     "google": "使用 Google 继续",
-    "sms": "使用短信登录",
-    "phone": "电话",
-    "phonePlaceholder": "+55 11 99999-9999",
-    "sendSmsCode": "发送短信验证码",
-    "codeSent": "验证码已发送！请检查手机。",
-    "smsCodeSent": "短信验证码已发送！",
+    "comingSoon": "即将推出...",
     "detectMyLocation": "检测我的位置",
     "detectingLocation": "正在检测位置...",
     "errors": {
@@ -340,14 +332,9 @@
       "geoUnknown": "无法检测您的位置。请重试。",
       "geoLookupFailed": "查询地址失败。请重试。",
       "wechatLogin": "微信登录出错",
-      "phoneRequired": "电话号码为必填项",
-      "smsCode": "发送短信验证码出错",
       "processRequest": "处理请求出错",
       "termsRequired": "请先接受条款和条件",
       "loginFailed": "登录失败，请重试。"
-    },
-    "toast": {
-      "smsCodeSent": "短信验证码已发送！"
     },
     "welcome": "欢迎！",
     "welcomeMessage": "您现在可以开始探索 Bhumi Shop 了。"

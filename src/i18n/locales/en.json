@@ -316,18 +316,10 @@
     "searchLocation": "Search for your city or address...",
     "searching": "Searching...",
     "changeLocation": "Change",
-    "validation": {
-      "phoneRequired": "Phone is required"
-    },
     "divider": "or",
     "wechat": "Continue with WeChat",
     "google": "Continue with Google",
-    "sms": "Login with SMS",
-    "phone": "Phone",
-    "phonePlaceholder": "+55 11 99999-9999",
-    "sendSmsCode": "Send SMS code",
-    "codeSent": "Code sent! Check your phone.",
-    "smsCodeSent": "SMS code sent!",
+    "comingSoon": "Coming soon...",
     "errors": {
       "geoNotSupported": "Geolocation is not supported by your browser",
       "geoPermissionDenied": "Location permission denied. Please enable location access.",
@@ -335,14 +327,9 @@
       "geoUnknown": "Unable to detect your location. Please try again.",
       "geoLookupFailed": "Failed to lookup address. Please try again.",
       "wechatLogin": "Error logging in with WeChat",
-      "phoneRequired": "Phone is required",
-      "smsCode": "Error sending SMS code",
       "processRequest": "Error processing request",
       "termsRequired": "Please accept the terms and conditions first",
       "loginFailed": "Sign-in failed. Please try again."
-    },
-    "toast": {
-      "smsCodeSent": "SMS code sent!"
     },
     "welcome": "Welcome!",
     "welcomeMessage": "You are now ready to explore Bhumi Shop.",

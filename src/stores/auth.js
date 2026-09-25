@@ -233,22 +233,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function signInWithPhone(phone) {
-    loading.value = true
-    try {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        phone,
-        options: {
-          redirectTo: getRedirectUrl()
-        }
-      })
-      if (error) throw error
-      return data
-    } finally {
-      loading.value = false
-    }
-  }
-
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -296,7 +280,6 @@ export const useAuthStore = defineStore('auth', () => {
     clearLocation,
     signInWithGoogle,
     signInWithWechat,
-    signInWithPhone,
     signOut,
     updateProfile,
     cleanup,

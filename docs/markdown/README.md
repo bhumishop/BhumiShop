@@ -56,7 +56,6 @@ BhumiShop is the official virtual store of Bhumisparsha School, offering unique 
 ### Authentication
 - Supabase integration
 - Social login (WeChat, Google)
-- SMS authentication
 - Role-based access control
 
 ---

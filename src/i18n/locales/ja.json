@@ -321,18 +321,10 @@
     "searchLocation": "都市名または住所を検索...",
     "searching": "検索中...",
     "changeLocation": "変更",
-    "validation": {
-      "phoneRequired": "電話番号は必須です"
-    },
     "divider": "または",
     "wechat": "WeChatで続ける",
     "google": "Googleで続ける",
-    "sms": "SMSでログイン",
-    "phone": "電話番号",
-    "phonePlaceholder": "+55 11 99999-9999",
-    "sendSmsCode": "SMSコードを送信",
-    "codeSent": "コードを送信しました！携帯電話を確認してください。",
-    "smsCodeSent": "SMSコードを送信しました！",
+    "comingSoon": "近日公開...",
     "errors": {
       "geoNotSupported": "お使いのブラウザはジオロケーションをサポートしていません",
       "geoPermissionDenied": "位置情報の権限が拒否されました。位置情報アクセスを有効にしてください。",
@@ -340,14 +332,9 @@
       "geoUnknown": "現在地を検出できません。もう一度お試しください。",
       "geoLookupFailed": "住所の検索に失敗しました。もう一度お試しください。",
       "wechatLogin": "WeChatログインエラー",
-      "phoneRequired": "電話番号は必須です",
-      "smsCode": "SMSコード送信エラー",
       "processRequest": "リクエスト処理エラー",
       "termsRequired": "利用規約に同意してください",
       "loginFailed": "サインインに失敗しました。もう一度お試しください।"
-    },
-    "toast": {
-      "smsCodeSent": "SMSコードを送信しました！"
     },
     "welcome": "ようこそ！",
     "welcomeMessage": "Bhumi Shop を探索する準備ができました。"

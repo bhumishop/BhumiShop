@@ -184,14 +184,6 @@ POST /auth/signin_with_oauth
 }
 ```
 
-### Login SMS
-```
-POST /auth/signin_with_otp
-{
-  phone: "+5511999999999"
-}
-```
-
 ---
 
 ## 📦 Pedidos
