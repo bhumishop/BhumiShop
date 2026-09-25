@@ -132,6 +132,7 @@ import { useProductStore } from '../stores/products'
 import ProductPixelCard from '../components/common/ProductPixelCard.vue'
 import BasePagination from '../components/common/BasePagination.vue'
 import FilterSidebar from '../components/common/FilterSidebar.vue'
+import { orderProducts } from '../utils/productMix'
 
 const route = useRoute()
 const router = useRouter()
@@ -178,24 +179,17 @@ async function retryFetch() {
 
 function clearFilters() {
   productStore.clearFilters()
+  currentPage.value = 1
   router.replace({ query: {} })
 }
 
-// Sorted products
-const sortedProducts = computed(() => {
-  const products = [...productStore.filteredProducts]
-  switch (sortBy.value) {
-    case 'price-asc':
-      return products.sort((a, b) => (a.price || 0) - (b.price || 0))
-    case 'price-desc':
-      return products.sort((a, b) => (b.price || 0) - (a.price || 0))
-    case 'name-asc':
-      return products.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-    case 'newest':
-    default:
-      return products.sort((a, b) => b.id - a.id)
-  }
-})
+// Sorted products: newest-first with an "All" category filter interleaves
+// categories round-robin (books, t-shirts, ...) so page 1 is never one
+// bulk-imported category only. A selected category, or an explicit price/name
+// sort, keeps its pure order.
+const sortedProducts = computed(() =>
+  orderProducts(productStore.filteredProducts, sortBy.value, productStore.activeCategory)
+)
 
 // Paginated sorted products
 const PAGE_SIZE = 20
@@ -209,8 +203,12 @@ function setPage(page) {
   currentPage.value = Math.max(1, Math.min(page, totalPages.value))
 }
 
-// Cleanup route watcher on unmount
+// Cleanup handles for every watcher registered in onMounted
 let routeWatchCleanup = null
+let categoryUrlCleanup = null
+let filterResetCleanup = null
+let pageClampCleanup = null
+
 onMounted(() => {
   // Register the route watcher *before* any await and make it immediate, so a
   // `?category=` deep link is applied right away instead of racing the network
@@ -218,11 +216,52 @@ onMounted(() => {
   routeWatchCleanup = watch(
     () => route.query.category,
     (val) => {
-      productStore.setActiveCategory(val || '')
+      const next = val || ''
+      // Guard: the URL-sync watcher below writes the same value back, and we
+      // must not ping-pong store -> router -> store.
+      if (productStore.activeCategory !== next) {
+        productStore.setActiveCategory(next)
+      }
       currentPage.value = 1
     },
     { immediate: true }
   )
+
+  // The FilterSidebar mutates the store directly (no router navigation), so
+  // mirror the picked category into `?category=` ourselves: shareable URLs and
+  // a working browser Back button for category browsing.
+  categoryUrlCleanup = watch(
+    () => productStore.activeCategory,
+    (val) => {
+      currentPage.value = 1
+      const next = val || ''
+      if ((route.query.category || '') === next) return
+      const query = { ...route.query }
+      if (next) query.category = next
+      else delete query.category
+      router.replace({ query })
+    }
+  )
+
+  // Narrowing any filter (price, collections, search) must restart at page 1:
+  // a page index left over from the previous, larger result set used to show
+  // an empty grid even though matching products existed.
+  filterResetCleanup = watch(
+    () => [
+      productStore.minPrice,
+      productStore.maxPrice,
+      productStore.searchQuery,
+      productStore.activeCollections.join('|')
+    ],
+    () => {
+      currentPage.value = 1
+    }
+  )
+
+  // Keep the page index inside the (possibly shrunken) page range.
+  pageClampCleanup = watch(totalPages, (pages) => {
+    if (pages < 1 || currentPage.value > pages) currentPage.value = 1
+  })
 
   // Products + categories hit the edge function, collections a direct Supabase
   // query. Fire all three together instead of awaiting them one after another.
@@ -235,6 +274,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (routeWatchCleanup) routeWatchCleanup()
+  if (categoryUrlCleanup) categoryUrlCleanup()
+  if (filterResetCleanup) filterResetCleanup()
+  if (pageClampCleanup) pageClampCleanup()
 })
 </script>
 

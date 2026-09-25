@@ -51,7 +51,8 @@
     "statProducts": "製品",
     "statCategories": "カテゴリー",
     "categories": "カテゴリー",
-    "highlights": "おすすめ"
+    "highlights": "おすすめ",
+    "seeAllProducts": "すべての商品を見る"
   },
   "products": {
     "title": "製品",
@@ -138,6 +139,7 @@
     "addedToCart": "{name} をカートに追加しました",
     "quickAdd": "クイック追加",
     "addToCart": "カートに追加",
+    "seeProduct": "商品を見る",
     "badges": {
       "umaPenca": "Uma Penca",
       "digital": "デジタル",

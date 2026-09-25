@@ -51,7 +51,8 @@
     "statProducts": "สินค้า",
     "statCategories": "หมวดหมู่",
     "categories": "หมวดหมู่",
-    "highlights": "สินค้าแนะนำ"
+    "highlights": "สินค้าแนะนำ",
+    "seeAllProducts": "ดูสินค้าทั้งหมด"
   },
   "products": {
     "title": "สินค้า",
@@ -138,6 +139,7 @@
     "addedToCart": "เพิ่ม {name} ลงในรถเข็นแล้ว",
     "quickAdd": "เพิ่มด่วน",
     "addToCart": "เพิ่มลงในรถเข็น",
+    "seeProduct": "ดูสินค้า",
     "badges": {
       "umaPenca": "Uma Penca",
       "digital": "ดิจิทัล",

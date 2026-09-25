@@ -51,7 +51,8 @@
     "statProducts": "产品",
     "statCategories": "分类",
     "categories": "分类",
-    "highlights": "精选"
+    "highlights": "精选",
+    "seeAllProducts": "查看全部产品"
   },
   "products": {
     "title": "产品",
@@ -138,6 +139,7 @@
     "addedToCart": "{name} 已加入购物车",
     "quickAdd": "快速添加",
     "addToCart": "添加到购物车",
+    "seeProduct": "查看商品",
     "badges": {
       "umaPenca": "Uma Penca",
       "digital": "数字",

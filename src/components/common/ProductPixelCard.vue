@@ -44,7 +44,7 @@
             <svg class="product-pixel-card__badge-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
-            Digital
+            {{ $t('productCard.badges.digital') }}
           </span>
         </div>
       </div>
@@ -70,21 +70,21 @@
           <span class="product-pixel-card__price">{{ formatPrice(product.price) }}</span>
         </div>
         <div class="product-pixel-card__actions">
-          <button class="product-pixel-card__cart" @click.stop="addToCart" aria-label="Add to cart">
+          <button class="product-pixel-card__cart" @click.stop="addToCart" :aria-label="$t('productCard.addToCart')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
               <line x1="3" y1="6" x2="21" y2="6"/>
               <path d="M16 10a4 4 0 01-8 0"/>
             </svg>
           </button>
-          <button class="product-pixel-card__add" @click.stop="handleSeeProduct" aria-label="See product">
+          <button class="product-pixel-card__add" @click.stop="handleSeeProduct" :aria-label="$t('productCard.seeProduct')">
             <span class="product-pixel-card__add-bg" aria-hidden="true"></span>
             <span class="product-pixel-card__add-shine" aria-hidden="true"></span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.35-4.35"/>
             </svg>
-            <span>See product</span>
+            <span>{{ $t('productCard.seeProduct') }}</span>
           </button>
         </div>
       </div>

@@ -107,8 +107,15 @@
           <h2 class="featured__title">{{ $t('home.highlights') }}</h2>
         </div>
 
-        <!-- Collection Selector -->
-        <div class="collection-selector">
+        <!-- Collection Selector: "All" mixes every category; picking one filters -->
+        <div v-if="collections.length > 0" class="collection-selector">
+          <button
+            class="collection-selector__btn"
+            :class="{ 'collection-selector__btn--active': selectedCollection === null }"
+            @click="selectedCollection = null"
+          >
+            {{ $t('products.all') || 'All' }}
+          </button>
           <button
             v-for="collection in collections"
             :key="collection.id"
@@ -130,7 +137,7 @@
         <!-- See More Button -->
         <div class="featured__see-more">
           <button class="see-more-btn" @click="router.push('/produtos')">
-            <span>Ver todos os produtos</span>
+            <span>{{ $t('home.seeAllProducts') }}</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
@@ -146,6 +153,7 @@ import { computed, onMounted, onUnmounted, ref, defineAsyncComponent } from 'vue
 import { useRouter } from 'vue-router'
 import { useProductStore } from '../stores/products'
 import { generateSlug } from '../utils/slug'
+import { interleaveByCategory, pickMixedProducts } from '../utils/productMix'
 import { scrollReveal, staggerGrid, createAnimationContext, refreshScrollTriggers } from '../utils/animations'
 import { prefetchProductImages } from '../utils/imagePrefetch'
 import ProductGrid from '../components/product/ProductGrid.vue'
@@ -165,14 +173,18 @@ let isNavigating = false
 // Get collections from product store
 const collections = computed(() => productStore.collections.filter(c => c.is_active !== false))
 
-// Featured products filtered by selected collection
+// Featured products filtered by selected collection.
+// "All" (no collection) interleaves every category — books, t-shirts, etc. —
+// instead of slicing the first N rows (which were t-shirts only after the
+// bulk import). A selected collection keeps its order but still mixes its
+// own categories.
 const filteredFeaturedProducts = computed(() => {
-  const products = productStore.products
+  const products = productStore.products.filter(p => p.is_active !== false && p.is_archived !== true)
   if (!selectedCollection.value) {
-    // Show products from all collections (up to 10)
-    return products.slice(0, 10)
+    return pickMixedProducts(products, 12)
   }
-  return products.filter(p => p.collection_id === selectedCollection.value).slice(0, 12)
+  const inCollection = products.filter(p => p.collection_id === selectedCollection.value)
+  return interleaveByCategory(inCollection).slice(0, 12)
 })
 
 // Hero mouse tracking - direct DOM manipulation to avoid Vue reactivity overhead
@@ -238,18 +250,19 @@ onMounted(async () => {
   // Update gallery offset after DOM is ready
   updateGalleryOffset()
 
-  // Prefetch product images, but only once the browser is idle: firing 12
-  // proxied image requests straight after mount competed with the hero and
-  // other critical resources.
+  // Prefetch exactly what this page renders: the mixed-category gallery +
+  // highlights rows (NOT productStore.products[0..12], which after the bulk
+  // import were all t-shirts the visitor may never see). Idle so these
+  // proxied image requests don't compete with the hero for bandwidth.
   if (typeof requestIdleCallback === 'function') {
     prefetchIdleHandle = requestIdleCallback(() => {
       prefetchIdleHandle = null
-      prefetchProductImages(productStore.products, 12)
+      prefetchProductImages(buildPrefetchList(), 16)
     }, { timeout: 4000 })
   } else {
     prefetchTimer = setTimeout(() => {
       prefetchTimer = null
-      prefetchProductImages(productStore.products, 12)
+      prefetchProductImages(buildPrefetchList(), 16)
     }, 500)
   }
 
@@ -346,8 +359,22 @@ onUnmounted(() => {
   heroMouseRafId = 0
 })
 
+/**
+ * Mixed-category window of products that have a usable image, so the
+ * circular showcase never shows one category only (previously
+ * `products.slice(0, 6)` = t-shirts only).
+ */
+const galleryProducts = computed(() => {
+  const withImages = productStore.products.filter(p => {
+    if (p.is_active === false || p.is_archived === true) return false
+    const img = p.image || ''
+    return img.startsWith('data:') || img.startsWith('http')
+  })
+  return pickMixedProducts(withImages, 8)
+})
+
 const galleryItems = computed(() => {
-  const products = productStore.products.slice(0, 6)
+  const products = galleryProducts.value
   if (products.length === 0) return []
   return products.map((product) => {
     let img = product.image || ''
@@ -363,9 +390,25 @@ const galleryItems = computed(() => {
     if (!img || (!img.startsWith('data:') && !img.startsWith('http'))) {
       img = ''
     }
-    return { image: img, url: `/produtos/${generateSlug(product.name, product.id)}` }
+    return { image: img, text: product.name || '', url: `/produtos/${generateSlug(product.name, product.id)}` }
   })
 })
+
+/**
+ * Gallery + highlights products, de-duplicated by id, in display order.
+ * Prefetching this list warms the images the visitor is actually about to
+ * see instead of the raw head of the catalog.
+ */
+function buildPrefetchList() {
+  const seen = new Set()
+  const list = []
+  for (const product of [...galleryProducts.value, ...filteredFeaturedProducts.value]) {
+    if (!product || product.id == null || seen.has(product.id)) continue
+    seen.add(product.id)
+    list.push(product)
+  }
+  return list
+}
 
 function updateGalleryOffset() {
   const featuredEl = document.getElementById('featured-start')

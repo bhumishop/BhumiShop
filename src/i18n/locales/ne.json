@@ -51,7 +51,8 @@
     "statProducts": "उत्पादनहरू",
     "statCategories": "श्रेणीहरू",
     "categories": "श्रेणीहरू",
-    "highlights": "मुख्य उत्पादनहरू"
+    "highlights": "मुख्य उत्पादनहरू",
+    "seeAllProducts": "सबै उत्पादनहरू हेर्नुहोस्"
   },
   "products": {
     "title": "उत्पादनहरू",
@@ -138,6 +139,7 @@
     "addedToCart": "{name} कार्टमा थपियो",
     "quickAdd": "छिटो थप्नुहोस्",
     "addToCart": "कार्टमा थप्नुहोस्",
+    "seeProduct": "उत्पादन हेर्नुहोस्",
     "badges": {
       "umaPenca": "Uma Penca",
       "digital": "डिजिटल",

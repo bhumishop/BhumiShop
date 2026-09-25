@@ -51,7 +51,8 @@
     "statProducts": "Products",
     "statCategories": "Categories",
     "categories": "Categories",
-    "highlights": "Highlights"
+    "highlights": "Highlights",
+    "seeAllProducts": "See all products"
   },
   "products": {
     "title": "Products",
@@ -138,6 +139,7 @@
     "addedToCart": "{name} added to cart",
     "quickAdd": "Quick Add",
     "addToCart": "Add to cart",
+    "seeProduct": "See product",
     "badges": {
       "umaPenca": "Uma Penca",
       "digital": "Digital",

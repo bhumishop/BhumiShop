@@ -65,7 +65,7 @@ const displayItems = computed(() => {
   if (!props.items || props.items.length === 0) {
     return []
   }
-  return props.items.map(item => ({ image: item.image, url: item.url }))
+  return props.items.map(item => ({ image: item.image, text: item.text, url: item.url }))
 });
 
 type GL = Renderer['gl'];
