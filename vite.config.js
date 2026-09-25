@@ -37,7 +37,11 @@ export default defineConfig(({ mode }) => {
           // which is only used by the Auth route stepper.
           manualChunks: {
             'vue-vendor': ['vue', 'vue-router', 'pinia'],
-            'vueuse-vendor': ['@vueuse/core', '@vueuse/shared'],
+            // Only direct dependencies here: Rollup resolves these names as
+            // entry modules, and transitive packages (e.g. @vueuse/shared) are
+            // not hoisted to the top level of node_modules under pnpm, which
+            // fails the CI build.
+            'vueuse-vendor': ['@vueuse/core'],
             'i18n-vendor': ['vue-i18n'],
             'gsap-vendor': ['gsap'],
             'motion-vendor': ['motion-v'],
