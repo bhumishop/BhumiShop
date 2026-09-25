@@ -179,7 +179,7 @@ export function prefetchProductImages(products, maxCount = 12, options = {}) {
  * @param {string[]} images - Array of image URLs
  * @param {string} productName - Product name for logging
  */
-export function prefetchGalleryImages(images, productName = '') {
+export function prefetchGalleryImages(images, _productName = '') {
   if (!Array.isArray(images) || images.length === 0) return
 
   images.forEach((url, index) => {

@@ -78,7 +78,7 @@ function handleImageError(event) {
   }
 }
 
-function handleThumbError(event, index) {
+function handleThumbError(event, _index) {
   const src = event.target?.src
   if (src) {
     markImageUrlAsBroken(src)

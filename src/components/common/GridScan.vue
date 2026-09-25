@@ -466,10 +466,8 @@ const setupAnimation = () => {
   const lookVel = new THREE.Vector2(0, 0);
   let tiltTarget = 0;
   let tiltCurrent = 0;
-  let tiltVel = 0;
   let yawTarget = 0;
   let yawCurrent = 0;
-  let yawVel = 0;
   const scanStarts: number[] = [];
   let leaveTimer: number | null = null;
 
@@ -752,11 +750,9 @@ const setupAnimation = () => {
 
     const tiltResult = smoothDampFloat(tiltCurrent, tiltTarget, tiltVelObj, smoothTime, dt);
     tiltCurrent = tiltResult;
-    tiltVel = tiltVelObj.v;
 
     const yawResult = smoothDampFloat(yawCurrent, yawTarget, yawVelObj, smoothTime, dt);
     yawCurrent = yawResult;
-    yawVel = yawVelObj.v;
 
     uniforms.uSkew.value.set(lookCurrent.x * skewScale, -lookCurrent.y * yBoost * skewScale);
     uniforms.uTilt.value = tiltCurrent * tiltScale;

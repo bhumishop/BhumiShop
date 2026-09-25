@@ -334,7 +334,6 @@ import { useProductStore } from '../stores/products'
 import { useToastStore } from '../stores/toast'
 import { useAuthStore } from '../stores/auth'
 import { usePixBricks } from '../composables/usePixBricks'
-import { getStateFromCEP } from '../stores/shipping'
 import BaseButton from '../components/common/BaseButton.vue'
 import BaseInput from '../components/common/BaseInput.vue'
 import AddressGuessInput from '../components/common/AddressGuessInput.vue'
@@ -582,7 +581,7 @@ async function handlePayment() {
   isProcessingPayment.value = true
 
   try {
-    const order = await checkoutStore.processPayment()
+    await checkoutStore.processPayment()
 
     // If uma_penca, the store already redirected — do nothing more
     if (checkoutStore.paymentProvider === 'uma_penca') return
@@ -617,7 +616,7 @@ async function renderPixBricks() {
       onReady: () => {
         pixBricksRendered.value = true
       },
-      onSubmit: async (formData) => {
+      onSubmit: async (_formData) => {
         // Payment submitted to MercadoPago
       },
       onError: (error) => {

@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-const _props = defineProps({
+defineProps({
   modelValue: Boolean,
   title: { type: String, default: '' },
   size: {

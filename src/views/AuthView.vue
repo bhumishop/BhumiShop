@@ -285,22 +285,6 @@ let hideTimeout = null
 // Nominatim API (OpenStreetMap - free, no API key)
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org'
 
-// Country code to country name mapping for common countries
-const COUNTRY_NAMES = {
-  'BR': 'Brazil', 'US': 'United States', 'CN': 'China', 'JP': 'Japan',
-  'GB': 'United Kingdom', 'DE': 'Germany', 'FR': 'France', 'IT': 'Italy',
-  'ES': 'Spain', 'PT': 'Portugal', 'CA': 'Canada', 'AU': 'Australia',
-  'IN': 'India', 'KR': 'South Korea', 'MX': 'Mexico', 'AR': 'Argentina',
-  'TH': 'Thailand', 'VN': 'Vietnam', 'ID': 'Indonesia', 'PH': 'Philippines',
-  'MY': 'Malaysia', 'SG': 'Singapore', 'NZ': 'New Zealand', 'ZA': 'South Africa',
-  'AE': 'UAE', 'SA': 'Saudi Arabia', 'RU': 'Russia', 'TR': 'Turkey',
-  'NL': 'Netherlands', 'BE': 'Belgium', 'CH': 'Switzerland', 'AT': 'Austria',
-  'SE': 'Sweden', 'NO': 'Norway', 'DK': 'Denmark', 'FI': 'Finland',
-  'PL': 'Poland', 'CZ': 'Czech Republic', 'IE': 'Ireland', 'IL': 'Israel',
-  'CO': 'Colombia', 'CL': 'Chile', 'PE': 'Peru', 'UY': 'Uruguay',
-  'NE': 'Nepal',
-}
-
 async function searchLocation(query) {
   if (!query || query.length < 3) {
     locationSuggestions.value = []
@@ -462,8 +446,6 @@ function hideSuggestionsDelayed() {
 function getMapImageUrl(lat, lon) {
   // OpenStreetMap static map image (free, no API key)
   const zoom = 13
-  const width = 400
-  const height = 200
   return `${NOMINATIM_BASE}/?mlat=${lat}&mlon=${lon}#map=${zoom}/${lat}/${lon}`
 }
 

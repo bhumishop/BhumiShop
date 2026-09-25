@@ -147,7 +147,7 @@ interface StepperProps {
   completeButtonText?: string
   disableStepIndicators?: boolean
   onComplete?: () => void | Promise<void>
-  onStepChange?: (step: number) => void
+  onStepChange?: (_step: number) => void
   loading?: boolean
 }
 
@@ -168,7 +168,6 @@ const currentStep = ref(props.initialStep)
 const direction = ref(0)
 const completedSteps = ref<Set<number>>(new Set())
 const validSteps = ref<Set<number>>(new Set())
-const contentRef = ref<HTMLElement | null>(null)
 const stepContentRef = ref<HTMLElement | null>(null)
 const internalLoading = ref(false)
 const contentHeight = ref(0)

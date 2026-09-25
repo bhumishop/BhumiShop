@@ -3,9 +3,6 @@
 // Creates payment brick widget
 // Supports: PIX (Brazil), UPI (India), Alipay (China), WeChat Pay (China)
 
-import { i18n } from '../i18n'
-const t = (key) => i18n.global.t(key)
-
 const MP_SDK_URL = 'https://sdk.mercadopago.com/js/v2'
 
 export function usePixBricks() {

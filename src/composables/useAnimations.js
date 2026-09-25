@@ -9,7 +9,7 @@
  *
  * @see https://gsap.com/resources/frameworks/
  */
-import { onUnmounted, nextTick, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import {
   gsap,
   ScrollTrigger,

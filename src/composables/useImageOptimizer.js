@@ -14,7 +14,7 @@
  *   width: 600
  * })
  */
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 
 // Supported output formats (AVIF is disabled on this proxy)
 const SUPPORTED_OUTPUTS = ['webp', 'jpg', 'png', 'tiff', 'gif', 'jxl']

@@ -60,7 +60,7 @@ interface AnimateOpts {
   duration?: number;
   delay?: number;
   ease?: (_t: number) => number;
-  onUpdate: (v: number) => void;
+  onUpdate: (_v: number) => void;
   onEnd?: () => void;
 }
 
@@ -252,23 +252,6 @@ const glowMaskWebkit = computed(() => glowMaskBase.value);
 const borderShadow = computed(() => {
   return isVisible.value
     ? 'rgba(0,0,0,0.1) 0 1px 2px, rgba(0,0,0,0.1) 0 2px 4px, rgba(0,0,0,0.1) 0 4px 8px, rgba(0,0,0,0.1) 0 8px 16px, rgba(0,0,0,0.1) 0 16px 32px, rgba(0,0,0,0.1) 0 32px 64px'
-    : 'none';
-});
-</script>
-
-<template>
-  <div
-    ref="cardRef"
-    @pointermove="handlePointerMove"
-    @pointerenter="isHovered = true"
-    @pointerleave="isHovered = false"
-    :class="`relative grid isolate border border-white/15 ${props.className}`"
-    :style="{
-      background: props.backgroundColor,
-      borderRadius: props.borderRadius + 'px',
-      transform: 'translate3d(0, 0, 0.01px)',
-      boxShadow: borderShadow,
-      transition0,0,0,0.1) 0 16px 32px, rgba(0,0,0,0.1) 0 32px 64px'
     : 'none';
 });
 </script>

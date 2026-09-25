@@ -39,7 +39,7 @@
 
 <script setup>
 import { onMounted, onUnmounted, watch, computed, defineAsyncComponent, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { refreshScrollTriggers, initGlobalAnimations, revertGlobalAnimations } from './utils/animations'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
@@ -48,7 +48,6 @@ import { useSEO, routeSEO } from './composables/useSEO'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 
-const router = useRouter()
 
 // Lazy load heavy visual effect components with error handling
 const CartDrawer = defineAsyncComponent({

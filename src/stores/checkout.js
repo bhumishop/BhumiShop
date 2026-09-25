@@ -6,7 +6,7 @@ import { useCartStore } from './cart'
 import { useProductStore } from './products'
 import { useToastStore } from './toast'
 import { useAuthStore } from './auth'
-import { calculateShipping, getStateFromCEP, getZoneFromState } from './shipping'
+import { calculateShipping, getStateFromCEP } from './shipping'
 import { t } from '../utils/storeI18n'
 
 function generateIdempotencyKey() {

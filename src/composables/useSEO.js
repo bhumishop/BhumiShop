@@ -1,12 +1,10 @@
-import { watch, nextTick } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { nextTick } from 'vue'
 
 /**
  * Composable for managing SEO meta tags dynamically in Vue components
  * Usage: call useSEO() in any component with route-specific meta data
  */
 export function useSEO(options = {}) {
-  const { t, locale } = useI18n()
 
   const defaultConfig = {
     title: 'BhumiShop - Bhumisparsha School Virtual Store',

@@ -133,34 +133,6 @@ onUnmounted(() => {
   if (resizeTimer) clearTimeout(resizeTimer);
 });
 
-/** Distribute items into columns for CSS masonry layout - used for potential JS fallback */
-const _columns = computed(() => {
-  const colCount = responsiveColumns.value;
-  const result: MasonryItem[][] = Array.from({ length: colCount }, () => []);
-
-  // Track column heights to distribute evenly
-  const colHeights = new Array(colCount).fill(0);
-
-  for (const item of props.items) {
-    // Find the shortest column
-    const shortestIdx = colHeights.indexOf(Math.min(...colHeights));
-    result[shortestIdx].push(item);
-    colHeights[shortestIdx] += getItemHeight(item);
-  }
-
-  return result;
-});
-
-/** Calculate item height for distribution logic */
-function getItemHeight(item: MasonryItem): number {
-  if (item.height) return item.height;
-  // Default height estimate based on aspect ratio
-  const containerWidth = containerRef.value?.clientWidth || 1200;
-  const colWidth = (containerWidth - (responsiveColumns.value - 1) * props.gap) / responsiveColumns.value;
-  const [w, h] = (item.aspectRatio || '1/1').split('/').map(Number);
-  return colWidth * (h / w);
-}
-
 /** Skeleton loading state */
 const skeletonCount = computed(() => responsiveColumns.value * 3);
 const skeletonHeights = [180, 220, 260, 200, 240, 190];

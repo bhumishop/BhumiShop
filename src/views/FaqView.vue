@@ -136,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import DarkVeil from '../components/common/DarkVeil.vue'
 
 const activeCategory = ref('compras')

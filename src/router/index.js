@@ -117,7 +117,7 @@ const router = createRouter({
   }
 })
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, _from) => {
   const authStore = useAuthStore()
 
   // Handle OAuth callback (Supabase implicit flow returns tokens/errors in the URL hash)

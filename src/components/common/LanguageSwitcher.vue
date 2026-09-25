@@ -28,7 +28,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { supportedLocales, changeLocale } from '@/i18n'
 
-const props = defineProps({
+defineProps({
   bubble: { type: Boolean, default: false }
 })
 

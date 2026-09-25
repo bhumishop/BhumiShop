@@ -109,8 +109,6 @@ export function calculateShipping(items, destinationCEP) {
     umaPencaDays = zoneConfig.days
   }
 
-  // Digital items
-  const digitalItems = items.filter(item => item.fulfillment_type === 'digital')
   let digitalCost = 0
 
   return {

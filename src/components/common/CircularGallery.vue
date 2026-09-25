@@ -43,7 +43,7 @@ function navigateTo(url?: string) {
   }
 }
 
-function handleClick(event: MouseEvent | TouchEvent) {
+function handleClick(_event: MouseEvent | TouchEvent) {
   // For WebGL mode, raycasting would be needed to determine which item was clicked
   // For now, we rely on the fallback click handlers
 }
@@ -70,20 +70,12 @@ const displayItems = computed(() => {
 
 type GL = Renderer['gl'];
 
-function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
+function debounce<T extends (..._args: unknown[]) => void>(func: T, wait: number) {
   let timeout: number;
   return function (this: unknown, ..._args: Parameters<T>) {
     window.clearTimeout(timeout);
     timeout = window.setTimeout(() => func.apply(this, _args), wait);
   };
-}
-
-/**
- * Cubic ease-out using direct multiplication (faster than Math.pow)
- */
-function _easeOutCubic(t: number): number {
-  const mt = 1 - t;
-  return 1 - mt * mt * mt;
 }
 
 /**
@@ -97,20 +89,6 @@ function smoothLerp(current: number, target: number, baseEase: number, _velocity
   const mt = 1 - t;
   const easedT = 1 - mt * mt * mt;
   return current + (target - current) * easedT;
-}
-
-function _autoBind<T extends object>(instance: T): void {
-  const proto = Object.getPrototypeOf(instance) as Record<string, unknown> | null;
-  if (!proto) return;
-  Object.getOwnPropertyNames(proto).forEach(key => {
-    if (key !== 'constructor') {
-      const desc = Object.getOwnPropertyDescriptor(proto, key);
-      if (desc && typeof desc.value === 'function') {
-        const fn = desc.value as (...args: unknown[]) => unknown;
-        (instance as Record<string, unknown>)[key] = fn.bind(instance);
-      }
-    }
-  });
 }
 
 interface ScreenSize {
@@ -362,7 +340,7 @@ class App {
     position?: number;
     velocity: number;
   };
-  onCheckDebounce: (...args: unknown[]) => void;
+  onCheckDebounce: (..._args: unknown[]) => void;
   renderer!: Renderer;
   gl!: GL;
   camera!: Camera;
@@ -378,10 +356,10 @@ class App {
   bendPrecomputed: { radius: number; absBend: number } = { radius: 0, absBend: 0 };
 
   boundOnResize!: () => void;
-  boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void;
-  boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void;
+  boundOnTouchDown!: (_e: MouseEvent | TouchEvent) => void;
+  boundOnTouchMove!: (_e: MouseEvent | TouchEvent) => void;
   boundOnTouchUp!: () => void;
-  boundOnClick!: (e: MouseEvent) => void;
+  boundOnClick!: (_e: MouseEvent) => void;
 
   isDown: boolean = false;
   start: number = 0;

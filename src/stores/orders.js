@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { storefrontOrders } from '../api/storefrontApi'
 import { t } from '../utils/storeI18n'
 
@@ -24,7 +24,7 @@ export const useOrderStore = defineStore('orders', () => {
     }
   }
 
-  async function fetchOrderByNumber(orderNumber, userId = null, isAdmin = false) {
+  async function fetchOrderByNumber(orderNumber, _userId = null, _isAdmin = false) {
     loading.value = true
     error.value = null
     try {
@@ -85,21 +85,17 @@ export const useOrderStore = defineStore('orders', () => {
   async function updateOrderPaymentStatus(orderId, paymentStatus, paymentRef) {
     // This is a lightweight status update that stays direct
     // In a future migration, this should also go through an edge function
-    try {
-      const { supabase } = await import('../supabase')
-      const { error: err } = await supabase
-        .from('orders')
-        .update({
-          payment_status: paymentStatus,
-          pix_key: paymentRef || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', orderId)
+    const { supabase } = await import('../supabase')
+    const { error: err } = await supabase
+      .from('orders')
+      .update({
+        payment_status: paymentStatus,
+        pix_key: paymentRef || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', orderId)
 
-      if (err) throw err
-    } catch (err) {
-      throw err
-    }
+    if (err) throw err
   }
 
   function clearCurrentOrder() {

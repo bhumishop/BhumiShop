@@ -281,12 +281,12 @@ export const useProductStore = defineStore('products', () => {
       let offset = 0
       const limit = 100
 
-      while (true) {
-        const result = await storefrontProducts.list({ limit, offset })
-        if (!result.data || result.data.length === 0) break
-        allProducts = allProducts.concat(result.data)
-        if (result.data.length < limit) break
+      let batch = await storefrontProducts.list({ limit, offset })
+      while (batch.data && batch.data.length > 0) {
+        allProducts = allProducts.concat(batch.data)
+        if (batch.data.length < limit) break
         offset += limit
+        batch = await storefrontProducts.list({ limit, offset })
       }
 
       products.value = allProducts
